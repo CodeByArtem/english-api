@@ -18,23 +18,41 @@ import { Submission } from './assignments/entities/submission.entity';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ 
+    ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get<string>('DB_HOST') || 'localhost',
-        port: configService.get<number>('DB_PORT') || 5432,
-        username: configService.get<string>('DB_USER') || 'postgres',
-        password: configService.get<string>('DB_PASSWORD') || 'password',
-        database: configService.get<string>('DB_NAME') || 'english_db',
-        entities: [User, Textbook, Unit, Lesson, Exercise, Material, Assignment, Submission],
-        synchronize: true,
-      }),
+      useFactory: (configService: ConfigService) => {
+        const databaseUrl = configService.get<string>('DATABASE_URL');
+
+        // Если есть DATABASE_URL (продакшн на Render)
+        if (databaseUrl) {
+          return {
+            type: 'postgres',
+            url: databaseUrl,
+            entities: [User, Textbook, Unit, Lesson, Exercise, Material, Assignment, Submission],
+            synchronize: true, // Внимание: в реальном production лучше использовать миграции
+            ssl: {
+              rejectUnauthorized: false, // Обязательно для облачной базы данных Render
+            },
+          };
+        }
+
+        // Если DATABASE_URL нет (локальная разработка)
+        return {
+          type: 'postgres',
+          host: configService.get<string>('DB_HOST') || 'localhost',
+          port: configService.get<number>('DB_PORT') || 5432,
+          username: configService.get<string>('DB_USER') || 'postgres',
+          password: configService.get<string>('DB_PASSWORD') || 'password',
+          database: configService.get<string>('DB_NAME') || 'english_db',
+          entities: [User, Textbook, Unit, Lesson, Exercise, Material, Assignment, Submission],
+          synchronize: true,
+        };
+      },
     }),
     UsersModule,
     AuthModule,
