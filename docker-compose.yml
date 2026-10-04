@@ -1,5 +1,17 @@
 version: '3.8'
 services:
+  api:
+    build: .
+    ports:
+      - '3000:3000'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: english_db
+      DATABASE_URL: postgresql://postgres:password@db:5432/english_db
+    depends_on:
+      - db
+
   db:
     image: postgres:15-alpine
     environment:

@@ -20,6 +20,15 @@ export class Lesson {
   @Column({ type: 'int' })
   order: number;
 
+  @Column({ type: 'text', nullable: true })
+  content: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  theory: string | null;
+
+  @Column({ type: 'jsonb', nullable: true })
+  media_links: string[] | null;
+
   @ManyToOne(() => Unit, (unit) => unit.lessons, {
     onDelete: 'CASCADE',
   })

@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "rootDir": ".",
     "resolvePackageJsonExports": true,
     "esModuleInterop": true,
     "isolatedModules": true,
@@ -18,5 +19,7 @@
     "skipLibCheck": true,
     "strict": true,
     "strictPropertyInitialization": false
-  }
+  },
+  "include": ["src", "test", "jest.config.ts"],
+  "exclude": ["node_modules", "dist"]
 }

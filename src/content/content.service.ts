@@ -23,6 +23,9 @@ export class ContentService {
       order: {
         units: {
           order: 'ASC',
+          lessons: {
+            order: 'ASC',
+          },
         },
       },
     });
@@ -33,6 +36,14 @@ export class ContentService {
       where: { id },
       relations: {
         exercises: true,
+      },
+      select: {
+        id: true,
+        title: true,
+        order: true,
+        content: true,
+        theory: true,
+        media_links: true,
       },
       order: {
         exercises: {
