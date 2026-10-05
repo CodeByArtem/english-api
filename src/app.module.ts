@@ -35,9 +35,9 @@ import { Submission } from './assignments/entities/submission.entity';
             url: databaseUrl,
             entities: [User, Textbook, Unit, Lesson, Exercise, Material, Assignment, Submission],
             synchronize: true, // Внимание: в реальном production лучше использовать миграции
-            ssl: {
-              rejectUnauthorized: false, // Обязательно для облачной базы данных Render
-            },
+            ssl: databaseUrl.includes('render.com') ? {
+              rejectUnauthorized: false, // SSL только для облачной базы данных Render
+            } : false,
           };
         }
 

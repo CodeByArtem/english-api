@@ -26,14 +26,21 @@ export class SubmissionsController {
     @Body() body: CreateSubmissionDto,
     @Request() req: any,
   ) {
+    console.log('=== SubmissionsController.createSubmission START ===');
+    console.log('Body:', JSON.stringify(body, null, 2));
+    console.log('User:', req.user);
+
     if (req.user.role?.toUpperCase() !== 'STUDENT') {
       throw new UnauthorizedException('Only students can submit assignments');
     }
 
-    return this.assignmentsService.createSubmission(
+    const result = await this.assignmentsService.createSubmission(
       body,
       req.user.id,
     );
+
+    console.log('=== SubmissionsController.createSubmission END ===');
+    return result;
   }
 
   @Get('student')

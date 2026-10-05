@@ -29,6 +29,9 @@ export class Lesson {
   @Column({ type: 'jsonb', nullable: true })
   media_links: string[] | null;
 
+  @Column({ type: 'jsonb', nullable: true })
+  answerKey: Record<string, any> | null;
+
   @ManyToOne(() => Unit, (unit) => unit.lessons, {
     onDelete: 'CASCADE',
   })

@@ -6,6 +6,7 @@ import {
   Get,
   UseGuards,
   Req,
+  UnauthorizedException,
 } from '@nestjs/common';
 import type { Response, Request as ExpressRequest } from 'express';
 import type { CookieOptions } from 'express';
@@ -74,6 +75,21 @@ export class AuthController {
     res.clearCookie('accessToken', baseCookieOptions);
     res.clearCookie('refreshToken', baseCookieOptions);
     return { message: 'Logged out successfully' };
+  }
+
+  @Post('refresh')
+  async refresh(
+    @Req() req: ExpressRequest,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const refreshToken = req.cookies?.refreshToken;
+    if (!refreshToken) {
+      throw new UnauthorizedException('No refresh token provided');
+    }
+
+    const tokens = await this.authService.refreshTokens(refreshToken);
+    this.setAuthCookies(res, tokens);
+    return tokens;
   }
 
   @Get('profile')

@@ -80,6 +80,9 @@ export class AssignmentsService {
       throw new BadRequestException('Valid lessonId or assignmentId is required');
     }
 
+    console.log('Lesson found:', lesson.id, lesson.title);
+    console.log('Lesson answerKey:', lesson.answerKey);
+
     // Автоматическая проверка ответов
     const { score, details } = this.calculateScore(lesson, dto.answers);
 
@@ -94,139 +97,107 @@ export class AssignmentsService {
     });
     
     const savedSubmission = await this.submissionRepository.save(submission);
-    
-    // Возвращаем с нужными связями
-    return this.submissionRepository.findOne({
-      where: { id: savedSubmission.id },
-      relations: { lesson: true, assignment: true },
-    });
+
+    // Возвращаем только score для студента (без details)
+    return {
+      id: savedSubmission.id,
+      score: savedSubmission.score,
+      status: savedSubmission.status,
+      lesson: savedSubmission.lesson,
+      assignment: savedSubmission.assignment,
+      createdAt: savedSubmission.createdAt
+    };
   }
 
   private calculateScore(lesson: Lesson, studentAnswers: Record<string, any>) {
-    if (!lesson || !lesson.exercises || lesson.exercises.length === 0) {
+    console.log('=== calculateScore START ===');
+    console.log('Student answers:', JSON.stringify(studentAnswers, null, 2));
+    console.log('Lesson answerKey:', JSON.stringify(lesson.answerKey, null, 2));
+
+    if (!lesson || !lesson.answerKey) {
+      console.log('No lesson or answerKey, returning 0');
       return { score: 0, details: {} };
     }
 
-    let totalPoints = 0;
-    let earnedPoints = 0;
-    const details: Record<string, any> = {};
-
-    // Картографируем ответы для удобства поиска
-    // Урок "1A Hello" использует flagAnswers, dialogInputs, stressTableInputs
+    const answerKey = lesson.answerKey;
     const flagAnswers = studentAnswers.flagAnswers || {};
     const dialogInputs = studentAnswers.dialogInputs || {};
     const stressTableInputs = studentAnswers.stressTableInputs || {};
 
-    const normalizedAnswers = {
-      ...studentAnswers,
-      ...flagAnswers,
-      ...dialogInputs,
-      ...stressTableInputs,
-    };
+    console.log('flagAnswers:', flagAnswers);
+    console.log('dialogInputs:', dialogInputs);
+    console.log('stressTableInputs:', stressTableInputs);
 
-    for (const exercise of lesson.exercises) {
-      const exerciseId = exercise.id;
-      const type = exercise.type;
-      const payload = exercise.payload;
-      let exerciseScore = 0;
-      let exerciseMaxPoints = 0;
-      const exerciseDetails: {
-        correct: boolean;
-        details: any[];
-      } = {
-        correct: false,
-        details: [],
-      };
+    let totalQuestions = 0;
+    let correctAnswers = 0;
 
-      if (type === 'match') {
-        const pairs = payload.pairs || [];
-        exerciseMaxPoints = pairs.length;
-        pairs.forEach((pair: any) => {
-          // Для флагов ключи числовые (ID флага)
-          const studentAnswer = normalizedAnswers[pair.id] || normalizedAnswers[pair.left] || normalizedAnswers[`match_${pair.id}`];
-          if (studentAnswer === pair.right) {
-            exerciseScore++;
-            exerciseDetails.details.push({ item: pair.left, status: 'correct' });
-          } else {
-            exerciseDetails.details.push({ 
-              item: pair.left, 
-              status: 'incorrect', 
-              expected: pair.right, 
-              actual: studentAnswer 
-            });
-          }
-        });
-      } else if (type === 'fill_in_the_blank') {
-        const gaps = payload.gaps || [];
-        exerciseMaxPoints = gaps.length;
-        gaps.forEach((gap: any) => {
-          // Ключи могут быть c1_1, gap_1 и т.д.
-          const studentAnswer = normalizedAnswers[gap.id] || normalizedAnswers[gap.id.replace('gap_', 'c1_')]; 
-          if (studentAnswer?.toLowerCase().trim() === gap.answer.toLowerCase().trim()) {
-            exerciseScore++;
-            exerciseDetails.details.push({ gap: gap.id, status: 'correct' });
-          } else {
-            exerciseDetails.details.push({ 
-              gap: gap.id, 
-              status: 'incorrect', 
-              expected: gap.answer, 
-              actual: studentAnswer 
-            });
-          }
-        });
-      } else if (type === 'stress_table') {
-        // Добавляем поддержку stress_table
-        const items = payload.items || [];
-        exerciseMaxPoints = items.length;
-        items.forEach((item: any) => {
-          const studentAnswer = normalizedAnswers[item.id];
-          if (studentAnswer === item.correctCategory) {
-            exerciseScore++;
-            exerciseDetails.details.push({ item: item.text, status: 'correct' });
-          } else {
-            exerciseDetails.details.push({ 
-              item: item.text, 
-              status: 'incorrect', 
-              expected: item.correctCategory, 
-              actual: studentAnswer 
-            });
-          }
-        });
-      } else if (type === 'multiple_choice') {
-        exerciseMaxPoints = 1;
-        const studentAnswer = normalizedAnswers[exerciseId] || normalizedAnswers[`choice_${exerciseId}`];
-        if (studentAnswer === payload.correctAnswer) {
-          exerciseScore = 1;
-          exerciseDetails.details.push({ status: 'correct' });
-        } else {
-          exerciseDetails.details.push({ 
-            status: 'incorrect', 
-            expected: payload.correctAnswer, 
-            actual: studentAnswer 
-          });
-        }
-      } else if (type === 'text_input') {
-        exerciseMaxPoints = 1;
-        const studentAnswer = normalizedAnswers[exerciseId] || normalizedAnswers[`input_${exerciseId}`];
-        if (studentAnswer?.toLowerCase().trim() === payload.answer.toLowerCase().trim()) {
-          exerciseScore = 1;
-          exerciseDetails.details.push({ status: 'correct' });
-        } else {
-          exerciseDetails.details.push({ 
-            status: 'incorrect', 
-            expected: payload.answer, 
-            actual: studentAnswer 
-          });
+    // Exercise 1a: Flags - считаем все вопросы из answerKey
+    if (answerKey.exercise_1a_flags) {
+      const expectedFlags = answerKey.exercise_1a_flags;
+      for (const [flagId, expectedCountry] of Object.entries(expectedFlags)) {
+        totalQuestions++;
+        const studentAnswer = flagAnswers[flagId];
+        const isCorrect = studentAnswer?.trim().toLowerCase() === (expectedCountry as string).trim().toLowerCase();
+        console.log(`Flag ${flagId}: student="${studentAnswer}", expected="${expectedCountry}", correct=${isCorrect}`);
+        if (isCorrect) {
+          correctAnswers++;
         }
       }
-
-      exerciseDetails.correct = exerciseScore === exerciseMaxPoints && exerciseMaxPoints > 0;
-      details[exerciseId] = exerciseDetails;
-      earnedPoints += exerciseScore;
-      totalPoints += exerciseMaxPoints;
     }
 
-    const finalScore = totalPoints > 0 ? Math.round((earnedPoints / totalPoints) * 100) : 0;
+    // Exercise 2a: Stress table - считаем все страны из answerKey
+    if (answerKey.exercise_2a_stress) {
+      const expectedStress = answerKey.exercise_2a_stress;
+      for (const [country, expectedPattern] of Object.entries(expectedStress)) {
+        totalQuestions++;
+        // Ищем ответ студента для этой страны
+        let studentPattern = null;
+        for (const [key, value] of Object.entries(stressTableInputs)) {
+          if (key === 'my_country') continue;
+          if (String(value)?.trim().toLowerCase() === country.trim().toLowerCase()) {
+            studentPattern = key.replace(/_\d+$/, ''); // Remove _1, _2 suffix
+            break;
+          }
+        }
+        const isCorrect = studentPattern?.trim().toLowerCase() === (expectedPattern as string).trim().toLowerCase();
+        console.log(`Stress ${country}: student="${studentPattern}", expected="${expectedPattern}", correct=${isCorrect}`);
+        if (isCorrect) {
+          correctAnswers++;
+        }
+      }
+    }
+
+    // Exercise 4a: Dialogues - считаем все gaps из answerKey
+    if (answerKey.exercise_4a_dialogues) {
+      const expectedDialogues = answerKey.exercise_4a_dialogues;
+      const keyMapping: Record<string, string> = {
+        'c1_1': 'gap_1',
+        'c1_2': 'gap_2',
+        'c2_1': 'gap_3',
+        'c2_2': 'gap_4'
+      };
+
+      for (const [gapKey, expectedCountry] of Object.entries(expectedDialogues)) {
+        totalQuestions++;
+        const frontendKey = Object.entries(keyMapping).find(([_, v]) => v === gapKey)?.[0];
+        const studentAnswer = frontendKey ? dialogInputs[frontendKey] : null;
+        const isCorrect = studentAnswer?.trim().toLowerCase() === (expectedCountry as string).trim().toLowerCase();
+        console.log(`Dialogue ${gapKey} (${frontendKey}): student="${studentAnswer}", expected="${expectedCountry}", correct=${isCorrect}`);
+        if (isCorrect) {
+          correctAnswers++;
+        }
+      }
+    }
+
+    const finalScore = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
+    console.log(`=== calculateScore END: ${correctAnswers}/${totalQuestions} = ${finalScore}% ===`);
+
+    const details = {
+      totalQuestions,
+      correctAnswers,
+      gradedAt: new Date().toISOString()
+    };
+
     return { score: finalScore, details };
   }
 

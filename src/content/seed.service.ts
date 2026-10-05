@@ -86,7 +86,7 @@ export class SeedService implements OnApplicationBootstrap {
           <p><strong>Goal:</strong> introduce yourself to other students. <br/>
           <strong>Grammar:</strong> be (I and you). <br/>
           <strong>Vocabulary:</strong> countries.</p>
-          
+
           <h4>Countries and Syllable Stress</h4>
           <ul>
             <li><strong>Oo:</strong> Argentina, Mexico, Poland, Turkey</li>
@@ -101,6 +101,40 @@ export class SeedService implements OnApplicationBootstrap {
         'https://example.com/audio/roadmap_a1_1a_conv1.mp3',
         'https://example.com/audio/roadmap_a1_1a_conv2.mp3',
       ],
+      answerKey: {
+        exercise_1a_flags: {
+          "1": "Canada",
+          "2": "the UK",
+          "3": "the US",
+          "4": "Spain",
+          "5": "Poland",
+          "6": "Turkey",
+          "7": "Japan",
+          "8": "Thailand",
+          "9": "Argentina",
+          "10": "Mexico",
+          "11": "Brazil",
+          "12": "Italy"
+        },
+        exercise_2a_stress: {
+          "Spain": "o",
+          "Poland": "Oo",
+          "Thailand": "Oo",
+          "Turkey": "Oo",
+          "Japan": "oO",
+          "Brazil": "oO",
+          "Canada": "Ooo",
+          "Italy": "Ooo",
+          "Mexico": "Ooo",
+          "Argentina": "ooOo"
+        },
+        exercise_4a_dialogues: {
+          "gap_1": "Mexico",
+          "gap_2": "Japan",
+          "gap_3": "the UK",
+          "gap_4": "Argentina"
+        }
+      },
       unit,
     });
 
