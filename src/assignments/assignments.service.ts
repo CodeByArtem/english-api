@@ -81,7 +81,6 @@ export class AssignmentsService {
     }
 
     console.log('Lesson found:', lesson.id, lesson.title);
-    console.log('Lesson answerKey:', lesson.answerKey);
 
     // Автоматическая проверка ответов
     const { score, details } = this.calculateScore(lesson, dto.answers);
@@ -103,17 +102,15 @@ export class AssignmentsService {
       id: savedSubmission.id,
       score: savedSubmission.score,
       status: savedSubmission.status,
-      lesson: savedSubmission.lesson,
+      lesson: savedSubmission.lesson
+        ? { id: savedSubmission.lesson.id, title: savedSubmission.lesson.title }
+        : null,
       assignment: savedSubmission.assignment,
       createdAt: savedSubmission.createdAt
     };
   }
 
   private calculateScore(lesson: Lesson, studentAnswers: Record<string, any>) {
-    console.log('=== calculateScore START ===');
-    console.log('Student answers:', JSON.stringify(studentAnswers, null, 2));
-    console.log('Lesson answerKey:', JSON.stringify(lesson.answerKey, null, 2));
-
     if (!lesson || !lesson.answerKey) {
       console.log('No lesson or answerKey, returning 0');
       return { score: 0, details: {} };
@@ -123,10 +120,6 @@ export class AssignmentsService {
     const flagAnswers = studentAnswers.flagAnswers || {};
     const dialogInputs = studentAnswers.dialogInputs || {};
     const stressTableInputs = studentAnswers.stressTableInputs || {};
-
-    console.log('flagAnswers:', flagAnswers);
-    console.log('dialogInputs:', dialogInputs);
-    console.log('stressTableInputs:', stressTableInputs);
 
     let totalQuestions = 0;
     let correctAnswers = 0;
@@ -138,7 +131,6 @@ export class AssignmentsService {
         totalQuestions++;
         const studentAnswer = flagAnswers[flagId];
         const isCorrect = studentAnswer?.trim().toLowerCase() === (expectedCountry as string).trim().toLowerCase();
-        console.log(`Flag ${flagId}: student="${studentAnswer}", expected="${expectedCountry}", correct=${isCorrect}`);
         if (isCorrect) {
           correctAnswers++;
         }
@@ -160,7 +152,6 @@ export class AssignmentsService {
           }
         }
         const isCorrect = studentPattern?.trim().toLowerCase() === (expectedPattern as string).trim().toLowerCase();
-        console.log(`Stress ${country}: student="${studentPattern}", expected="${expectedPattern}", correct=${isCorrect}`);
         if (isCorrect) {
           correctAnswers++;
         }
@@ -182,7 +173,6 @@ export class AssignmentsService {
         const frontendKey = Object.entries(keyMapping).find(([_, v]) => v === gapKey)?.[0];
         const studentAnswer = frontendKey ? dialogInputs[frontendKey] : null;
         const isCorrect = studentAnswer?.trim().toLowerCase() === (expectedCountry as string).trim().toLowerCase();
-        console.log(`Dialogue ${gapKey} (${frontendKey}): student="${studentAnswer}", expected="${expectedCountry}", correct=${isCorrect}`);
         if (isCorrect) {
           correctAnswers++;
         }
@@ -190,7 +180,6 @@ export class AssignmentsService {
     }
 
     const finalScore = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
-    console.log(`=== calculateScore END: ${correctAnswers}/${totalQuestions} = ${finalScore}% ===`);
 
     const details = {
       totalQuestions,
@@ -256,6 +245,14 @@ export class AssignmentsService {
     const role = user.role?.toUpperCase();
     if (role === 'STUDENT' && submission.student.id !== user.id) {
       throw new ForbiddenException('You can only access your own submissions');
+    }
+
+    if (role === 'STUDENT' && submission.lesson) {
+      const { answerKey: _answerKey, ...lessonWithoutAnswerKey } = submission.lesson;
+      return {
+        ...submission,
+        lesson: lessonWithoutAnswerKey,
+      };
     }
 
     return submission;

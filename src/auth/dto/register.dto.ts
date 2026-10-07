@@ -1,5 +1,4 @@
-import { IsEmail, IsString, IsOptional, IsEnum } from 'class-validator';
-import { Role } from '../../common/role.enum';
+import { IsEmail, IsString, IsOptional, MaxLength } from 'class-validator';
 
 export class RegisterDto {
   @IsEmail()
@@ -9,6 +8,7 @@ export class RegisterDto {
   password: string;
 
   @IsOptional()
-  @IsEnum(Role)
-  role?: Role;
+  @IsString()
+  @MaxLength(100)
+  inviteCode?: string;
 }

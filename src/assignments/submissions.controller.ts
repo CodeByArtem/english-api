@@ -27,8 +27,6 @@ export class SubmissionsController {
     @Request() req: any,
   ) {
     console.log('=== SubmissionsController.createSubmission START ===');
-    console.log('Body:', JSON.stringify(body, null, 2));
-    console.log('User:', req.user);
 
     if (req.user.role?.toUpperCase() !== 'STUDENT') {
       throw new UnauthorizedException('Only students can submit assignments');

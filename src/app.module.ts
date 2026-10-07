@@ -7,7 +7,9 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ContentModule } from './content/content.module';
 import { AssignmentsModule } from './assignments/assignments.module';
+import { InvitesModule } from './invites/invites.module';
 import { User } from './users/user.entity';
+import { Invite } from './invites/invite.entity';
 import { Textbook } from './content/entities/textbook.entity';
 import { Unit } from './content/entities/unit.entity';
 import { Lesson } from './content/entities/lesson.entity';
@@ -33,7 +35,7 @@ import { Submission } from './assignments/entities/submission.entity';
           return {
             type: 'postgres',
             url: databaseUrl,
-            entities: [User, Textbook, Unit, Lesson, Exercise, Material, Assignment, Submission],
+            entities: [User, Textbook, Unit, Lesson, Exercise, Material, Assignment, Submission, Invite],
             synchronize: true, // Внимание: в реальном production лучше использовать миграции
             ssl: databaseUrl.includes('render.com') ? {
               rejectUnauthorized: false, // SSL только для облачной базы данных Render
@@ -49,7 +51,7 @@ import { Submission } from './assignments/entities/submission.entity';
           username: configService.get<string>('DB_USER') || 'postgres',
           password: configService.get<string>('DB_PASSWORD') || 'password',
           database: configService.get<string>('DB_NAME') || 'english_db',
-          entities: [User, Textbook, Unit, Lesson, Exercise, Material, Assignment, Submission],
+          entities: [User, Textbook, Unit, Lesson, Exercise, Material, Assignment, Submission, Invite],
           synchronize: true,
         };
       },
@@ -58,6 +60,7 @@ import { Submission } from './assignments/entities/submission.entity';
     AuthModule,
     ContentModule,
     AssignmentsModule,
+    InvitesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
