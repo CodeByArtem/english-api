@@ -10,10 +10,16 @@ import {
 } from '@nestjs/common';
 import type { Response, Request as ExpressRequest } from 'express';
 import type { CookieOptions } from 'express';
+import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import {
+  THROTTLE_TTL,
+  THROTTLE_AUTH_LIMIT,
+  THROTTLE_REFRESH_LIMIT,
+} from './throttle.constants';
 
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -48,6 +54,7 @@ export class AuthController {
     });
   }
 
+  @Throttle({ default: { limit: THROTTLE_AUTH_LIMIT, ttl: THROTTLE_TTL } })
   @Post('register')
   async register(
     @Body() registerDto: RegisterDto,
@@ -58,6 +65,7 @@ export class AuthController {
     return tokens;
   }
 
+  @Throttle({ default: { limit: THROTTLE_AUTH_LIMIT, ttl: THROTTLE_TTL } })
   @Post('login')
   async login(
     @Body() loginDto: LoginDto,
@@ -69,7 +77,14 @@ export class AuthController {
   }
 
   @Post('logout')
-  async logout(@Res({ passthrough: true }) res: Response) {
+  async logout(
+    @Req() req: ExpressRequest,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const refreshToken = req.cookies?.refreshToken;
+    if (refreshToken) {
+      await this.authService.revokeFamily(refreshToken);
+    }
     // Опции должны совпадать с теми, с которыми cookie ставились,
     // иначе браузер не удалит их.
     res.clearCookie('accessToken', baseCookieOptions);
@@ -77,6 +92,7 @@ export class AuthController {
     return { message: 'Logged out successfully' };
   }
 
+  @Throttle({ default: { limit: THROTTLE_REFRESH_LIMIT, ttl: THROTTLE_TTL } })
   @Post('refresh')
   async refresh(
     @Req() req: ExpressRequest,
