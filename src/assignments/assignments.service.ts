@@ -110,7 +110,27 @@ export class AssignmentsService {
     };
   }
 
-  private calculateScore(lesson: Lesson, studentAnswers: Record<string, any>) {
+  normalizeAnswer(val: any): string {
+    if (val === null || val === undefined) return '';
+    return String(val)
+      .trim()
+      .toLowerCase()
+      .replace(/[’‘`´]/g, "'");
+  }
+
+  matchesAnswer(studentVal: any, expected: any): boolean {
+    const normalizedStudent = this.normalizeAnswer(studentVal);
+    if (!normalizedStudent) return false;
+
+    if (Array.isArray(expected)) {
+      return expected.some(
+        (exp) => this.normalizeAnswer(exp) === normalizedStudent,
+      );
+    }
+    return this.normalizeAnswer(expected) === normalizedStudent;
+  }
+
+  public calculateScore(lesson: Lesson, studentAnswers: Record<string, any>) {
     if (!lesson || !lesson.answerKey) {
       console.log('No lesson or answerKey, returning 0');
       return { score: 0, details: {} };
@@ -120,6 +140,8 @@ export class AssignmentsService {
     const flagAnswers = studentAnswers.flagAnswers || {};
     const dialogInputs = studentAnswers.dialogInputs || {};
     const stressTableInputs = studentAnswers.stressTableInputs || {};
+    const grammarInputs = studentAnswers.grammarInputs || {};
+    const dialogue7aInputs = studentAnswers.dialogue7aInputs || {};
 
     let totalQuestions = 0;
     let correctAnswers = 0;
@@ -130,8 +152,7 @@ export class AssignmentsService {
       for (const [flagId, expectedCountry] of Object.entries(expectedFlags)) {
         totalQuestions++;
         const studentAnswer = flagAnswers[flagId];
-        const isCorrect = studentAnswer?.trim().toLowerCase() === (expectedCountry as string).trim().toLowerCase();
-        if (isCorrect) {
+        if (this.matchesAnswer(studentAnswer, expectedCountry)) {
           correctAnswers++;
         }
       }
@@ -143,16 +164,15 @@ export class AssignmentsService {
       for (const [country, expectedPattern] of Object.entries(expectedStress)) {
         totalQuestions++;
         // Ищем ответ студента для этой страны
-        let studentPattern = null;
+        let studentPattern: string | null = null;
         for (const [key, value] of Object.entries(stressTableInputs)) {
           if (key === 'my_country') continue;
-          if (String(value)?.trim().toLowerCase() === country.trim().toLowerCase()) {
+          if (this.normalizeAnswer(value) === this.normalizeAnswer(country)) {
             studentPattern = key.replace(/_\d+$/, ''); // Remove _1, _2 suffix
             break;
           }
         }
-        const isCorrect = studentPattern?.trim().toLowerCase() === (expectedPattern as string).trim().toLowerCase();
-        if (isCorrect) {
+        if (this.matchesAnswer(studentPattern, expectedPattern)) {
           correctAnswers++;
         }
       }
@@ -172,8 +192,31 @@ export class AssignmentsService {
         totalQuestions++;
         const frontendKey = Object.entries(keyMapping).find(([_, v]) => v === gapKey)?.[0];
         const studentAnswer = frontendKey ? dialogInputs[frontendKey] : null;
-        const isCorrect = studentAnswer?.trim().toLowerCase() === (expectedCountry as string).trim().toLowerCase();
-        if (isCorrect) {
+        if (this.matchesAnswer(studentAnswer, expectedCountry)) {
+          correctAnswers++;
+        }
+      }
+    }
+
+    // Exercise 5: Grammar - Short forms
+    if (answerKey.exercise_5_grammar) {
+      const expectedGrammar = answerKey.exercise_5_grammar;
+      for (const [gapId, expected] of Object.entries(expectedGrammar)) {
+        totalQuestions++;
+        const studentAnswer = grammarInputs[gapId];
+        if (this.matchesAnswer(studentAnswer, expected)) {
+          correctAnswers++;
+        }
+      }
+    }
+
+    // Exercise 7a: Dialogue with be
+    if (answerKey.exercise_7a_dialogue) {
+      const expectedDialogue7a = answerKey.exercise_7a_dialogue;
+      for (const [gapId, expected] of Object.entries(expectedDialogue7a)) {
+        totalQuestions++;
+        const studentAnswer = dialogue7aInputs[gapId];
+        if (this.matchesAnswer(studentAnswer, expected)) {
           correctAnswers++;
         }
       }

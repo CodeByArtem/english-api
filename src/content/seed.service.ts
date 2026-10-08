@@ -133,6 +133,21 @@ export class SeedService implements OnApplicationBootstrap {
           "gap_2": "Japan",
           "gap_3": "the UK",
           "gap_4": "Argentina"
+        },
+        exercise_5_grammar: {
+          "1": "I'm",
+          "2": "you're",
+          "3": "aren't"
+        },
+        exercise_7a_dialogue: {
+          "1": "Are",
+          "2": "am",
+          "3": ["'m", "am"],
+          "4": ["'m", "am"],
+          "5": "Are",
+          "6": ["'m", "am"],
+          "7": "are",
+          "8": ["'m", "am"]
         }
       },
       unit,
