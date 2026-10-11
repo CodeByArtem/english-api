@@ -185,16 +185,63 @@ export class SeedService implements OnApplicationBootstrap {
       lesson: lesson1,
     });
 
-    const lesson2 = this.lessonRepository.create({
+    const lesson2 = await this.lessonRepository.save({
       id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a33',
-      title: 'Lesson 2: Numbers and Colors',
+      title: '1B Jobs',
       order: 2,
-      content: 'Learn the basic numbers from 1 to 10 and primary colors.',
-      theory: 'Numbers: one, two, three... Colors: red, blue, green...',
-      media_links: ['https://example.com/images/colors.png'],
+      content: 'Ask and answer about jobs. Look at the map and complete profiles 1-6. Read about Green Cross Hospital staff. Grammar: be (he/she/it). Practice dialogues.',
+      theory: 'Goal: ask and answer about jobs. Grammar: be (he/she/it). Vocabulary: jobs.',
+      answerKey: {
+        exercise_1b_jobs: {
+          "1": "taxi driver",
+          "2": "farmer",
+          "3": "doctor",
+          "4": "football player",
+          "5": "nurse",
+          "6": "school teacher"
+        },
+        exercise_3_reading: {
+          "1": ["b", "doctor"],
+          "2": ["c", "nurse"],
+          "3": ["a", "office worker"]
+        },
+        exercise_page9_profiles: {
+          "lidia": ["pilot", "a pilot"],
+          "sakura": ["architect", "an architect"]
+        },
+        exercise_4a_reading: {
+          "1": ["b", "no, it isn't", "no"],
+          "2": ["a", "yes, he is", "yes"],
+          "3": ["b", "no, she isn't a doctor. she's an office worker", "no, she isn't"]
+        },
+        exercise_5a_grammar: {
+          "1": ["'s", "is"],
+          "2": ["'s", "is"],
+          "3": ["isn't", "is not"],
+          "4": ["'s", "is"]
+        },
+        exercise_6_dialogue: {
+          "1": ["'m", "I'm", "1'm", "i'm"],
+          "2": ["Is it", "/ Is it", "is it"],
+          "3": ["it is", "3it is"],
+          "4": ["Is the manager", "4Is the manager", "is the manager"],
+          "5": ["he's", "5he's", "he is"],
+          "6": ["Is he", "/ is he", "He's", "6He's", "is he"],
+          "7": ["he isn't", "not", "isn't", "7isn't"],
+          "8": ["'s he", "8's he", "is he"],
+          "9": ["He's", "9He's", "he is"]
+        },
+        exercise_7a_qa: {
+          "2": ["No, he isn't. He's a taxi driver", "No, he isn't", "taxi driver", "He's a taxi driver"],
+          "3": ["No, she isn't. She's an architect", "No, she isn't", "architect", "She's an architect"],
+          "4": ["No, he isn't. He's a doctor", "No, he isn't", "doctor", "He's a doctor"],
+          "5": ["Yes, he is", "He's a school teacher", "school teacher", "teacher"],
+          "6": ["No, she isn't. She's a nurse", "No, she isn't", "nurse", "She's a nurse"]
+        }
+      },
+      media_links: ['/audio/1.6.mp3', '/audio/1.7.mp3', '/audio/1.8.mp3'],
       unit,
     });
-    await this.lessonRepository.save(lesson2);
 
     const exercise3 = this.exerciseRepository.create({
       id: 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a33',

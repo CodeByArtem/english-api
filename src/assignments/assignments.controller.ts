@@ -1,20 +1,21 @@
-import { Controller, Post, Get, Patch, Param, Body, UseGuards, Request, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Get, Param, Body, UseGuards, Request, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AssignmentsService } from './assignments.service';
-import { CreateSubmissionDto } from './dto/create-submission.dto';
-import { CreateAssignmentDto, GradeSubmissionDto } from './dto/assignment.dto';
+import { CreateAssignmentDto } from './dto/assignment.dto';
 
 @Controller('assignments')
 @UseGuards(AuthGuard('jwt'))
 export class AssignmentsController {
   constructor(private readonly assignmentsService: AssignmentsService) {}
 
-  @Get('teacher-stats')
-  async getTeacherStats(@Request() req: any) {
-    if (req.user.role?.toUpperCase() !== 'TUTOR') {
-      throw new UnauthorizedException('Only tutors can view statistics');
-    }
-    return this.assignmentsService.getTeacherStats();
+  @Get()
+  async findAll(@Request() req: any) {
+    return this.assignmentsService.findAllForUser(req.user);
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string, @Request() req: any) {
+    return this.assignmentsService.findOneForUser(id, req.user);
   }
 
   @Post()

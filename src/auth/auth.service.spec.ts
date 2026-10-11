@@ -22,10 +22,17 @@ describe('AuthService - Registration & Invites', () => {
     mockConfigService = {
       get: jest.fn().mockReturnValue('secret'),
     };
+    const mockQueryBuilder = {
+      delete: jest.fn().mockReturnThis(),
+      from: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      execute: jest.fn().mockResolvedValue({ affected: 0 }),
+    };
     mockEntityManager = {
       findOne: jest.fn(),
       create: jest.fn(),
       save: jest.fn(),
+      createQueryBuilder: jest.fn().mockReturnValue(mockQueryBuilder),
     };
     mockDataSource = {
       transaction: jest.fn().mockImplementation((cb) => cb(mockEntityManager)),

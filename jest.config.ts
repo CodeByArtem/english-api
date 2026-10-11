@@ -15,9 +15,23 @@ const config: Config = {
   rootDir: '.',
   testRegex: '.*\\.spec\\.ts$',
   transform: {
-    '^.+\\.(t|j)s$': 'ts-jest',
+    '^.+\\.(t|j)s$': [
+      'ts-jest',
+      {
+        tsconfig: {
+          allowJs: true,
+          module: 'commonjs',
+          target: 'ES2022',
+        },
+      },
+    ],
   },
-  moduleNameMapper: pathsToModuleNameMapper(paths, { prefix: '<rootDir>/' }),
+  transformIgnorePatterns: ['node_modules[/\\\\](?!@nestjs[/\\\\])'],
+  moduleNameMapper: {
+    ...pathsToModuleNameMapper(paths, { prefix: '<rootDir>/' }),
+    '.*load-package\\.util\\.js$': '<rootDir>/test/load-package.mock.js',
+    '.*typeorm-compat\\.js$': '<rootDir>/test/typeorm-compat.mock.js',
+  },
   collectCoverageFrom: [
     'src/**/*.(t|j)s',
     'libs/**/*.(t|j)s',

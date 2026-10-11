@@ -301,6 +301,95 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
       expect(result.details.correctAnswers).toBe(0);
       expect(result.score).toBe(0);
     });
+
+    it('should dynamically score generic lessons with arbitrary answerKey sections', () => {
+      const dynamicLesson: Lesson = {
+        id: 'dyn-lesson',
+        title: 'Dynamic Lesson',
+        order: 2,
+        content: '',
+        theory: '',
+        media_links: [],
+        answerKey: {
+          vocabulary: {
+            q1: 'apple',
+            q2: 'banana',
+          },
+          reading: {
+            q3: 'London',
+          },
+        },
+        unit: null as any,
+        exercises: [],
+      } as Lesson;
+
+      const studentAnswers = {
+        vocabulary: {
+          q1: 'apple',
+          q2: 'orange', // incorrect
+        },
+        reading: {
+          q3: 'LONDON',
+        },
+      };
+
+      const result = service.calculateScore(dynamicLesson, studentAnswers);
+      expect(result.details.totalQuestions).toBe(3);
+      expect(result.details.correctAnswers).toBe(2);
+      expect(result.score).toBe(67);
+    });
+
+    it('should dynamically score lessons using exercise entities when answerKey is empty', () => {
+      const exerciseLesson: Lesson = {
+        id: 'ex-lesson',
+        title: 'Exercise Lesson',
+        order: 3,
+        content: '',
+        theory: '',
+        media_links: [],
+        answerKey: null,
+        unit: null as any,
+        exercises: [
+          {
+            id: 'ex-1',
+            type: 'multiple_choice',
+            order: 1,
+            payload: { question: 'Sky color', correctAnswer: 'Blue' },
+          },
+          {
+            id: 'ex-2',
+            type: 'text_input',
+            order: 2,
+            payload: { question: '5 spelled', answer: 'five' },
+          },
+          {
+            id: 'ex-3',
+            type: 'fill_in_the_blank',
+            order: 3,
+            payload: {
+              gaps: [
+                { id: 'gap_1', answer: 'hello' },
+                { id: 'gap_2', answer: 'world' },
+              ],
+            },
+          },
+        ],
+      } as any;
+
+      const studentAnswers = {
+        'ex-1': 'Blue',
+        'ex-2': 'FIVE',
+        'ex-3': {
+          gap_1: 'hello',
+          gap_2: 'incorrect',
+        },
+      };
+
+      const result = service.calculateScore(exerciseLesson, studentAnswers);
+      expect(result.details.totalQuestions).toBe(4);
+      expect(result.details.correctAnswers).toBe(3);
+      expect(result.score).toBe(75);
+    });
   });
 
   describe('ValidationPipe and DTO Integrity', () => {
@@ -349,6 +438,313 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
 
       expect(transformedReview.answers?.grammarInputs).toBeDefined();
       expect(transformedReview.answers?.conferenceCard).toBeDefined();
+    });
+  });
+
+  describe('Homework Lifecycle & Submissions Management', () => {
+    let mockSubmissionRepo: any;
+    let mockLessonRepo: any;
+    let mockAssignmentRepo: any;
+    let lifecycleService: AssignmentsService;
+
+    beforeEach(() => {
+      mockSubmissionRepo = {
+        findOne: jest.fn(),
+        create: jest.fn((data) => ({ id: 'new-sub-id', ...data })),
+        save: jest.fn(async (data) => ({ ...data, id: data.id || 'saved-sub-id', createdAt: new Date() })),
+        remove: jest.fn(async (data) => data),
+      };
+      mockLessonRepo = {
+        findOne: jest.fn(async () => mockLessonWithAllExercises),
+      };
+      mockAssignmentRepo = {
+        findOne: jest.fn(),
+      };
+      lifecycleService = new AssignmentsService(
+        mockAssignmentRepo,
+        mockSubmissionRepo,
+        mockLessonRepo,
+      );
+    });
+
+    it('should reject submission if student already has a pending submission', async () => {
+      mockSubmissionRepo.findOne.mockResolvedValueOnce({
+        id: 'existing-id',
+        status: 'submitted',
+      });
+
+      await expect(
+        lifecycleService.createSubmission(
+          { lessonId: mockLessonWithAllExercises.id, answers: {} },
+          'student-123',
+        ),
+      ).rejects.toThrow('You have already submitted this homework. It is currently under review by your teacher.');
+    });
+
+    it('should reject submission if homework is already graded', async () => {
+      mockSubmissionRepo.findOne.mockResolvedValueOnce({
+        id: 'existing-id',
+        status: 'graded',
+      });
+
+      await expect(
+        lifecycleService.createSubmission(
+          { lessonId: mockLessonWithAllExercises.id, answers: {} },
+          'student-123',
+        ),
+      ).rejects.toThrow('This homework has already been graded and cannot be resubmitted.');
+    });
+
+    it('should update existing submission on needs_revision without creating duplicate', async () => {
+      const existing = {
+        id: 'existing-sub-id',
+        status: 'needs_revision',
+        answers: { flagAnswers: { 1: 'Wrong' } },
+        score: 0,
+      };
+      mockSubmissionRepo.findOne.mockResolvedValueOnce(existing);
+
+      const result = await lifecycleService.createSubmission(
+        { lessonId: mockLessonWithAllExercises.id, answers: { flagAnswers: { 1: 'Canada' } } },
+        'student-123',
+      );
+
+      expect(mockSubmissionRepo.create).not.toHaveBeenCalled();
+      expect(mockSubmissionRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: 'existing-sub-id',
+          status: 'submitted',
+        }),
+      );
+      expect(result.id).toBe('existing-sub-id');
+      expect(result.status).toBe('submitted');
+    });
+
+    it('should delete submission and return success', async () => {
+      const existing = { id: 'sub-to-delete' };
+      mockSubmissionRepo.findOne.mockResolvedValueOnce(existing);
+
+      const res = await lifecycleService.deleteSubmission('sub-to-delete');
+      expect(mockSubmissionRepo.remove).toHaveBeenCalledWith(existing);
+      expect(res).toEqual({ success: true, message: 'Submission deleted successfully' });
+    });
+
+    it('should throw NotFoundException when deleting non-existent submission', async () => {
+      mockSubmissionRepo.findOne.mockResolvedValueOnce(null);
+      await expect(lifecycleService.deleteSubmission('missing-id')).rejects.toThrow('Submission not found');
+    });
+
+    it('should set status to needs_revision when reviewed with revision status', async () => {
+      const existing = {
+        id: 'sub-review-id',
+        status: 'submitted',
+      };
+      mockSubmissionRepo.findOne.mockResolvedValueOnce(existing);
+
+      const res = await lifecycleService.reviewSubmission('sub-review-id', {
+        tutorComment: 'Fix exercise 5',
+        status: 'needs_revision',
+      });
+
+      expect(mockSubmissionRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: 'needs_revision',
+          tutorComment: 'Fix exercise 5',
+        }),
+      );
+      expect(res.status).toBe('needs_revision');
+    });
+
+    it('should default to graded status when status is not specified in review', async () => {
+      const existing = {
+        id: 'sub-review-id',
+        status: 'submitted',
+      };
+      mockSubmissionRepo.findOne.mockResolvedValueOnce(existing);
+
+      const res = await lifecycleService.reviewSubmission('sub-review-id', {
+        grade: 100,
+        tutorComment: 'Perfect!',
+      });
+
+      expect(mockSubmissionRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: 'graded',
+          grade: 100,
+        }),
+      );
+      expect(res.status).toBe('graded');
+    });
+  });
+
+  describe('Lesson 1B Jobs - Dynamic calculateScore', () => {
+    const mockLesson1B: Lesson = {
+      id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a33',
+      title: '1B Jobs',
+      order: 2,
+      content: '',
+      theory: '',
+      media_links: [],
+      answerKey: {
+        exercise_1b_jobs: {
+          '1': 'taxi driver',
+          '2': 'farmer',
+          '3': 'doctor',
+          '4': 'football player',
+          '5': 'nurse',
+          '6': 'school teacher',
+        },
+        exercise_3_reading: {
+          '1': ['b', 'doctor'],
+          '2': ['c', 'nurse'],
+          '3': ['a', 'office worker'],
+        },
+      },
+      unit: null as any,
+      exercises: [],
+      submissions: [],
+      assignments: [],
+    };
+
+    it('should accurately score 100% for full correct answers in Lesson 1B', () => {
+      const studentAnswers = {
+        exercise_1b_jobs: {
+          '1': 'taxi driver',
+          '2': 'farmer',
+          '3': 'doctor',
+          '4': 'football player',
+          '5': 'nurse',
+          '6': 'school teacher',
+        },
+        exercise_3_reading: {
+          '1': 'b',
+          '2': 'c',
+          '3': 'a',
+        },
+      };
+
+      const result = service.calculateScore(mockLesson1B, studentAnswers);
+      expect(result.score).toBe(100);
+      expect(result.details.totalQuestions).toBe(9);
+      expect(result.details.correctAnswers).toBe(9);
+    });
+
+    it('should handle partial correct answers, case insensitivity, and alternative letter/text options', () => {
+      const studentAnswers = {
+        exercise_1b_jobs: {
+          '1': 'Taxi Driver ',
+          '2': 'FARMER',
+          '3': 'wrong_job',
+          '4': 'football player',
+          '5': 'nurse',
+          '6': 'school teacher',
+        },
+        exercise_3_reading: {
+          '1': 'doctor',
+          '2': 'c',
+          '3': 'wrong',
+        },
+      };
+
+      const result = service.calculateScore(mockLesson1B, studentAnswers);
+      expect(result.details.correctAnswers).toBe(7);
+      expect(result.details.totalQuestions).toBe(9);
+      expect(result.score).toBe(78);
+    });
+    it('should accurately score 100% for all exercises in Lesson 1B (Page 8 + Page 9)', () => {
+      const mockLesson1BFull: Lesson = {
+        ...mockLesson1B,
+        answerKey: {
+          ...mockLesson1B.answerKey,
+          exercise_page9_profiles: {
+            lidia: ['pilot', 'a pilot'],
+            sakura: ['architect', 'an architect'],
+          },
+          exercise_4a_reading: {
+            '1': ['b', "no, it isn't", 'no'],
+            '2': ['a', 'yes, he is', 'yes'],
+            '3': ['b', "no, she isn't a doctor. she's an office worker", "no, she isn't"],
+          },
+          exercise_5a_grammar: {
+            '1': ["'s", 'is'],
+            '2': ["'s", 'is'],
+            '3': ["isn't", 'is not'],
+            '4': ["'s", 'is'],
+          },
+          exercise_6_dialogue: {
+            '1': ["'m", "I'm"],
+            '2': 'Is it',
+            '3': 'it is',
+            '4': 'Is the manager',
+            '5': "he's",
+            '6': ['Is he', "He's"],
+            '7': ["he isn't", 'not', "isn't"],
+            '8': "'s he",
+            '9': "He's",
+          },
+          exercise_7a_qa: {
+            '2': ["No, he isn't. He's a taxi driver", "No, he isn't", 'taxi driver'],
+            '3': ["No, she isn't. She's an architect", "No, she isn't", 'architect'],
+            '4': ["No, he isn't. He's a doctor", "No, he isn't", 'doctor'],
+            '5': ['Yes, he is', 'teacher'],
+            '6': ["No, she isn't. She's a nurse", "No, she isn't", 'nurse'],
+          },
+        },
+      };
+
+      const studentAnswers = {
+        exercise_1b_jobs: {
+          '1': 'taxi driver',
+          '2': 'farmer',
+          '3': 'doctor',
+          '4': 'football player',
+          '5': 'nurse',
+          '6': 'school teacher',
+        },
+        exercise_3_reading: {
+          '1': 'b',
+          '2': 'c',
+          '3': 'a',
+        },
+        exercise_page9_profiles: {
+          lidia: 'pilot',
+          sakura: 'architect',
+        },
+        exercise_4a_reading: {
+          '1': 'b',
+          '2': 'a',
+          '3': 'b',
+        },
+        exercise_5a_grammar: {
+          '1': "'s",
+          '2': "'s",
+          '3': "isn't",
+          '4': "'s",
+        },
+        exercise_6_dialogue: {
+          '1': "'m",
+          '2': 'Is it',
+          '3': 'it is',
+          '4': 'Is the manager',
+          '5': "he's",
+          '6': 'Is he',
+          '7': 'he isn\'t',
+          '8': "'s he",
+          '9': "He's",
+        },
+        exercise_7a_qa: {
+          '2': "No, he isn't. He's a taxi driver.", // with trailing period
+          '3': "No, she isn't. She's an architect",
+          '4': "No, he isn't. He's a doctor.",
+          '5': "Yes, he is.",
+          '6': "No, she isn't. She's a nurse",
+        },
+      };
+
+      const result = service.calculateScore(mockLesson1BFull, studentAnswers);
+      expect(result.details.totalQuestions).toBe(32);
+      expect(result.details.correctAnswers).toBe(32);
+      expect(result.score).toBe(100);
     });
   });
 });

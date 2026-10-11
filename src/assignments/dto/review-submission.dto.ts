@@ -14,4 +14,8 @@ export class ReviewSubmissionDto {
   @IsString()
   @IsOptional()
   tutorComment?: string;
+
+  @IsString()
+  @IsOptional()
+  status?: string;
 }

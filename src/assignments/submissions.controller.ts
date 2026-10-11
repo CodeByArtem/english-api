@@ -3,6 +3,7 @@ import {
   Post,
   Get,
   Patch,
+  Delete,
   Param,
   Body,
   UseGuards,
@@ -46,6 +47,17 @@ export class SubmissionsController {
     return this.assignmentsService.getSubmissionsByStudent(req.user.id);
   }
 
+  @Get('lesson/:lessonId/my-submission')
+  async getMySubmissionForLesson(
+    @Param('lessonId') lessonId: string,
+    @Request() req: any,
+  ) {
+    return this.assignmentsService.getStudentSubmissionForLesson(
+      req.user.id,
+      lessonId,
+    );
+  }
+
   @Get('teacher-stats')
   async getTeacherStats(@Request() req: any) {
     const role = req.user.role?.toUpperCase();
@@ -84,5 +96,14 @@ export class SubmissionsController {
       throw new ForbiddenException('Only staff can grade submissions');
     }
     return this.assignmentsService.gradeSubmission(id, body.grade, body.tutorComment || '');
+  }
+
+  @Delete(':id')
+  async deleteSubmission(@Param('id') id: string, @Request() req: any) {
+    const role = req.user.role?.toUpperCase();
+    if (!['TUTOR', 'TEACHER', 'ADMIN'].includes(role)) {
+      throw new ForbiddenException('Only staff can delete submissions');
+    }
+    return this.assignmentsService.deleteSubmission(id);
   }
 }

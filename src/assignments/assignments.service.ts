@@ -38,6 +38,95 @@ export class AssignmentsService {
     return this.assignmentRepository.save(assignment);
   }
 
+  async findAllForUser(user: any) {
+    const assignments = await this.assignmentRepository.find({
+      relations: {
+        lesson: true,
+        submissions: {
+          student: true,
+        },
+      },
+      order: {
+        dueDate: 'ASC',
+      },
+    });
+
+    const isStudent = user?.role?.toUpperCase() === 'STUDENT';
+
+    return assignments.map((assignment) => {
+      let status: 'pending' | 'submitted' | 'graded' = 'pending';
+      let grade: number | null = null;
+
+      if (isStudent && assignment.submissions) {
+        const studentSub = assignment.submissions.find(
+          (s) => s.student?.id === user.id,
+        );
+        if (studentSub) {
+          status = studentSub.status === 'graded' ? 'graded' : 'submitted';
+          grade = studentSub.grade ?? studentSub.score ?? null;
+        }
+      }
+
+      return {
+        id: assignment.id,
+        title: assignment.title,
+        description: assignment.description,
+        dueDate: assignment.dueDate,
+        lessonId: assignment.lesson?.id,
+        status,
+        grade,
+      };
+    });
+  }
+
+  async findOneForUser(id: string, user: any) {
+    const assignment = await this.assignmentRepository.findOne({
+      where: { id },
+      relations: {
+        lesson: {
+          exercises: true,
+        },
+        submissions: {
+          student: true,
+        },
+      },
+    });
+
+    if (!assignment) {
+      throw new NotFoundException('Assignment not found');
+    }
+
+    const isStudent = user?.role?.toUpperCase() === 'STUDENT';
+    const studentSub = isStudent
+      ? assignment.submissions?.find((s) => s.student?.id === user.id)
+      : null;
+
+    const status = studentSub
+      ? studentSub.status === 'graded'
+        ? 'graded'
+        : 'submitted'
+      : 'pending';
+
+    return {
+      id: assignment.id,
+      title: assignment.title,
+      description: assignment.description,
+      dueDate: assignment.dueDate,
+      lessonId: assignment.lesson?.id,
+      lesson: assignment.lesson,
+      status,
+      submission: studentSub
+        ? {
+            id: studentSub.id,
+            content: studentSub.answers ? JSON.stringify(studentSub.answers) : '',
+            submittedAt: studentSub.createdAt,
+            grade: studentSub.grade ?? studentSub.score ?? undefined,
+            feedback: studentSub.tutorComment || undefined,
+          }
+        : undefined,
+    };
+  }
+
   async findByLessonId(lessonId: string) {
     if (!lessonId) return [];
     return this.assignmentRepository.find({
@@ -82,6 +171,47 @@ export class AssignmentsService {
 
     console.log('Lesson found:', lesson.id, lesson.title);
 
+    // Check if student already has a submission for this lesson
+    const existingSubmission = await this.submissionRepository.findOne({
+      where: {
+        student: { id: studentId },
+        lesson: { id: lesson.id },
+      },
+      order: { createdAt: 'DESC' },
+    });
+
+    if (existingSubmission) {
+      if (existingSubmission.status === 'submitted') {
+        throw new BadRequestException(
+          'You have already submitted this homework. It is currently under review by your teacher.',
+        );
+      }
+      if (existingSubmission.status === 'graded') {
+        throw new BadRequestException(
+          'This homework has already been graded and cannot be resubmitted.',
+        );
+      }
+      if (existingSubmission.status === 'needs_revision') {
+        // Upon revision request, update the existing submission instead of creating duplicate
+        const { score, details } = this.calculateScore(lesson, dto.answers);
+        existingSubmission.answers = dto.answers;
+        existingSubmission.score = score;
+        existingSubmission.details = details;
+        existingSubmission.status = 'submitted'; // return to teacher for re-checking
+        const updated = await this.submissionRepository.save(existingSubmission);
+        return {
+          id: updated.id,
+          score: updated.score,
+          status: updated.status,
+          lesson: updated.lesson
+            ? { id: updated.lesson.id, title: updated.lesson.title }
+            : null,
+          assignment: updated.assignment,
+          createdAt: updated.createdAt,
+        };
+      }
+    }
+
     // Автоматическая проверка ответов
     const { score, details } = this.calculateScore(lesson, dto.answers);
 
@@ -115,7 +245,8 @@ export class AssignmentsService {
     return String(val)
       .trim()
       .toLowerCase()
-      .replace(/[’‘`´]/g, "'");
+      .replace(/[’‘`´]/g, "'")
+      .replace(/\.+$/, '');
   }
 
   matchesAnswer(studentVal: any, expected: any): boolean {
@@ -131,20 +262,28 @@ export class AssignmentsService {
   }
 
   public calculateScore(lesson: Lesson, studentAnswers: Record<string, any>) {
-    if (!lesson || !lesson.answerKey) {
-      console.log('No lesson or answerKey, returning 0');
+    if (!lesson) {
       return { score: 0, details: {} };
     }
 
-    const answerKey = lesson.answerKey;
-    const flagAnswers = studentAnswers.flagAnswers || {};
-    const dialogInputs = studentAnswers.dialogInputs || {};
-    const stressTableInputs = studentAnswers.stressTableInputs || {};
-    const grammarInputs = studentAnswers.grammarInputs || {};
-    const dialogue7aInputs = studentAnswers.dialogue7aInputs || {};
+    const answerKey = lesson.answerKey || {};
+    const answers = studentAnswers || {};
+    const flagAnswers = answers.flagAnswers || {};
+    const dialogInputs = answers.dialogInputs || {};
+    const stressTableInputs = answers.stressTableInputs || {};
+    const grammarInputs = answers.grammarInputs || {};
+    const dialogue7aInputs = answers.dialogue7aInputs || {};
 
     let totalQuestions = 0;
     let correctAnswers = 0;
+
+    const handledLesson1AKeys = new Set([
+      'exercise_1a_flags',
+      'exercise_2a_stress',
+      'exercise_4a_dialogues',
+      'exercise_5_grammar',
+      'exercise_7a_dialogue',
+    ]);
 
     // Exercise 1a: Flags - считаем все вопросы из answerKey
     if (answerKey.exercise_1a_flags) {
@@ -185,7 +324,7 @@ export class AssignmentsService {
         'c1_1': 'gap_1',
         'c1_2': 'gap_2',
         'c2_1': 'gap_3',
-        'c2_2': 'gap_4'
+        'c2_2': 'gap_4',
       };
 
       for (const [gapKey, expectedCountry] of Object.entries(expectedDialogues)) {
@@ -222,12 +361,69 @@ export class AssignmentsService {
       }
     }
 
-    const finalScore = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
+    // Универсальная динамическая проверка остальных секций в answerKey
+    for (const [sectionKey, sectionValue] of Object.entries(answerKey)) {
+      if (handledLesson1AKeys.has(sectionKey)) continue;
+
+      if (sectionValue && typeof sectionValue === 'object' && !Array.isArray(sectionValue)) {
+        const studentSection = answers[sectionKey] || {};
+        for (const [qKey, expectedVal] of Object.entries(sectionValue as Record<string, any>)) {
+          totalQuestions++;
+          const studentVal = studentSection[qKey] ?? answers[qKey];
+          if (this.matchesAnswer(studentVal, expectedVal)) {
+            correctAnswers++;
+          }
+        }
+      } else {
+        totalQuestions++;
+        const studentVal = answers[sectionKey];
+        if (this.matchesAnswer(studentVal, sectionValue)) {
+          correctAnswers++;
+        }
+      }
+    }
+
+    // Динамическая проверка exercises сущностей (если answerKey был пуст или не содержал вопросов)
+    if (totalQuestions === 0 && Array.isArray(lesson.exercises) && lesson.exercises.length > 0) {
+      for (const exercise of lesson.exercises) {
+        const payload = exercise.payload || {};
+        if (exercise.type === 'multiple_choice' && payload.correctAnswer) {
+          totalQuestions++;
+          const studentVal = answers[exercise.id] ?? answers[exercise.order];
+          if (this.matchesAnswer(studentVal, payload.correctAnswer)) {
+            correctAnswers++;
+          }
+        } else if (exercise.type === 'text_input' && payload.answer) {
+          totalQuestions++;
+          const studentVal = answers[exercise.id] ?? answers[exercise.order];
+          if (this.matchesAnswer(studentVal, payload.answer)) {
+            correctAnswers++;
+          }
+        } else if (exercise.type === 'fill_in_the_blank' && Array.isArray(payload.gaps)) {
+          const studentGaps = answers[exercise.id] || answers;
+          for (const gap of payload.gaps) {
+            if (gap.id && gap.answer) {
+              totalQuestions++;
+              const studentVal = studentGaps[gap.id];
+              if (this.matchesAnswer(studentVal, gap.answer)) {
+                correctAnswers++;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    if (totalQuestions === 0) {
+      return { score: 0, details: {} };
+    }
+
+    const finalScore = Math.round((correctAnswers / totalQuestions) * 100);
 
     const details = {
       totalQuestions,
       correctAnswers,
-      gradedAt: new Date().toISOString()
+      gradedAt: new Date().toISOString(),
     };
 
     return { score: finalScore, details };
@@ -342,8 +538,31 @@ export class AssignmentsService {
       submission.tutorComment = dto.tutorComment;
     }
 
-    submission.status = 'graded';
+    submission.status = dto.status || 'graded';
 
     return this.submissionRepository.save(submission);
+  }
+
+  async deleteSubmission(submissionId: string) {
+    const submission = await this.submissionRepository.findOne({
+      where: { id: submissionId },
+    });
+
+    if (!submission) {
+      throw new NotFoundException('Submission not found');
+    }
+
+    await this.submissionRepository.remove(submission);
+    return { success: true, message: 'Submission deleted successfully' };
+  }
+
+  async getStudentSubmissionForLesson(studentId: string, lessonId: string) {
+    return this.submissionRepository.findOne({
+      where: {
+        student: { id: studentId },
+        lesson: { id: lessonId },
+      },
+      order: { createdAt: 'DESC' },
+    });
   }
 }
