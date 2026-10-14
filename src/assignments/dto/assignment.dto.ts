@@ -14,8 +14,22 @@ export class CreateAssignmentDto {
   dueDate?: string;
 
   @IsString()
+  @IsOptional()
+  lessonId?: string;
+
+  @IsString()
+  @IsOptional()
+  attachmentUrl?: string;
+
+  @IsString()
+  @IsOptional()
+  studentId?: string;
+}
+
+export class SubmitAssignmentTextDto {
+  @IsString()
   @IsNotEmpty()
-  lessonId: string;
+  content: string;
 }
 
 export class GradeSubmissionDto {

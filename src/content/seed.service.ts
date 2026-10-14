@@ -270,16 +270,126 @@ export class SeedService implements OnApplicationBootstrap {
     });
     await this.exerciseRepository.save(exercise4);
 
-    const lesson3 = this.lessonRepository.create({
+    const lesson3 = await this.lessonRepository.save({
       id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a44',
-      title: 'Lesson 3: Basic Verbs',
+      title: '1C Nationalities',
       order: 3,
-      content: 'Understand and use simple verbs like run, eat, and sleep.',
-      theory: 'A verb is a word that describes an action. In English, we use base forms for simple present actions.',
-      media_links: [],
+      content: `
+        <div class="lesson-section">
+          <h3>Vocabulary: Nationalities</h3>
+          <p>Learn different countries and nationalities, word stress, and discuss people from around the world.</p>
+          <h3>Reading: Me and my friends</h3>
+          <p>Read Nina's blog about her friends and international office team.</p>
+        </div>
+      `,
+      theory: `
+        <div class="theory-section">
+          <p><strong>Goal:</strong> talk about different nationalities. <br/>
+          <strong>Grammar:</strong> be: you/we/they. <br/>
+          <strong>Vocabulary:</strong> nationalities.</p>
+
+          <h4>Grammar: be with you / we / they</h4>
+          <ul>
+            <li><strong>+ Positive:</strong> You're British. / We're office workers. / They're nurses.</li>
+            <li><strong>- Negative:</strong> You aren't American. / We aren't football players. / They aren't doctors.</li>
+            <li><strong>? Questions & Short answers:</strong>
+              <ul>
+                <li>Are you British? – Yes, we are. / No, we aren't.</li>
+                <li>Are we a good team? – Yes, you are. / No, you aren't.</li>
+                <li>Are they in the UK? – Yes, they are. / No, they aren't.</li>
+              </ul>
+            </li>
+            <li><strong>with Who:</strong> Who are they? – They're my friends.</li>
+          </ul>
+
+          <h4>Vocabulary: Countries and Nationalities</h4>
+          <ul>
+            <li>Spain – Spanish</li>
+            <li>Canada – Canadian</li>
+            <li>Japan – Japanese</li>
+            <li>the US – American</li>
+            <li>Poland – Polish</li>
+            <li>Argentina – Argentinian</li>
+            <li>Thailand – Thai</li>
+            <li>the UK – British</li>
+            <li>Turkey – Turkish</li>
+            <li>Mexico – Mexican</li>
+            <li>Brazil – Brazilian</li>
+            <li>Italy – Italian</li>
+          </ul>
+        </div>
+      `,
+      answerKey: {
+        exercise_1b_nationalities: {
+          '1': ['d', 'Spanish'],
+          '2': ['j', 'Canadian'],
+          '3': ['g', 'Japanese'],
+          '4': ['i', 'American'],
+          '5': ['c', 'Polish'],
+          '6': ['l', 'Argentinian'],
+          '7': ['a', 'Thai'],
+          '8': ['b', 'British'],
+          '9': ['e', 'Turkish'],
+          '10': ['f', 'Mexican'],
+          '11': ['k', 'Brazilian'],
+          '12': ['h', 'Italian'],
+        },
+        exercise_2c_stress: {
+          '2': ['D', 'Different', 'd'],
+          '3': ['D', 'Different', 'd'],
+          '4': ['S', 'Same', 's'],
+          '5': ['S', 'Same', 's'],
+        },
+        exercise_4a_photos: {
+          '1': ['D', 'd'],
+          '2': ['B', 'b'],
+          '3': ['C', 'c', 'A', 'a'],
+          '4': ['A', 'a', 'C', 'c'],
+          '5': ['E', 'e'],
+        },
+        exercise_4b_tf: {
+          '2': ['F', 'False', 'f'],
+          '3': ['T', 'True', 't'],
+          '4': ['F', 'False', 'f'],
+          '5': ['F', 'False', 'f'],
+        },
+        exercise_5a_grammar: {
+          '1': ["aren't", 'are not', 'arent'],
+          '2': ['are'],
+          '3': ['Are', 'are'],
+          '4': ["aren't", 'are not', 'arent'],
+          '5': ['are'],
+        },
+        exercise_6_texts: {
+          '2': ["'re", 'are'],
+          '3': ["aren't", 'are not', 'arent'],
+          '4': ["'re", 'are'],
+          '5': ["'re", 'are'],
+          '7': ["aren't", 'are not', 'arent'],
+          '8': ["'re", 'are'],
+          '9': ['are', "'re"],
+          '10': ['are', "'re"],
+        },
+        exercise_7a_questions: {
+          '2': [
+            'Are the teachers at your school American?',
+            'Are the teachers at your school American',
+          ],
+          '3': [
+            'Are your classmates from different countries?',
+            'Are your classmates from different countries',
+          ],
+          '4': [
+            'Where are you and your classmates now?',
+            'Where are you and your classmates now',
+          ],
+          '5': ['Who are your teachers?', 'Who are your teachers'],
+          '6': ['Where are your teachers from?', 'Where are your teachers from'],
+        },
+      },
+      media_links: ['/audio/1.11.mp3', '/audio/1.12.mp3', '/audio/1.13.mp3'],
       unit,
     });
-    await this.lessonRepository.save(lesson3);
 
     const exercise5 = this.exerciseRepository.create({
       id: 'c1eebc99-9c0b-4ef8-bb6d-6bb9bd380a44',

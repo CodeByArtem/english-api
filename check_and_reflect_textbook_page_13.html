@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Check and reflect — Page 13</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600;1,700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --book-red: #d3232a;
+      --book-teal: #1d4e66;
+      --book-blue-italic: #1e7898;
+      --page-bg: #f9ebe5;
+      --box-bg: #f1d3c9;
+    }
+
+    body {
+      font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #2b2d30;
+      color: #222222;
+      margin: 0;
+      padding: 20px 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Main Textbook Page Container */
+    .textbook-page {
+      max-width: 880px;
+      margin: 0 auto;
+      background-color: var(--page-bg);
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.55);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Top and Right Red/White Diagonal Striped Border */
+    .striped-top-bar {
+      height: 15px;
+      width: 100%;
+      background: repeating-linear-gradient(
+        -55deg,
+        #d3232a 0px,
+        #d3232a 7px,
+        #ffffff 7px,
+        #ffffff 9.5px
+      );
+    }
+
+    .striped-right-bar {
+      width: 15px;
+      background: repeating-linear-gradient(
+        -55deg,
+        #d3232a 0px,
+        #d3232a 7px,
+        #ffffff 7px,
+        #ffffff 9.5px
+      );
+    }
+
+    .title-heading {
+      font-family: 'Merriweather Sans', sans-serif;
+      color: var(--book-teal);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .example-blue {
+      color: var(--book-blue-italic);
+      font-style: italic;
+    }
+
+    /* Wordsearch Table */
+    .wordsearch-table {
+      border-collapse: collapse;
+      background-color: #ffffff;
+    }
+    .wordsearch-table td {
+      width: 29px;
+      height: 23px;
+      border: 1px solid #c97f77;
+      text-align: center;
+      vertical-align: middle;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #2b2b2b;
+      padding: 0;
+      line-height: 1;
+    }
+
+    /* Blank Write-in Lines */
+    .line-blank {
+      display: inline-block;
+      border-bottom: 1px solid #555555;
+      height: 13px;
+      vertical-align: baseline;
+    }
+
+    /* Short letter dash for Exercise 4 */
+    .letter-dash {
+      display: inline-block;
+      width: 8px;
+      border-bottom: 1px solid #444444;
+      margin: 0 1.2px;
+      height: 12px;
+      vertical-align: baseline;
+    }
+
+    .letter-dash-filled {
+      display: inline-block;
+      width: 8.5px;
+      border-bottom: 1px solid #444444;
+      margin: 0 1px;
+      text-align: center;
+      line-height: 1;
+      color: var(--book-blue-italic);
+      font-style: italic;
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="textbook-page pb-12">
+
+    <!-- Top Red & White Striped Border -->
+    <div class="striped-top-bar"></div>
+
+    <!-- Right Red & White Striped Border (stops above bottom-right page number pin) -->
+    <div class="striped-right-bar absolute top-0 right-0 bottom-[48px] z-10"></div>
+
+    <!-- Main Content Area -->
+    <div class="pl-12 pr-14 pt-9">
+
+      <!-- Page Heading -->
+      <h1 class="title-heading text-[33px] leading-none mb-4">
+        Check and reflect
+      </h1>
+
+      <!-- Two-Column Exercises Grid -->
+      <div class="grid grid-cols-12 gap-x-8 items-start text-[13.1px] leading-[1.34]">
+
+        <!-- ================= LEFT COLUMN (Exercises 1–5) ================= -->
+        <div class="col-span-12 md:col-span-6 space-y-3.5">
+
+          <!-- Exercise 1 -->
+          <div class="space-y-2">
+            <div class="flex items-baseline gap-2.5">
+              <span class="text-[#d3232a] font-extrabold">1</span>
+              <p class="font-bold text-neutral-900">Find the ten countries in the wordsearch.</p>
+            </div>
+
+            <!-- Countries Word Bank -->
+            <div class="ml-4 bg-[#f1d3c9] px-3 py-1.5 text-[12.8px] text-neutral-800 max-w-[332px] leading-[1.3]">
+              <div class="flex justify-between pr-4">
+                <span>Argentina</span>
+                <span>Brazil</span>
+                <span>Canada</span>
+                <span>Italy</span>
+                <span>Japan</span>
+              </div>
+              <div class="flex justify-between pr-1">
+                <span>Mexico</span>
+                <span>Poland</span>
+                <span>Spain</span>
+                <span>Thailand</span>
+                <span>Turkey</span>
+              </div>
+            </div>
+
+            <!-- 10x10 Wordsearch with circled POLAND -->
+            <div class="ml-4 pt-0.5">
+              <div class="relative inline-block">
+                <table class="wordsearch-table select-none">
+                  <tbody>
+                    <tr>
+                      <td>P</td><td>L</td><td>B</td><td>R</td><td>A</td><td>Z</td><td>I</td><td>L</td><td>L</td><td>M</td>
+                    </tr>
+                    <tr>
+                      <td>O</td><td>T</td><td>U</td><td>X</td><td>O</td><td>P</td><td>R</td><td>N</td><td>N</td><td>E</td>
+                    </tr>
+                    <tr>
+                      <td>L</td><td>U</td><td>R</td><td>I</td><td>T</td><td>A</td><td>L</td><td>Y</td><td>K</td><td>X</td>
+                    </tr>
+                    <tr>
+                      <td>A</td><td>R</td><td>G</td><td>E</td><td>N</td><td>T</td><td>I</td><td>N</td><td>A</td><td>I</td>
+                    </tr>
+                    <tr>
+                      <td>N</td><td>K</td><td>J</td><td>A</td><td>P</td><td>A</td><td>N</td><td>S</td><td>F</td><td>C</td>
+                    </tr>
+                    <tr>
+                      <td>D</td><td>E</td><td>K</td><td>Z</td><td>Z</td><td>O</td><td>N</td><td>B</td><td>T</td><td>O</td>
+                    </tr>
+                    <tr>
+                      <td>B</td><td>Y</td><td>U</td><td>S</td><td>P</td><td>A</td><td>I</td><td>N</td><td>K</td><td>C</td>
+                    </tr>
+                    <tr>
+                      <td>T</td><td>H</td><td>A</td><td>I</td><td>L</td><td>A</td><td>N</td><td>D</td><td>R</td><td>S</td>
+                    </tr>
+                    <tr>
+                      <td>U</td><td>K</td><td>V</td><td>S</td><td>J</td><td>J</td><td>K</td><td>P</td><td>K</td><td>N</td>
+                    </tr>
+                    <tr>
+                      <td>C</td><td>A</td><td>N</td><td>A</td><td>D</td><td>A</td><td>I</td><td>B</td><td>B</td><td>E</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!-- Red Loop around "POLAND" (Column 1, Rows 1–6) -->
+                <div
+                  class="pointer-events-none absolute top-[2px] left-[4px] w-[21px] h-[134px] rounded-full border-[2px] border-[#c5282c]"
+                  aria-hidden="true"
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Exercise 2a & 2b -->
+          <div class="space-y-1.5 pt-0.5">
+            <div class="flex items-baseline gap-1.5">
+              <span class="text-[#d3232a] font-extrabold">2</span>
+              <span class="font-bold text-neutral-900">a</span>
+              <p class="font-bold text-neutral-900">Put the words in the correct order to make sentences.</p>
+            </div>
+
+            <div class="pl-4 space-y-0.5 text-neutral-800">
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">1</span>
+                <div>
+                  <p>from / I / Brazil / am</p>
+                  <p class="example-blue">I am from Brazil.</p>
+                </div>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">2</span>
+                <p>am / London / from / not / I</p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">3</span>
+                <p>you / class / my / in / Are ?</p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">4</span>
+                <p>are / Where / from / you ?</p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">5</span>
+                <p>my / you / are / No, / in / class / not</p>
+              </div>
+            </div>
+
+            <div class="flex items-baseline gap-2 pl-2.5 pt-0.5">
+              <span class="font-bold text-neutral-900">b</span>
+              <p class="font-bold text-neutral-900">
+                Rewrite three of the sentences in Exercise 2a. Use short forms.
+              </p>
+            </div>
+          </div>
+
+          <!-- Exercise 3 -->
+          <div class="space-y-1">
+            <div class="flex items-baseline gap-2.5">
+              <span class="text-[#d3232a] font-extrabold">3</span>
+              <p class="font-bold text-neutral-900">
+                Complete the sentences with the correct form of <em class="italic">be</em>. Use short forms.
+              </p>
+            </div>
+
+            <div class="pl-4 space-y-0.5 text-neutral-800">
+              <!-- Item 1 -->
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">1</span>
+                <div class="space-y-0.5">
+                  <p><strong class="font-bold text-neutral-900">A:</strong> <span class="line-blank w-[44px]"></span> you from Spain?</p>
+                  <p><strong class="font-bold text-neutral-900">B:</strong> No, I <span class="line-blank w-[44px]"></span> from Mexico.</p>
+                </div>
+              </div>
+              <!-- Item 2 -->
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">2</span>
+                <div class="space-y-0.5">
+                  <p><strong class="font-bold text-neutral-900">A:</strong> I <span class="line-blank w-[44px]"></span> in Class 4. <span class="line-blank w-[44px]"></span> you?</p>
+                  <p><strong class="font-bold text-neutral-900">B:</strong> No, I <span class="line-blank w-[44px]"></span> . I <span class="line-blank w-[44px]"></span> in Class 3.</p>
+                </div>
+              </div>
+              <!-- Item 3 -->
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">3</span>
+                <div class="space-y-0.5">
+                  <p><strong class="font-bold text-neutral-900">A:</strong> Hi, I <span class="line-blank w-[44px]"></span> Tomoko. I <span class="line-blank w-[44px]"></span> from Japan.</p>
+                  <p><strong class="font-bold text-neutral-900">B:</strong> Nice to meet you. I <span class="line-blank w-[44px]"></span> Burak from Turkey.</p>
+                </div>
+              </div>
+              <!-- Item 4 -->
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">4</span>
+                <div class="space-y-0.5">
+                  <p><strong class="font-bold text-neutral-900">A:</strong> <span class="line-blank w-[44px]"></span> I late?</p>
+                  <p><strong class="font-bold text-neutral-900">B:</strong> No, you <span class="line-blank w-[44px]"></span> late.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Exercise 4 -->
+          <div class="space-y-1">
+            <div class="flex items-baseline gap-2.5">
+              <span class="text-[#d3232a] font-extrabold">4</span>
+              <p class="font-bold text-neutral-900">Complete the names of the jobs.</p>
+            </div>
+
+            <div class="pl-4 space-y-0.5 text-neutral-800">
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">1</span>
+                <p>
+                  f<span class="letter-dash"></span><span class="letter-dash"></span><span class="letter-dash"></span>b<span class="letter-dash"></span><span class="letter-dash"></span><span class="letter-dash"></span>
+                  <span class="ml-1">pl<span class="letter-dash-filled">a</span><span class="letter-dash-filled">y</span><span class="letter-dash-filled">e</span><span class="letter-dash-filled">r</span></span>
+                </p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">2</span>
+                <p>
+                  s<span class="letter-dash"></span><span class="letter-dash"></span><span class="letter-dash"></span><span class="letter-dash"></span><span class="letter-dash"></span>
+                  <span class="ml-1">t<span class="letter-dash"></span><span class="letter-dash"></span><span class="letter-dash"></span><span class="letter-dash"></span><span class="letter-dash"></span>r</span>
+                </p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">3</span>
+                <p>f<span class="letter-dash"></span><span class="letter-dash"></span><span class="letter-dash"></span><span class="letter-dash"></span>r</p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">4</span>
+                <p>
+                  o<span class="letter-dash"></span><span class="letter-dash"></span><span class="letter-dash"></span><span class="letter-dash"></span><span class="letter-dash"></span>
+                  <span class="ml-1">w<span class="letter-dash"></span><span class="letter-dash"></span><span class="letter-dash"></span><span class="letter-dash"></span>r</span>
+                </p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">5</span>
+                <p>p<span class="letter-dash"></span><span class="letter-dash"></span>o<span class="letter-dash"></span></p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">6</span>
+                <p>d<span class="letter-dash"></span><span class="letter-dash"></span>t<span class="letter-dash"></span><span class="letter-dash"></span></p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">7</span>
+                <p>
+                  t<span class="letter-dash"></span><span class="letter-dash"></span><span class="letter-dash"></span>
+                  <span class="ml-1">d<span class="letter-dash"></span><span class="letter-dash"></span><span class="letter-dash"></span><span class="letter-dash"></span>r</span>
+                </p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">8</span>
+                <p>n<span class="letter-dash"></span><span class="letter-dash"></span><span class="letter-dash"></span><span class="letter-dash"></span></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Exercise 5 -->
+          <div class="space-y-1">
+            <div class="flex items-baseline gap-2.5">
+              <span class="text-[#d3232a] font-extrabold">5</span>
+              <p class="font-bold text-neutral-900">
+                Correct the sentences. Add <em class="italic">is</em> or <em class="italic">isn't</em>.
+              </p>
+            </div>
+
+            <div class="pl-4 space-y-0.5 text-neutral-800">
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">1</span>
+                <p>Lionel Messi a football player.</p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">2</span>
+                <p>Marina from Italy?</p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">3</span>
+                <p>Yes, Yoko in Class 5.</p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">4</span>
+                <p>The White House in New York.</p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">5</span>
+                <p>Pete a doctor?</p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">6</span>
+                <p>No, he.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ================= RIGHT COLUMN (Exercises 6–9 & Reflect) ================= -->
+        <div class="col-span-12 md:col-span-6 space-y-3.5">
+
+          <!-- Exercise 6 -->
+          <div class="space-y-1">
+            <div class="flex items-baseline gap-2.5">
+              <span class="text-[#d3232a] font-extrabold">6</span>
+              <p class="font-bold text-neutral-900">
+                Correct the sentences. Use the information in brackets.
+              </p>
+            </div>
+
+            <div class="pl-4 space-y-0.5 text-neutral-800">
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">1</span>
+                <div>
+                  <p>Jennifer Lopez is English. (American)</p>
+                  <p class="example-blue">Jennifer Lopez isn't English. She's American.</p>
+                </div>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">2</span>
+                <p>Cristiano Ronaldo is a doctor. (football player)</p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">3</span>
+                <p>The students are at a British university. (American)</p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">4</span>
+                <p>Celine Dion is from Spain. (Canada)</p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">5</span>
+                <p>We are from Spain. (all over the world)</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Exercise 7a, 7b, 7c -->
+          <div class="space-y-1.5">
+            <div class="flex items-baseline gap-1.5">
+              <span class="text-[#d3232a] font-extrabold">7</span>
+              <span class="font-bold text-neutral-900">a</span>
+              <p class="font-bold text-neutral-900">
+                Complete the sentences with the correct nationalities.
+              </p>
+            </div>
+
+            <div class="pl-3 space-y-0.5 text-neutral-800">
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-4 text-right">1</span>
+                <p>
+                  Gemma's from the UK. Gemma's
+                  <span class="inline-block border-b border-neutral-600 px-2 example-blue leading-none">British</span> .
+                </p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-4 text-right">2</span>
+                <p>Murat's from Turkey. Murat's <span class="line-blank w-[48px]"></span> .</p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-4 text-right">3</span>
+                <p>Sonoko's from Japan. Sonoko's <span class="line-blank w-[48px]"></span> .</p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-4 text-right">4</span>
+                <p>Jake's from Canada. Jake's <span class="line-blank w-[48px]"></span> .</p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-4 text-right">5</span>
+                <p>Felipe's from Brazil. Felipe's <span class="line-blank w-[48px]"></span> .</p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-4 text-right">6</span>
+                <p>Manolo's from Spain. Manolo's <span class="line-blank w-[48px]"></span> .</p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-4 text-right">7</span>
+                <p>Maria's from Argentina. Maria's <span class="line-blank w-[48px]"></span> .</p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-4 text-right">8</span>
+                <p>Sergio's from Mexico. Sergio's <span class="line-blank w-[48px]"></span> .</p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-4 text-right">9</span>
+                <p>Agnieszka's from Poland. Agnieszka's <span class="line-blank w-[48px]"></span> .</p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-4 text-right">10</span>
+                <p>Anurak's from Thailand. Anurak's <span class="line-blank w-[48px]"></span> .</p>
+              </div>
+            </div>
+
+            <!-- 7b -->
+            <div class="flex items-baseline gap-2 pl-2.5 pt-0.5">
+              <span class="font-bold text-neutral-900">b</span>
+              <p class="font-bold text-neutral-900">
+                Write the names, nationalities and jobs of three people you know.
+              </p>
+            </div>
+
+            <!-- 7c -->
+            <div class="space-y-0.5 pl-2.5">
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900">c</span>
+                <p class="font-bold text-neutral-900">
+                  Work in pairs. Tell your partner about the people in Exercise 7b.
+                </p>
+              </div>
+              <p class="pl-5 example-blue">Gino's my friend. He's Italian and he's a doctor.</p>
+            </div>
+          </div>
+
+          <!-- Exercise 8 -->
+          <div class="space-y-1">
+            <div class="flex items-baseline gap-2.5">
+              <span class="text-[#d3232a] font-extrabold">8</span>
+              <p class="font-bold text-neutral-900">Choose the correct alternatives.</p>
+            </div>
+
+            <div class="pl-4 space-y-0.5 text-neutral-800">
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">1</span>
+                <p>Ana and Lydia are friends. <em class="italic">We're</em> / <em class="italic">They're</em> from Mexico.</p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">2</span>
+                <p>Hey Luca, <em class="italic">we are</em> / <em class="italic">are we</em> in Classroom 2 today?</p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">3</span>
+                <p>Mike and Sally are teachers. <em class="italic">Are they</em> / <em class="italic">They are</em> British.</p>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">4</span>
+                <div class="space-y-0.5">
+                  <p><strong class="font-bold text-neutral-900">A:</strong> Hello Yuki, hello Yumi. <em class="italic">Are we</em> / <em class="italic">Are you</em> from Tokyo?</p>
+                  <p><strong class="font-bold text-neutral-900">B:</strong> <em class="italic">We aren't</em> / <em class="italic">They aren't</em> from Tokyo. <em class="italic">You're</em> / <em class="italic">We're</em> from Osaka.</p>
+                </div>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-900 w-2.5">5</span>
+                <p>Hi Jaime, hi Abdul. Don't worry! <em class="italic">You aren't</em> / <em class="italic">They aren't</em> late.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Exercise 9 -->
+          <div class="space-y-1">
+            <div class="flex items-baseline gap-2.5">
+              <span class="text-[#d3232a] font-extrabold">9</span>
+              <p class="font-bold text-neutral-900">
+                Complete the text with <em class="italic">'re</em>, <em class="italic">are</em> and <em class="italic">aren't</em>.
+              </p>
+            </div>
+
+            <div class="pl-4 text-neutral-800 leading-[1.42]">
+              <p>
+                Nick and Kelly <span class="line-blank w-[44px]"></span> my friends in London. I'm from the
+                UK, but Nick and Kelly <span class="line-blank w-[44px]"></span> British. They <span class="line-blank w-[44px]"></span> from
+                Canada.
+              </p>
+            </div>
+          </div>
+
+          <!-- Reflect Box -->
+          <div class="pt-1">
+            <div class="bg-[#f1d3c9] px-3.5 py-2.5 space-y-1.5">
+              <h2 class="title-heading text-[16px] leading-tight">
+                Reflect
+              </h2>
+              <p class="font-bold text-neutral-900 text-[12.8px] leading-[1.32]">
+                How confident do you feel about the statements below? Write 1–5 (1 = not very confident, 5 = very confident).
+              </p>
+              <ul class="space-y-0.5 pl-3 text-[12.8px] text-neutral-800">
+                <li class="flex items-baseline gap-2">
+                  <span class="text-[#d3232a] text-[10px] leading-none">•</span>
+                  <span>I can introduce myself to other students.</span>
+                </li>
+                <li class="flex items-baseline gap-2">
+                  <span class="text-[#d3232a] text-[10px] leading-none">•</span>
+                  <span>I can ask and answer about jobs.</span>
+                </li>
+                <li class="flex items-baseline gap-2">
+                  <span class="text-[#d3232a] text-[10px] leading-none">•</span>
+                  <span>I can talk about different nationalities.</span>
+                </li>
+                <li class="flex items-baseline gap-2">
+                  <span class="text-[#d3232a] text-[10px] leading-none">•</span>
+                  <span>I can ask for and give contact information.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Bottom-Right "Want more practice?" Chevron -->
+          <div class="pt-1 flex justify-end select-none">
+            <div class="relative w-[246px] h-[74px]">
+              <svg viewBox="0 0 246 74" class="w-full h-full block">
+                <!-- Left Light Green Chevron -->
+                <polygon points="0,0 38,0 62,37 38,74 0,74 24,37" fill="#a8d582" />
+                <!-- Middle Green Chevron -->
+                <polygon points="38,0 76,0 100,37 76,74 38,74 62,37" fill="#8dc663" />
+                <!-- Right Red Chevron -->
+                <polygon points="76,0 222,0 246,37 222,74 76,74 100,37" fill="#d3232a" />
+              </svg>
+
+              <!-- Text inside Red Chevron -->
+              <div
+                class="absolute inset-y-0 left-[98px] right-4 flex flex-col justify-center items-center text-white text-center"
+                style="font-family: 'Merriweather Sans', sans-serif;"
+              >
+                <span class="text-[13.5px] font-bold leading-[1.15]">Want more</span>
+                <span class="text-[13.5px] font-bold leading-[1.15] mb-1">practice?</span>
+                <span class="text-[9.8px] font-bold leading-[1.2] opacity-95">Go to your Workbook</span>
+                <span class="text-[9.8px] font-bold leading-[1.2] opacity-95">or app.</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= BOTTOM-RIGHT PAGE NUMBER PIN ("13") ================= -->
+    <div class="absolute bottom-0 right-0 w-[15px] h-[48px] bg-white z-10"></div>
+    <div class="absolute bottom-2 right-2.5 flex items-center select-none z-20">
+      <div class="relative w-8 h-10 flex items-start justify-center">
+        <svg viewBox="0 0 36 44" class="w-full h-full">
+          <path d="M18 0C8.06 0 0 8.06 0 18c0 11.25 18 26 18 26s18-14.75 18-26C36 8.06 27.94 0 18 0z" fill="#d3232a"/>
+          <circle cx="18" cy="17" r="11.5" fill="#ffffff"/>
+        </svg>
+        <span class="absolute top-[8px] text-[11px] font-bold text-neutral-700 tracking-tighter">13</span>
+      </div>
+    </div>
+
+  </main>
+</body>
+</html>

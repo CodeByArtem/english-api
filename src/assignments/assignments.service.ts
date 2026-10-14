@@ -9,6 +9,8 @@ import { Repository } from 'typeorm';
 import { Assignment } from './entities/assignment.entity';
 import { Submission } from './entities/submission.entity';
 import { Lesson } from '../content/entities/lesson.entity';
+import { User } from '../users/user.entity';
+import { Role } from '../common/role.enum';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
 import { ReviewSubmissionDto } from './dto/review-submission.dto';
 
@@ -21,27 +23,47 @@ export class AssignmentsService {
     private readonly submissionRepository: Repository<Submission>,
     @InjectRepository(Lesson)
     private readonly lessonRepository: Repository<Lesson>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
+
+  async getStudentsList() {
+    return this.userRepository.find({
+      where: { role: Role.STUDENT },
+      select: { id: true, email: true },
+      order: { email: 'ASC' },
+    });
+  }
 
   async createAssignment(
     title: string,
     description: string | null,
     dueDate: Date | null,
-    lessonId: string,
+    attachmentUrl: string | null = null,
+    studentId: string | null = null,
+    teacherId: string | null = null,
+    lessonId: string | null = null,
   ) {
     const assignment = this.assignmentRepository.create({
       title,
       description,
       dueDate,
-      lesson: { id: lessonId } as any,
+      attachmentUrl,
+      student: studentId ? ({ id: studentId } as any) : null,
+      teacher: teacherId ? ({ id: teacherId } as any) : null,
+      lesson: lessonId ? ({ id: lessonId } as any) : null,
     });
     return this.assignmentRepository.save(assignment);
   }
 
   async findAllForUser(user: any) {
+    const isStudent = user?.role?.toLowerCase() === Role.STUDENT;
+
     const assignments = await this.assignmentRepository.find({
       relations: {
         lesson: true,
+        student: true,
+        teacher: true,
         submissions: {
           student: true,
         },
@@ -51,19 +73,24 @@ export class AssignmentsService {
       },
     });
 
-    const isStudent = user?.role?.toUpperCase() === 'STUDENT';
+    const filtered = isStudent
+      ? assignments.filter((a) => !a.student || a.student.id === user.id)
+      : assignments;
 
-    return assignments.map((assignment) => {
-      let status: 'pending' | 'submitted' | 'graded' = 'pending';
+    return filtered.map((assignment) => {
+      let status: 'pending' | 'submitted' | 'graded' | 'needs_revision' = 'pending';
       let grade: number | null = null;
+      let submissionId: string | null = null;
 
-      if (isStudent && assignment.submissions) {
-        const studentSub = assignment.submissions.find(
-          (s) => s.student?.id === user.id,
-        );
+      if (assignment.submissions) {
+        const studentSub = isStudent
+          ? assignment.submissions.find((s) => s.student?.id === user.id)
+          : assignment.submissions[0];
+
         if (studentSub) {
-          status = studentSub.status === 'graded' ? 'graded' : 'submitted';
+          status = studentSub.status as any;
           grade = studentSub.grade ?? studentSub.score ?? null;
+          submissionId = studentSub.id;
         }
       }
 
@@ -72,9 +99,15 @@ export class AssignmentsService {
         title: assignment.title,
         description: assignment.description,
         dueDate: assignment.dueDate,
+        attachmentUrl: assignment.attachmentUrl,
         lessonId: assignment.lesson?.id,
+        assignedStudent: assignment.student
+          ? { id: assignment.student.id, email: assignment.student.email }
+          : null,
+        submissionsCount: assignment.submissions?.length || 0,
         status,
         grade,
+        submissionId,
       };
     });
   }
@@ -89,6 +122,8 @@ export class AssignmentsService {
         submissions: {
           student: true,
         },
+        student: true,
+        teacher: true,
       },
     });
 
@@ -96,32 +131,43 @@ export class AssignmentsService {
       throw new NotFoundException('Assignment not found');
     }
 
-    const isStudent = user?.role?.toUpperCase() === 'STUDENT';
+    const isStudent = user?.role?.toLowerCase() === Role.STUDENT;
+    if (isStudent && assignment.student && assignment.student.id !== user.id) {
+      throw new ForbiddenException('This assignment is not assigned to you');
+    }
+
     const studentSub = isStudent
       ? assignment.submissions?.find((s) => s.student?.id === user.id)
       : null;
 
-    const status = studentSub
-      ? studentSub.status === 'graded'
-        ? 'graded'
-        : 'submitted'
-      : 'pending';
+    const rawContent =
+      studentSub?.answers?.text ||
+      (typeof studentSub?.answers === 'string'
+        ? studentSub.answers
+        : studentSub?.answers
+        ? JSON.stringify(studentSub.answers)
+        : '');
 
     return {
       id: assignment.id,
       title: assignment.title,
       description: assignment.description,
       dueDate: assignment.dueDate,
+      attachmentUrl: assignment.attachmentUrl,
       lessonId: assignment.lesson?.id,
       lesson: assignment.lesson,
-      status,
+      assignedStudent: assignment.student
+        ? { id: assignment.student.id, email: assignment.student.email }
+        : null,
+      status: studentSub?.status || 'pending',
       submission: studentSub
         ? {
             id: studentSub.id,
-            content: studentSub.answers ? JSON.stringify(studentSub.answers) : '',
+            content: rawContent,
             submittedAt: studentSub.createdAt,
             grade: studentSub.grade ?? studentSub.score ?? undefined,
             feedback: studentSub.tutorComment || undefined,
+            status: studentSub.status,
           }
         : undefined,
     };
@@ -154,7 +200,7 @@ export class AssignmentsService {
       if (!assignment) throw new NotFoundException('Assignment not found');
       lesson = assignment.lesson;
 
-      if (dto.lessonId && dto.lessonId !== lesson.id) {
+      if (dto.lessonId && lesson && dto.lessonId !== lesson.id) {
         throw new BadRequestException('lessonId does not match assignment lesson');
       }
     } else if (dto.lessonId) {
@@ -165,18 +211,19 @@ export class AssignmentsService {
       if (!lesson) throw new NotFoundException('Lesson not found');
     }
 
-    if (!lesson) {
+    if (!lesson && !assignment) {
       throw new BadRequestException('Valid lessonId or assignmentId is required');
     }
 
-    console.log('Lesson found:', lesson.id, lesson.title);
+    if (lesson) {
+      console.log('Lesson found:', lesson.id, lesson.title);
+    }
 
-    // Check if student already has a submission for this lesson
+    // Check if student already has a submission for this lesson / assignment
     const existingSubmission = await this.submissionRepository.findOne({
-      where: {
-        student: { id: studentId },
-        lesson: { id: lesson.id },
-      },
+      where: lesson
+        ? { student: { id: studentId }, lesson: { id: lesson.id } }
+        : { student: { id: studentId }, assignment: { id: assignment!.id } },
       order: { createdAt: 'DESC' },
     });
 
@@ -193,7 +240,9 @@ export class AssignmentsService {
       }
       if (existingSubmission.status === 'needs_revision') {
         // Upon revision request, update the existing submission instead of creating duplicate
-        const { score, details } = this.calculateScore(lesson, dto.answers);
+        const { score, details } = lesson
+          ? this.calculateScore(lesson, dto.answers)
+          : { score: 0, details: null };
         existingSubmission.answers = dto.answers;
         existingSubmission.score = score;
         existingSubmission.details = details;
@@ -212,13 +261,15 @@ export class AssignmentsService {
       }
     }
 
-    // Автоматическая проверка ответов
-    const { score, details } = this.calculateScore(lesson, dto.answers);
+    // Автоматическая проверка ответов (если есть урок)
+    const { score, details } = lesson
+      ? this.calculateScore(lesson, dto.answers)
+      : { score: 0, details: null };
 
     const submission = this.submissionRepository.create({
       answers: dto.answers,
-      assignment,
-      lesson,
+      assignment: assignment || null,
+      lesson: lesson || null,
       student: { id: studentId } as any,
       score,
       details,
@@ -554,6 +605,57 @@ export class AssignmentsService {
 
     await this.submissionRepository.remove(submission);
     return { success: true, message: 'Submission deleted successfully' };
+  }
+
+  async deleteAssignment(id: string) {
+    const assignment = await this.assignmentRepository.findOne({ where: { id } });
+    if (!assignment) {
+      throw new NotFoundException('Assignment not found');
+    }
+    await this.assignmentRepository.remove(assignment);
+    return { success: true, message: 'Assignment deleted successfully' };
+  }
+
+  async submitTextAssignment(assignmentId: string, studentId: string, content: string) {
+    const assignment = await this.assignmentRepository.findOne({
+      where: { id: assignmentId },
+      relations: { student: true, lesson: true },
+    });
+
+    if (!assignment) {
+      throw new NotFoundException('Assignment not found');
+    }
+
+    if (assignment.student && assignment.student.id !== studentId) {
+      throw new ForbiddenException('This assignment is not assigned to you');
+    }
+
+    let submission = await this.submissionRepository.findOne({
+      where: {
+        assignment: { id: assignmentId },
+        student: { id: studentId },
+      },
+    });
+
+    if (submission) {
+      if (submission.status === 'graded') {
+        throw new BadRequestException(
+          'This assignment has already been graded and cannot be resubmitted.',
+        );
+      }
+      submission.answers = { text: content };
+      submission.status = 'submitted';
+    } else {
+      submission = this.submissionRepository.create({
+        assignment,
+        lesson: assignment.lesson || null,
+        student: { id: studentId } as any,
+        answers: { text: content },
+        status: 'submitted',
+      });
+    }
+
+    return this.submissionRepository.save(submission);
   }
 
   async getStudentSubmissionForLesson(studentId: string, lessonId: string) {

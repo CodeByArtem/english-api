@@ -460,10 +460,15 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
       mockAssignmentRepo = {
         findOne: jest.fn(),
       };
+      const mockUserRepo = {
+        find: jest.fn(),
+        findOne: jest.fn(),
+      };
       lifecycleService = new AssignmentsService(
         mockAssignmentRepo,
         mockSubmissionRepo,
         mockLessonRepo,
+        mockUserRepo as any,
       );
     });
 
@@ -744,6 +749,140 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
       const result = service.calculateScore(mockLesson1BFull, studentAnswers);
       expect(result.details.totalQuestions).toBe(32);
       expect(result.details.correctAnswers).toBe(32);
+      expect(result.score).toBe(100);
+    });
+  });
+
+  describe('Lesson 1C Nationalities - Dynamic calculateScore', () => {
+    const mockLesson1CFull: any = {
+      id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a44',
+      title: '1C Nationalities',
+      order: 3,
+      answerKey: {
+        exercise_1b_nationalities: {
+          '1': ['d', 'Spanish'],
+          '2': ['j', 'Canadian'],
+          '3': ['g', 'Japanese'],
+          '4': ['i', 'American'],
+          '5': ['c', 'Polish'],
+          '6': ['l', 'Argentinian'],
+          '7': ['a', 'Thai'],
+          '8': ['b', 'British'],
+          '9': ['e', 'Turkish'],
+          '10': ['f', 'Mexican'],
+          '11': ['k', 'Brazilian'],
+          '12': ['h', 'Italian'],
+        },
+        exercise_2c_stress: {
+          '2': ['D', 'Different', 'd'],
+          '3': ['D', 'Different', 'd'],
+          '4': ['S', 'Same', 's'],
+          '5': ['S', 'Same', 's'],
+        },
+        exercise_4a_photos: {
+          '1': ['D', 'd'],
+          '2': ['B', 'b'],
+          '3': ['C', 'c', 'A', 'a'],
+          '4': ['A', 'a', 'C', 'c'],
+          '5': ['E', 'e'],
+        },
+        exercise_4b_tf: {
+          '2': ['F', 'False', 'f'],
+          '3': ['T', 'True', 't'],
+          '4': ['F', 'False', 'f'],
+          '5': ['F', 'False', 'f'],
+        },
+        exercise_5a_grammar: {
+          '1': ["aren't", 'are not', 'arent'],
+          '2': ['are'],
+          '3': ['Are', 'are'],
+          '4': ["aren't", 'are not', 'arent'],
+          '5': ['are'],
+        },
+        exercise_6_texts: {
+          '2': ["'re", 'are'],
+          '3': ["aren't", 'are not', 'arent'],
+          '4': ["'re", 'are'],
+          '5': ["'re", 'are'],
+          '7': ["aren't", 'are not', 'arent'],
+          '8': ["'re", 'are'],
+          '9': ['are', "'re"],
+          '10': ['are', "'re"],
+        },
+        exercise_7a_questions: {
+          '2': ['Are the teachers at your school American?'],
+          '3': ['Are your classmates from different countries?'],
+          '4': ['Where are you and your classmates now?'],
+          '5': ['Who are your teachers?'],
+          '6': ['Where are your teachers from?'],
+        },
+      },
+    };
+
+    it('should score 100% for full correct answers in Lesson 1C', () => {
+      const studentAnswers = {
+        exercise_1b_nationalities: {
+          '1': 'd',
+          '2': 'Canadian',
+          '3': 'g',
+          '4': 'American',
+          '5': 'c',
+          '6': 'Argentinian',
+          '7': 'Thai',
+          '8': 'British',
+          '9': 'e',
+          '10': 'Mexican',
+          '11': 'k',
+          '12': 'Italian',
+        },
+        exercise_2c_stress: {
+          '2': 'D',
+          '3': 'd',
+          '4': 'S',
+          '5': 'Same',
+        },
+        exercise_4a_photos: {
+          '1': 'D',
+          '2': 'B',
+          '3': 'C',
+          '4': 'A',
+          '5': 'E',
+        },
+        exercise_4b_tf: {
+          '2': 'F',
+          '3': 'T',
+          '4': 'False',
+          '5': 'f',
+        },
+        exercise_5a_grammar: {
+          '1': "aren't",
+          '2': 'are',
+          '3': 'Are',
+          '4': "aren't",
+          '5': 'are',
+        },
+        exercise_6_texts: {
+          '2': "'re",
+          '3': "aren't",
+          '4': "'re",
+          '5': 'are',
+          '7': "aren't",
+          '8': "'re",
+          '9': 'are',
+          '10': "'re",
+        },
+        exercise_7a_questions: {
+          '2': 'Are the teachers at your school American?',
+          '3': 'Are your classmates from different countries?',
+          '4': 'Where are you and your classmates now?',
+          '5': 'Who are your teachers?',
+          '6': 'Where are your teachers from?',
+        },
+      };
+
+      const result = service.calculateScore(mockLesson1CFull, studentAnswers);
+      expect((result.details as any)?.totalQuestions).toBe(43);
+      expect((result.details as any)?.correctAnswers).toBe(43);
       expect(result.score).toBe(100);
     });
   });

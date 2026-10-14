@@ -5,9 +5,11 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
+  CreateDateColumn,
 } from 'typeorm';
 import { Lesson } from '../../content/entities/lesson.entity';
 import { Submission } from './submission.entity';
+import { User } from '../../users/user.entity';
 
 @Entity('assignments')
 export class Assignment {
@@ -23,9 +25,23 @@ export class Assignment {
   @Column({ type: 'timestamp', nullable: true })
   dueDate: Date | null;
 
-  @ManyToOne(() => Lesson, { onDelete: 'CASCADE' })
+  @Column({ name: 'attachment_url', type: 'text', nullable: true })
+  attachmentUrl: string | null;
+
+  @ManyToOne(() => Lesson, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'lesson_id' })
-  lesson: Lesson;
+  lesson: Lesson | null;
+
+  @ManyToOne(() => User, { nullable: true, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'student_id' })
+  student: User | null;
+
+  @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'teacher_id' })
+  teacher: User | null;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
 
   @OneToMany(() => Submission, (submission) => submission.assignment)
   submissions: Submission[];

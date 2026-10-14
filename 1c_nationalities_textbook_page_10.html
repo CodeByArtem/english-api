@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>1C Nationalities — Page 10</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600;1,700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --book-red: #d3232a;
+      --book-coral: #d65c48;
+      --book-teal: #1d4e66;
+      --book-blue-italic: #1e7898;
+      --book-pink: #f04b73;
+      --book-lightblue: #d4edf6;
+      --book-header-bg: #e7eef1;
+    }
+
+    body {
+      font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #2b2d30;
+      color: #222222;
+      margin: 0;
+      padding: 20px 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Textbook page container matching exact print aspect ratio */
+    .textbook-page {
+      max-width: 880px;
+      margin: 0 auto;
+      background: #ffffff;
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.55);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Section Headings (Vocabulary, Reading) */
+    .section-heading {
+      font-family: 'Merriweather Sans', sans-serif;
+      color: var(--book-teal);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    /* Blue italic example text as printed in the book */
+    .example-text {
+      color: var(--book-blue-italic);
+      font-style: italic;
+    }
+
+    /* Red Diamond Icon for Audio & App */
+    .diamond-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      background-color: var(--book-red);
+      transform: rotate(45deg);
+      border-radius: 1.5px;
+      margin-right: 4px;
+      margin-left: 2px;
+      vertical-align: -2px;
+      flex-shrink: 0;
+    }
+    .diamond-icon svg {
+      transform: rotate(-45deg);
+      width: 10px;
+      height: 10px;
+      fill: #ffffff;
+    }
+
+    /* Numbered & Lettered Photo Badges */
+    .photo-badge {
+      background-color: #164860;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      position: absolute;
+      z-index: 10;
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="textbook-page">
+
+    <!-- ================= TOP HEADER & PHOTO 3 ================= -->
+    <div class="grid grid-cols-12 bg-[#e7eef1]">
+      
+      <!-- Left & Center Header Banner ("1C Nationalities") -->
+      <div class="col-span-12 md:col-span-7 flex items-stretch min-h-[124px] relative overflow-hidden">
+        
+        <!-- SVG Geometric Red Chevron + Hatched Left Wedge -->
+        <div class="relative w-[215px] sm:w-[230px] flex-shrink-0 select-none">
+          <svg viewBox="0 0 230 124" class="w-full h-full block" preserveAspectRatio="none">
+            <defs>
+              <pattern id="diagHatch" width="5.5" height="5.5" patternTransform="rotate(60 0 0)" patternUnits="userSpaceOnUse">
+                <line x1="0" y1="0" x2="0" y2="5.5" stroke="#9fa6aa" stroke-width="1.5" />
+              </pattern>
+            </defs>
+            <polygon points="0,0 35,0 74,62 35,124 0,124" fill="#ffffff" />
+            <polygon points="0,0 35,0 74,62 35,124 0,124" fill="url(#diagHatch)" />
+            <polygon points="35,0 130,0 82,62" fill="#df5542" />
+            <polygon points="130,0 176,0 220,62 176,124 35,124 74,62" fill="#d3232a" />
+          </svg>
+          <div class="absolute inset-0 flex items-center pl-[88px] sm:pl-[95px] pt-1">
+            <span class="text-white font-extrabold text-[54px] leading-none tracking-tighter" style="font-family: 'Merriweather Sans', sans-serif;">1</span>
+            <span class="text-[#f1968b] font-bold text-[40px] leading-none ml-0.5 mt-2" style="font-family: 'Merriweather Sans', sans-serif;">C</span>
+          </div>
+        </div>
+
+        <!-- "Nationalities" Heading -->
+        <div class="flex items-center pl-2 pr-4 pt-3">
+          <h1 class="text-[34px] sm:text-[40px] font-bold text-[#1d4e66] tracking-tight leading-none" style="font-family: 'Merriweather Sans', sans-serif;">
+            Nationalities
+          </h1>
+        </div>
+      </div>
+
+      <!-- Top Right Photo 3: Gaucho on Horse with Cattle -->
+      <div class="col-span-12 md:col-span-5 relative h-[124px] overflow-hidden">
+        <img 
+          src="https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80" 
+          onerror="this.onerror=null;this.src='https://placehold.co/600x300/5b7043/ffffff?text=3';"
+          alt="Photo 3" 
+          class="w-full h-full object-cover object-center"
+        />
+        <div class="photo-badge bottom-0 left-0">3</div>
+      </div>
+    </div>
+
+    <!-- ================= UPPER SECTION: CORAL BOX + PHOTO 1 (LEFT) & PHOTO 2 + READING INTRO (RIGHT) ================= -->
+    <div class="grid grid-cols-12">
+      
+      <!-- Left Half (Cols 1-6): Coral Goal Box + Photo 1 -->
+      <div class="col-span-12 md:col-span-6 flex flex-col">
+        
+        <!-- Coral Goal / Grammar / Vocabulary Box -->
+        <div class="bg-[#d65c48] text-white pl-10 pr-6 py-3 text-[14.5px] leading-[1.42] space-y-0.5">
+          <div class="flex items-baseline gap-1.5">
+            <span class="text-[#f6b8ad] text-[11px] font-bold">❯</span>
+            <p><strong class="font-bold text-white">Goal:</strong> <span class="text-[#fdebe7]">talk about different nationalities</span></p>
+          </div>
+          <div class="flex items-baseline gap-1.5">
+            <span class="text-[#f6b8ad] text-[11px] font-bold">❯</span>
+            <p><strong class="font-bold text-white">Grammar:</strong> <span class="text-[#fdebe7]"><i>be</i>: <i>you</i>/<i>we</i>/<i>they</i></span></p>
+          </div>
+          <div class="flex items-baseline gap-1.5">
+            <span class="text-[#f6b8ad] text-[11px] font-bold">❯</span>
+            <p><strong class="font-bold text-white">Vocabulary:</strong> <span class="text-[#fdebe7]">nationalities</span></p>
+          </div>
+        </div>
+
+        <!-- Photo 1: Red British Telephone Boxes (Left-indented to align with page margin) -->
+        <div class="pl-8 pr-0">
+          <div class="relative h-[225px] overflow-hidden bg-stone-200">
+            <img 
+              src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=900&q=80" 
+              onerror="this.onerror=null;this.src='https://placehold.co/700x450/b91c1c/ffffff?text=1';"
+              alt="Photo 1" 
+              class="w-full h-full object-cover"
+            />
+            <div class="photo-badge bottom-0 left-0">1</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Half (Cols 7-12): Photo 2 (Maple Leaves) + Reading Heading -->
+      <div class="col-span-12 md:col-span-6 flex flex-col">
+        
+        <!-- Photo 2: Red Maple Leaves -->
+        <div class="relative h-[180px] overflow-hidden bg-red-950">
+          <img 
+            src="https://images.unsplash.com/photo-1507783548227-544c3b8fc065?auto=format&fit=crop&w=900&q=80" 
+            onerror="this.onerror=null;this.src='https://placehold.co/700x360/991b1b/ffffff?text=2';"
+            alt="Photo 2" 
+            class="w-full h-full object-cover"
+          />
+          <div class="photo-badge bottom-0 left-0">2</div>
+        </div>
+
+        <!-- Reading Heading & Exercise 4a instruction -->
+        <div class="pl-6 pr-8 pt-4 pb-1">
+          <h2 class="section-heading text-[21px] mb-1">Reading</h2>
+          <div class="flex items-baseline gap-1.5 text-[14px] leading-snug">
+            <span class="text-[#d3232a] font-extrabold">4</span>
+            <span class="font-bold text-neutral-900">a</span>
+            <p class="font-bold text-neutral-900">Read the blog. Match photos A–E with paragraphs 1–5.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= MAIN TWO-COLUMN CONTENT ================= -->
+    <div class="grid grid-cols-12 pl-8 pr-8 pb-12 pt-1 gap-x-6 items-start">
+
+      <!-- ================= LEFT COLUMN: VOCABULARY ================= -->
+      <div class="col-span-12 md:col-span-6 space-y-3.5 text-[14px] leading-[1.38] pr-2">
+        
+        <h2 class="section-heading text-[21px] pt-2">Vocabulary</h2>
+
+        <!-- Exercise 1a -->
+        <div class="flex items-baseline gap-1.5">
+          <span class="text-[#d3232a] font-extrabold">1</span>
+          <span class="font-bold text-neutral-900">a</span>
+          <p class="font-bold text-neutral-900">Work in pairs. Look at photos 1–6 and name the countries.</p>
+        </div>
+
+        <!-- Exercise 1b -->
+        <div class="space-y-1.5">
+          <div class="flex items-baseline gap-2 pl-3">
+            <span class="font-bold text-neutral-900">b</span>
+            <p class="font-bold text-neutral-900">Match countries 1–12 with nationalities a–l.</p>
+          </div>
+
+          <!-- Countries 1–12 & Nationalities a–l -->
+          <div class="pl-5 grid grid-cols-12 gap-x-2 text-[13.8px] leading-[1.48]">
+            <div class="col-span-5 flex"><span class="w-5 text-right font-bold text-neutral-700 mr-2">1</span><span>Spain</span></div>
+            <div class="col-span-7 flex"><span class="w-4 font-bold text-neutral-800 mr-1.5">a</span><span>Thai</span></div>
+
+            <div class="col-span-5 flex"><span class="w-5 text-right font-bold text-neutral-700 mr-2">2</span><span>Canada</span></div>
+            <div class="col-span-7 flex"><span class="w-4 font-bold text-neutral-800 mr-1.5">b</span><span>British</span></div>
+
+            <div class="col-span-5 flex"><span class="w-5 text-right font-bold text-neutral-700 mr-2">3</span><span>Japan</span></div>
+            <div class="col-span-7 flex"><span class="w-4 font-bold text-neutral-800 mr-1.5">c</span><span>Polish</span></div>
+
+            <div class="col-span-5 flex"><span class="w-5 text-right font-bold text-neutral-700 mr-2">4</span><span>the US</span></div>
+            <div class="col-span-7 flex"><span class="w-4 font-bold text-neutral-800 mr-1.5">d</span><span>Spanish</span></div>
+
+            <div class="col-span-5 flex"><span class="w-5 text-right font-bold text-neutral-700 mr-2">5</span><span>Poland</span></div>
+            <div class="col-span-7 flex"><span class="w-4 font-bold text-neutral-800 mr-1.5">e</span><span>Turkish</span></div>
+
+            <div class="col-span-5 flex"><span class="w-5 text-right font-bold text-neutral-700 mr-2">6</span><span>Argentina</span></div>
+            <div class="col-span-7 flex"><span class="w-4 font-bold text-neutral-800 mr-1.5">f</span><span>Mexican</span></div>
+
+            <div class="col-span-5 flex"><span class="w-5 text-right font-bold text-neutral-700 mr-2">7</span><span>Thailand</span></div>
+            <div class="col-span-7 flex"><span class="w-4 font-bold text-neutral-800 mr-1.5">g</span><span>Japanese</span></div>
+
+            <div class="col-span-5 flex"><span class="w-5 text-right font-bold text-neutral-700 mr-2">8</span><span>the UK</span></div>
+            <div class="col-span-7 flex"><span class="w-4 font-bold text-neutral-800 mr-1.5">h</span><span>Italian</span></div>
+
+            <div class="col-span-5 flex"><span class="w-5 text-right font-bold text-neutral-700 mr-2">9</span><span>Turkey</span></div>
+            <div class="col-span-7 flex"><span class="w-4 font-bold text-neutral-800 mr-1.5">i</span><span>American</span></div>
+
+            <div class="col-span-5 flex"><span class="w-5 text-right font-bold text-neutral-700 mr-2">10</span><span>Mexico</span></div>
+            <div class="col-span-7 flex"><span class="w-4 font-bold text-neutral-800 mr-1.5">j</span><span>Canadian</span></div>
+
+            <div class="col-span-5 flex"><span class="w-5 text-right font-bold text-neutral-700 mr-2">11</span><span>Brazil</span></div>
+            <div class="col-span-7 flex"><span class="w-4 font-bold text-neutral-800 mr-1.5">k</span><span>Brazilian</span></div>
+
+            <div class="col-span-5 flex"><span class="w-5 text-right font-bold text-neutral-700 mr-2">12</span><span>Italy</span></div>
+            <div class="col-span-7 flex"><span class="w-4 font-bold text-neutral-800 mr-1.5">l</span><span>Argentinian</span></div>
+          </div>
+        </div>
+
+        <!-- Exercise 2a & 2b -->
+        <div class="space-y-1.5 pt-0.5">
+          <div class="flex items-baseline gap-1.5">
+            <span class="text-[#d3232a] font-extrabold">2</span>
+            <span class="font-bold text-neutral-900">a</span>
+            <p class="font-bold text-neutral-900">
+              <span class="diamond-icon">
+                <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+              </span><span class="text-[#d3232a] font-extrabold">1.11</span> Listen and underline the stressed syllables in nationalities a–l in Exercise 1b.
+            </p>
+          </div>
+
+          <div class="flex items-baseline gap-2 pl-3">
+            <span class="font-bold text-neutral-900">b</span>
+            <p class="font-bold text-neutral-900">Listen again and repeat.</p>
+          </div>
+        </div>
+
+        <!-- Exercise 2c -->
+        <div class="space-y-1.5">
+          <div class="flex items-baseline gap-2 pl-3">
+            <span class="font-bold text-neutral-900">c</span>
+            <p class="font-bold text-neutral-900">
+              <span class="diamond-icon">
+                <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+              </span><span class="text-[#d3232a] font-extrabold">1.12</span> Read the sentences. Is the stress in the countries and nationalities on the same (S) syllable or on different (D) syllables? Listen and check.
+            </p>
+          </div>
+
+          <div class="pl-6 space-y-0.5 text-[13.8px]">
+            <div class="flex items-baseline gap-2">
+              <span class="font-bold text-neutral-600 w-3">1</span>
+              <p>She's from Argen<span class="underline decoration-1 underline-offset-2">ti</span>na. She's Argen<span class="underline decoration-1 underline-offset-2">ti</span>nian. <span class="example-text ml-0.5">S</span></p>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span class="font-bold text-neutral-600 w-3">2</span>
+              <p>She's from Canada. She's Canadian.</p>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span class="font-bold text-neutral-600 w-3">3</span>
+              <p>He's from Japan. He's Japanese.</p>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span class="font-bold text-neutral-600 w-3">4</span>
+              <p>She's from Mexico. She's Mexican.</p>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span class="font-bold text-neutral-600 w-3">5</span>
+              <p>He's from Poland. He's Polish.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exercise 3 -->
+        <div class="space-y-1 pt-0.5">
+          <div class="flex items-baseline gap-2">
+            <span class="text-[#d3232a] font-extrabold">3</span>
+            <p class="font-bold text-neutral-900">Write sentences about the nationalities of some famous people.</p>
+          </div>
+          <div class="pl-5">
+            <p class="example-text text-[14px]">Tom Cruise is American.</p>
+          </div>
+        </div>
+
+        <!-- App Practice Footer Link -->
+        <div class="pt-1 flex items-center gap-1 text-[12px] text-[#3b6e84]">
+          <span class="diamond-icon !w-[18px] !h-[18px]">
+            <svg viewBox="0 0 24 24"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
+          </span>
+          <span>Go to your app for more practice.</span>
+        </div>
+
+      </div>
+
+      <!-- ================= RIGHT COLUMN: READING ================= -->
+      <div class="col-span-12 md:col-span-6 space-y-4 md:-mt-16 pl-0 md:pl-2">
+
+        <!-- PHOTOS GRID A–E -->
+        <div class="space-y-1.5">
+          <!-- Row 1: Photos A, B, C -->
+          <div class="grid grid-cols-3 gap-1.5">
+            <div class="relative h-[160px] bg-stone-200 overflow-hidden">
+              <img 
+                src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=500&q=80" 
+                onerror="this.onerror=null;this.src='https://placehold.co/300x400/cbd5e1/1e293b?text=A';"
+                alt="Photo A" 
+                class="w-full h-full object-cover object-center"
+              />
+              <div class="photo-badge top-0 left-0">A</div>
+            </div>
+
+            <div class="relative h-[160px] bg-stone-200 overflow-hidden">
+              <img 
+                src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=500&q=80" 
+                onerror="this.onerror=null;this.src='https://placehold.co/300x400/cbd5e1/1e293b?text=B';"
+                alt="Photo B" 
+                class="w-full h-full object-cover object-center"
+              />
+              <div class="photo-badge top-0 left-0">B</div>
+            </div>
+
+            <div class="relative h-[160px] bg-stone-200 overflow-hidden">
+              <img 
+                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=500&q=80" 
+                onerror="this.onerror=null;this.src='https://placehold.co/300x400/cbd5e1/1e293b?text=C';"
+                alt="Photo C" 
+                class="w-full h-full object-cover object-center"
+              />
+              <div class="photo-badge top-0 left-0">C</div>
+            </div>
+          </div>
+
+          <!-- Row 2: Photos D, E -->
+          <div class="grid grid-cols-2 gap-1.5">
+            <div class="relative h-[118px] bg-stone-200 overflow-hidden">
+              <img 
+                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=500&q=80" 
+                onerror="this.onerror=null;this.src='https://placehold.co/400x260/cbd5e1/1e293b?text=D';"
+                alt="Photo D" 
+                class="w-full h-full object-cover object-top"
+              />
+              <div class="photo-badge top-0 left-0">D</div>
+            </div>
+
+            <div class="relative h-[118px] bg-stone-200 overflow-hidden">
+              <img 
+                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=500&q=80" 
+                onerror="this.onerror=null;this.src='https://placehold.co/400x260/cbd5e1/1e293b?text=E';"
+                alt="Photo E" 
+                class="w-full h-full object-cover object-top"
+              />
+              <div class="photo-badge top-0 left-0">E</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BLOG BOX: "Me and my friends" -->
+        <div>
+          <div class="bg-[#f04b73] text-white px-3 py-1 text-[14.5px] font-medium">
+            Me and my friends
+          </div>
+          <div class="bg-[#d4edf6] px-3 py-2.5 space-y-1.5 text-[13.4px] leading-[1.35] text-neutral-800">
+            <div class="flex items-baseline gap-1.5">
+              <span class="font-extrabold text-neutral-900">1</span>
+              <p>Hi! I'm Nina. I'm from London. I'm a university student and an office worker.</p>
+            </div>
+            <div class="flex items-baseline gap-1.5">
+              <span class="font-extrabold text-neutral-900">2</span>
+              <p>Tessa and Julia are my friends from university. Tessa is Turkish and Julia is Polish. They're student nurses.</p>
+            </div>
+            <div class="flex items-baseline gap-1.5">
+              <span class="font-extrabold text-neutral-900">3</span>
+              <p>This is my office. We aren't all British. We're from all over the world. Diego is from Spain, Carlos is from Argentina and the manager is from Thailand. We're a good team.</p>
+            </div>
+            <div class="flex items-baseline gap-1.5">
+              <span class="font-extrabold text-neutral-900">4</span>
+              <p>Tim, Annie and Dan are my friends from school. They aren't in the UK now. They're at an American university.</p>
+            </div>
+            <div class="flex items-baseline gap-1.5">
+              <span class="font-extrabold text-neutral-900">5</span>
+              <p>And this is my friend Marvin. He's from London, but he's in Vancouver in Canada now.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exercise 4b -->
+        <div class="space-y-1.5 text-[14px]">
+          <div class="flex items-baseline gap-2 pl-2">
+            <span class="font-bold text-neutral-900">b</span>
+            <p class="font-bold text-neutral-900 leading-snug">
+              Read the blog again. Are the sentences true (T) or false (F)? Correct the false sentences.
+            </p>
+          </div>
+
+          <div class="pl-5 space-y-1 text-[13.8px]">
+            <div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-neutral-600 w-3">1</span>
+                <span>Nina is from the US.</span>
+              </div>
+              <div class="pl-5 example-text">F – Nina is from the UK.</div>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span class="font-bold text-neutral-600 w-3">2</span>
+              <span>Tessa and Julia are from Turkey.</span>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span class="font-bold text-neutral-600 w-3">3</span>
+              <span>The office manager is Thai.</span>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span class="font-bold text-neutral-600 w-3">4</span>
+              <span>Tim, Annie and Dan are in the UK now.</span>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span class="font-bold text-neutral-600 w-3">5</span>
+              <span>Marvin is from Vancouver.</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ================= BOTTOM-LEFT PAGE NUMBER PIN ("10") ================= -->
+    <div class="absolute bottom-2.5 left-4 flex items-center select-none">
+      <div class="relative w-8 h-10 flex items-start justify-center">
+        <svg viewBox="0 0 36 44" class="w-full h-full">
+          <path d="M18 0C8.06 0 0 8.06 0 18c0 11.25 18 26 18 26s18-14.75 18-26C36 8.06 27.94 0 18 0z" fill="#d3232a"/>
+          <circle cx="18" cy="17" r="11.5" fill="#ffffff"/>
+        </svg>
+        <span class="absolute top-[8px] text-[11px] font-bold text-neutral-700 tracking-tighter">10</span>
+      </div>
+    </div>
+
+  </main>
+</body>
+</html>

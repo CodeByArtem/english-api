@@ -8,38 +8,28 @@ import {
   Body,
   UseGuards,
   Request,
-  UnauthorizedException,
-  ForbiddenException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '../common/role.enum';
 import { AssignmentsService } from './assignments.service';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
 import { GradeSubmissionDto } from './dto/assignment.dto';
 import { ReviewSubmissionDto } from './dto/review-submission.dto';
 
 @Controller('submissions')
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 export class SubmissionsController {
   constructor(private readonly assignmentsService: AssignmentsService) {}
 
   @Post()
+  @Roles(Role.STUDENT)
   async createSubmission(
     @Body() body: CreateSubmissionDto,
     @Request() req: any,
   ) {
-    console.log('=== SubmissionsController.createSubmission START ===');
-
-    if (req.user.role?.toUpperCase() !== 'STUDENT') {
-      throw new UnauthorizedException('Only students can submit assignments');
-    }
-
-    const result = await this.assignmentsService.createSubmission(
-      body,
-      req.user.id,
-    );
-
-    console.log('=== SubmissionsController.createSubmission END ===');
-    return result;
+    return this.assignmentsService.createSubmission(body, req.user.id);
   }
 
   @Get('student')
@@ -59,11 +49,8 @@ export class SubmissionsController {
   }
 
   @Get('teacher-stats')
-  async getTeacherStats(@Request() req: any) {
-    const role = req.user.role?.toUpperCase();
-    if (!['TUTOR', 'TEACHER', 'ADMIN'].includes(role)) {
-      throw new ForbiddenException('Only staff can access stats');
-    }
+  @Roles(Role.TUTOR)
+  async getTeacherStats() {
     return this.assignmentsService.getTeacherStats();
   }
 
@@ -73,37 +60,30 @@ export class SubmissionsController {
   }
 
   @Patch(':id/review')
+  @Roles(Role.TUTOR)
   async reviewSubmission(
     @Param('id') id: string,
     @Body() body: ReviewSubmissionDto,
-    @Request() req: any,
   ) {
-    const role = req.user.role?.toUpperCase();
-    if (!['TUTOR', 'TEACHER', 'ADMIN'].includes(role)) {
-      throw new ForbiddenException('Only staff can review submissions');
-    }
     return this.assignmentsService.reviewSubmission(id, body);
   }
 
   @Patch(':id/grade')
+  @Roles(Role.TUTOR)
   async gradeSubmission(
     @Param('id') id: string,
     @Body() body: GradeSubmissionDto,
-    @Request() req: any,
   ) {
-    const role = req.user.role?.toUpperCase();
-    if (!['TUTOR', 'TEACHER', 'ADMIN'].includes(role)) {
-      throw new ForbiddenException('Only staff can grade submissions');
-    }
-    return this.assignmentsService.gradeSubmission(id, body.grade, body.tutorComment || '');
+    return this.assignmentsService.gradeSubmission(
+      id,
+      body.grade,
+      body.tutorComment || '',
+    );
   }
 
   @Delete(':id')
-  async deleteSubmission(@Param('id') id: string, @Request() req: any) {
-    const role = req.user.role?.toUpperCase();
-    if (!['TUTOR', 'TEACHER', 'ADMIN'].includes(role)) {
-      throw new ForbiddenException('Only staff can delete submissions');
-    }
+  @Roles(Role.TUTOR)
+  async deleteSubmission(@Param('id') id: string) {
     return this.assignmentsService.deleteSubmission(id);
   }
 }

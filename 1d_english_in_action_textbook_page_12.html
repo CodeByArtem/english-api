@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>1D English in action — Page 12</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600;1,700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --book-red: #d3232a;
+      --book-coral: #d65c48;
+      --book-teal: #1d4e66;
+      --book-blue-italic: #1e7898;
+      --book-cyan: #169bd5;
+    }
+
+    body {
+      font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #2b2d30;
+      color: #222222;
+      margin: 0;
+      padding: 20px 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Textbook page container matching exact print aspect ratio */
+    .textbook-page {
+      max-width: 880px;
+      margin: 0 auto;
+      background: #ffffff;
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.55);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Main Title Font */
+    .title-heading {
+      font-family: 'Merriweather Sans', sans-serif;
+      color: var(--book-teal);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    /* Red Diamond Icon for Audio */
+    .diamond-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      background-color: var(--book-red);
+      transform: rotate(45deg);
+      border-radius: 1.5px;
+      margin-right: 4px;
+      margin-left: 2px;
+      vertical-align: -2px;
+      flex-shrink: 0;
+    }
+    .diamond-icon svg {
+      transform: rotate(-45deg);
+      width: 10px;
+      height: 10px;
+      fill: #ffffff;
+    }
+
+    /* Useful Phrases Gradient Box */
+    .useful-phrases-box {
+      background: linear-gradient(90deg, #f8d4dc 0%, #fbebf0 75%, #fdf4f6 100%);
+    }
+
+    /* Contact Card Outer Frame */
+    .contact-card-frame {
+      background-color: #a9b6bf;
+      padding: 7px 8px;
+    }
+
+    /* Contact Card Inner Box */
+    .contact-card-inner {
+      background-color: #ffffff;
+      border-radius: 8px;
+      padding: 8px 14px 12px 14px;
+    }
+
+    /* Blank Write-in Lines */
+    .line-blank {
+      display: inline-block;
+      border-bottom: 1px solid #555555;
+      height: 14px;
+      vertical-align: baseline;
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="textbook-page pb-14">
+
+    <!-- ================= TOP HEADER BANNER ("1D English in action") ================= -->
+    <header class="relative h-[126px] w-full overflow-hidden select-none" style="background: linear-gradient(90deg, #ffffff 0%, #f5f8fa 38%, #dce5ea 100%);">
+      <div class="relative h-full flex items-center">
+        <!-- SVG Chevrons on the left -->
+        <svg viewBox="0 0 430 126" class="h-full w-[430px] flex-shrink-0 block" preserveAspectRatio="none">
+          <!-- Main Red Chevron -->
+          <polygon points="28,22 146,22 184,74 146,126 28,126 66,74" fill="#d3232a" />
+          <!-- Chevron Ribbon 1 -->
+          <polygon points="160,22 190,22 228,74 190,126 160,126 198,74" fill="#e06a59" />
+          <!-- Chevron Ribbon 2 -->
+          <polygon points="204,22 234,22 272,74 234,126 204,126 242,74" fill="#ea9384" />
+          <!-- Chevron Ribbon 3 -->
+          <polygon points="248,22 278,22 316,74 278,126 248,126 286,74" fill="#f3bcb1" />
+        </svg>
+
+        <!-- "1D" Text inside Red Chevron -->
+        <div class="absolute left-[84px] top-[38px] flex items-baseline leading-none" style="font-family: 'Merriweather Sans', sans-serif;">
+          <span class="text-white font-extrabold text-[54px] tracking-tight">1</span>
+          <span class="text-[#ee8d83] font-extrabold text-[40px] ml-0.5">D</span>
+        </div>
+
+        <!-- "English in action" Heading overlapping the chevrons -->
+        <h1 class="title-heading text-[33px] absolute left-[218px] top-[53px] leading-none">
+          English in action
+        </h1>
+      </div>
+    </header>
+
+    <!-- ================= MAIN TWO-COLUMN CONTENT GRID ================= -->
+    <div class="grid grid-cols-12 items-start">
+
+      <!-- ================= LEFT COLUMN ================= -->
+      <div class="col-span-12 md:col-span-6 flex flex-col">
+
+        <!-- Goal Banner -->
+        <div class="pl-12">
+          <div class="bg-[#d65c48] text-white px-3.5 py-1.5 text-[14.5px] flex items-center gap-1.5">
+            <svg viewBox="0 0 12 20" class="w-2.5 h-3.5 fill-current opacity-85 flex-shrink-0">
+              <polygon points="0,0 5,0 12,10 5,20 0,20 7,10" />
+            </svg>
+            <p class="leading-tight">
+              <strong class="font-bold">Goal:</strong> <span class="font-normal opacity-95">ask for and give contact information</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Left Column Exercises Wrapper -->
+        <div class="pl-12 pr-5 pt-4 space-y-3 text-[13.6px] leading-[1.36]">
+
+          <!-- Exercise 1 -->
+          <div class="space-y-1">
+            <div class="flex items-baseline gap-2.5">
+              <span class="text-[#d3232a] font-extrabold">1</span>
+              <p class="font-bold text-neutral-900">Look at the photo. Work in pairs. Where are the people?</p>
+            </div>
+            <div class="pl-5 space-y-0.5 text-[13.4px]">
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-[#1d4e66] w-2.5">a</span>
+                <span class="text-neutral-800">at a conference</span>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-[#1d4e66] w-2.5">b</span>
+                <span class="text-neutral-800">in a language school</span>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-[#1d4e66] w-2.5">c</span>
+                <span class="text-neutral-800">in a hotel</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Exercise 2 -->
+          <div class="flex items-baseline gap-2.5">
+            <span class="text-[#d3232a] font-extrabold">2</span>
+            <p class="font-bold text-neutral-900">
+              <span class="diamond-icon">
+                <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+              </span><span class="text-[#d3232a] font-extrabold">1.14</span> Listen to the conversation. Who is the student? Where is she from?
+            </p>
+          </div>
+
+          <!-- Exercise 3a -->
+          <div class="flex items-baseline gap-1.5">
+            <span class="text-[#d3232a] font-extrabold">3</span>
+            <span class="font-bold text-neutral-900">a</span>
+            <p class="font-bold text-neutral-900">
+              Read the Useful phrases box. Listen to the conversation again and number the phrases in the order that you hear them.
+            </p>
+          </div>
+
+          <!-- Useful Phrases Box -->
+          <div class="pl-5 pr-4 pt-0.5">
+            <div class="useful-phrases-box px-3.5 py-2.5 space-y-2 text-[13.2px] leading-[1.38]">
+              <h3 class="text-[#d3232a] font-bold text-[15px] leading-tight" style="font-family: 'Merriweather Sans', sans-serif;">
+                Useful phrases
+              </h3>
+
+              <!-- Group 1 -->
+              <div>
+                <p class="font-bold text-neutral-900">Asking for information</p>
+                <p class="text-neutral-800">What's your first name?</p>
+                <p class="text-neutral-800">What's your family name?</p>
+                <p class="text-neutral-800">What's your phone number?</p>
+                <p class="text-neutral-800">What's your email address?</p>
+              </div>
+
+              <!-- Group 2 -->
+              <div>
+                <p class="font-bold text-neutral-900">Checking information</p>
+                <p class="text-neutral-800">Sorry, can you say that again?</p>
+                <p class="text-neutral-800">How do you spell (your first name)?</p>
+              </div>
+
+              <!-- Group 3 -->
+              <div>
+                <p class="font-bold text-neutral-900">Giving information</p>
+                <p class="text-neutral-800">My first name is (Selin).</p>
+                <p class="text-neutral-800">My family name is (Atakan).</p>
+                <p class="text-neutral-800">My number is (020-555-7645).</p>
+                <p class="text-neutral-800">My email address is (selin2000@dmail.com).</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Exercise 3b -->
+          <div class="flex items-baseline gap-2 pl-2.5 pt-0.5">
+            <span class="font-bold text-neutral-900">b</span>
+            <p class="font-bold text-neutral-900">Listen again and complete the form.</p>
+          </div>
+
+          <!-- NEW CONTACT Card (Exercise 3b) -->
+          <div class="pt-0.5 pr-1">
+            <div class="contact-card-frame">
+              <div class="contact-card-inner">
+                <div class="text-[#169bd5] font-extrabold text-[13.5px] tracking-wide uppercase border-b border-[#7fcbee] pb-0.5 mb-1.5">
+                  NEW CONTACT
+                </div>
+                <div class="space-y-1 text-[13.2px] text-neutral-800">
+                  <div>
+                    <sup class="font-bold text-neutral-900 text-[9.5px]">1</sup><span class="line-blank w-[124px]"></span> : Selin
+                  </div>
+                  <div>
+                    <sup class="font-bold text-neutral-900 text-[9.5px]">2</sup><span class="line-blank w-[124px]"></span> : Atakan
+                  </div>
+                  <div>
+                    <sup class="font-bold text-neutral-900 text-[9.5px]">3</sup><span class="line-blank w-[124px]"></span> : 020-555-7645
+                  </div>
+                  <div>
+                    <sup class="font-bold text-neutral-900 text-[9.5px]">4</sup><span class="line-blank w-[124px]"></span> : selin2000@dmail.com
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Exercise 4a -->
+          <div class="space-y-1.5 pt-1">
+            <div class="flex items-baseline gap-1.5">
+              <span class="text-[#d3232a] font-extrabold">4</span>
+              <span class="font-bold text-neutral-900">a</span>
+              <p class="font-bold text-neutral-900">
+                Complete the conversation with the correct questions. Use the Useful phrases to help you.
+              </p>
+            </div>
+
+            <div class="pl-5 space-y-1 text-[13.1px] leading-[1.38] text-neutral-800">
+              <p>
+                <strong class="font-bold text-neutral-900">A:</strong>
+                <sup class="font-bold text-neutral-900 text-[9.5px]">1</sup><span class="line-blank w-[255px]"></span>?
+              </p>
+              <p><strong class="font-bold text-neutral-900">B:</strong> Dieter Neumann.</p>
+
+              <p>
+                <strong class="font-bold text-neutral-900">A:</strong>
+                <sup class="font-bold text-neutral-900 text-[9.5px]">2</sup><span class="line-blank w-[198px]"></span> first name?
+              </p>
+              <p><strong class="font-bold text-neutral-900">B:</strong> D - I - E - T - E - R.</p>
+
+              <p>
+                <strong class="font-bold text-neutral-900">A:</strong> And
+                <sup class="font-bold text-neutral-900 text-[9.5px]">3</sup><span class="line-blank w-[198px]"></span> again?
+              </p>
+              <p><strong class="font-bold text-neutral-900">B:</strong> Neumann. That's N - E - U - M - A - N - N.</p>
+
+              <p>
+                <strong class="font-bold text-neutral-900">A:</strong>
+                <sup class="font-bold text-neutral-900 text-[9.5px]">4</sup><span class="line-blank w-[255px]"></span>?
+              </p>
+              <p><strong class="font-bold text-neutral-900">B:</strong> It's 07700 900617.</p>
+
+              <p>
+                <strong class="font-bold text-neutral-900">A:</strong> Sorry,
+                <sup class="font-bold text-neutral-900 text-[9.5px]">5</sup><span class="line-blank w-[224px]"></span>?
+              </p>
+              <p><strong class="font-bold text-neutral-900">B:</strong> 07700 900617.</p>
+
+              <p>
+                <strong class="font-bold text-neutral-900">A:</strong> And
+                <sup class="font-bold text-neutral-900 text-[9.5px]">6</sup><span class="line-blank w-[232px]"></span>?
+              </p>
+              <p><strong class="font-bold text-neutral-900">B:</strong> It's dietern@intertalk.com.</p>
+            </div>
+          </div>
+
+          <!-- Exercise 4b -->
+          <div class="flex items-baseline gap-2 pl-2.5 pt-0.5">
+            <span class="font-bold text-neutral-900">b</span>
+            <p class="font-bold text-neutral-900">
+              <span class="diamond-icon">
+                <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+              </span><span class="text-[#d3232a] font-extrabold">1.15</span> Listen, check and repeat.
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ================= RIGHT COLUMN ================= -->
+      <div class="col-span-12 md:col-span-6 flex flex-col">
+
+        <!-- Main Photo (Bleeds to right edge of page) -->
+        <div class="w-full h-[358px] overflow-hidden bg-stone-200">
+          <img
+            src="https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=900&q=80"
+            onerror="this.onerror=null;this.src='https://placehold.co/600x480/d6d3d1/292524?text=Two+People+Talking';"
+            alt="Two people having a conversation in a language school"
+            class="w-full h-full object-cover object-center"
+          />
+        </div>
+
+        <!-- Exercises 5 & 6 Content Area -->
+        <div class="pl-5 pr-12 pt-6 space-y-5 text-[13.6px] leading-[1.36]">
+
+          <!-- Exercise 5 -->
+          <div class="space-y-2.5">
+            <div class="flex items-baseline gap-2.5">
+              <span class="text-[#d3232a] font-extrabold">5</span>
+              <p class="font-bold text-neutral-900">Complete the form with your information.</p>
+            </div>
+
+            <!-- NEW CONTACT Card (Exercise 5) -->
+            <div class="pl-2">
+              <div class="contact-card-frame">
+                <div class="contact-card-inner flex items-center justify-between gap-3">
+                  <!-- Form Lines -->
+                  <div class="flex-1">
+                    <div class="text-[#169bd5] font-extrabold text-[13.5px] tracking-wide uppercase border-b border-[#7fcbee] pb-0.5 mb-2">
+                      NEW CONTACT
+                    </div>
+                    <div class="space-y-1.5 text-[13.2px] text-neutral-800">
+                      <div>First name: <span class="line-blank w-[142px]"></span></div>
+                      <div>Family name: <span class="line-blank w-[132px]"></span></div>
+                      <div>Phone number: <span class="line-blank w-[122px]"></span></div>
+                      <div>Email address: <span class="line-blank w-[124px]"></span></div>
+                    </div>
+                  </div>
+
+                  <!-- Female Avatar Illustration -->
+                  <div class="w-[68px] h-[68px] flex-shrink-0 self-end mb-0.5">
+                    <svg viewBox="0 0 80 80" class="w-full h-full block">
+                      <defs>
+                        <clipPath id="femaleCircle">
+                          <circle cx="40" cy="40" r="38" />
+                        </clipPath>
+                      </defs>
+                      <circle cx="40" cy="40" r="38" fill="#ee9691" />
+                      <g clip-path="url(#femaleCircle)">
+                        <!-- Back hair -->
+                        <path d="M23 30 C21 44 21 56 24 62 L56 62 C59 56 59 44 57 30 Z" fill="#b45a3c" />
+                        <!-- Shoulders / Dark Top -->
+                        <path d="M14 80 C15 65 26 60 40 60 C54 60 65 65 66 80 Z" fill="#3a3537" />
+                        <!-- Neck & Chest V-Neck -->
+                        <polygon points="33,52 47,52 47,63 40,71 33,63" fill="#f7d3ba" />
+                        <!-- Ears -->
+                        <circle cx="27" cy="41" r="3.5" fill="#f7d3ba" />
+                        <circle cx="53" cy="41" r="3.5" fill="#f7d3ba" />
+                        <!-- Face -->
+                        <path d="M27 32 C27 21 53 21 53 32 L52 43 C52 51 45 56 40 56 C35 56 28 51 28 43 Z" fill="#fce0cb" />
+                        <!-- Front swept hair -->
+                        <path d="M25 35 C25 20 35 17 44 18 C52 19 56 25 55 36 C51 29 44 25 36 27 C31 28 28 32 25 35 Z" fill="#c56646" />
+                      </g>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Exercise 6 -->
+          <div class="space-y-2.5 pt-1">
+            <div class="flex items-baseline gap-2.5">
+              <span class="text-[#d3232a] font-extrabold">6</span>
+              <p class="font-bold text-neutral-900">
+                Work in pairs. Ask and answer questions to complete the form with your partner's information.
+              </p>
+            </div>
+
+            <!-- NEW CONTACT Card (Exercise 6) -->
+            <div class="pl-2">
+              <div class="contact-card-frame">
+                <div class="contact-card-inner flex items-center justify-between gap-3">
+                  <!-- Form Lines -->
+                  <div class="flex-1">
+                    <div class="text-[#169bd5] font-extrabold text-[13.5px] tracking-wide uppercase border-b border-[#7fcbee] pb-0.5 mb-2">
+                      NEW CONTACT
+                    </div>
+                    <div class="space-y-1.5 text-[13.2px] text-neutral-800">
+                      <div>First name: <span class="line-blank w-[142px]"></span></div>
+                      <div>Family name: <span class="line-blank w-[132px]"></span></div>
+                      <div>Phone number: <span class="line-blank w-[122px]"></span></div>
+                      <div>Email address: <span class="line-blank w-[124px]"></span></div>
+                    </div>
+                  </div>
+
+                  <!-- Male Avatar Illustration -->
+                  <div class="w-[68px] h-[68px] flex-shrink-0 self-end mb-0.5">
+                    <svg viewBox="0 0 80 80" class="w-full h-full block">
+                      <defs>
+                        <clipPath id="maleCircle">
+                          <circle cx="40" cy="40" r="38" />
+                        </clipPath>
+                      </defs>
+                      <circle cx="40" cy="40" r="38" fill="#78ccc9" />
+                      <g clip-path="url(#maleCircle)">
+                        <!-- Shoulders / Blue Shirt -->
+                        <path d="M13 80 C15 64 26 59 40 59 C54 59 65 64 67 80 Z" fill="#0d69a8" />
+                        <!-- Neck & V-Neck -->
+                        <polygon points="33,51 47,51 47,61 40,68 33,61" fill="#f3cbb2" />
+                        <!-- Ears -->
+                        <circle cx="27" cy="40" r="3.5" fill="#f3cbb2" />
+                        <circle cx="53" cy="40" r="3.5" fill="#f3cbb2" />
+                        <!-- Face -->
+                        <path d="M27 31 C27 20 53 20 53 31 L52 43 C52 51 45 55 40 55 C35 55 28 51 28 43 Z" fill="#f9dac5" />
+                        <!-- Short Brown Hair -->
+                        <path d="M26 35 C25 22 31 17 40 17 C49 17 55 22 54 35 C52 28 48 25 40 25 C32 25 28 28 26 35 Z" fill="#825339" />
+                      </g>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom-Right "Go online for the Roadmap video." Chevron -->
+          <div class="pt-16 flex justify-end select-none">
+            <div class="relative w-[242px] h-[54px]">
+              <svg viewBox="0 0 242 54" class="w-full h-full block">
+                <!-- Left Green Chevron -->
+                <polygon points="0,0 64,0 82,27 64,54 0,54 18,27" fill="#93c868" />
+                <!-- Right Red Chevron -->
+                <polygon points="64,0 224,0 242,27 224,54 64,54 82,27" fill="#d3232a" />
+              </svg>
+
+              <!-- Circular Video Camera Badge -->
+              <div class="absolute left-[34px] top-1/2 -translate-y-1/2 w-[38px] h-[38px] rounded-full bg-[#93c868] border-[2.5px] border-white flex items-center justify-center shadow-sm">
+                <svg viewBox="0 0 24 24" class="w-5 h-5 fill-white">
+                  <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                </svg>
+              </div>
+
+              <!-- Text inside Red Chevron -->
+              <div class="absolute inset-y-0 left-[86px] right-4 flex flex-col justify-center items-center text-white text-center leading-[1.18]" style="font-family: 'Merriweather Sans', sans-serif;">
+                <span class="text-[12px] font-bold">Go online for the</span>
+                <span class="text-[12px] font-bold">Roadmap video.</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= BOTTOM-LEFT PAGE NUMBER PIN ("12") ================= -->
+    <div class="absolute bottom-2.5 left-4 flex items-center select-none">
+      <div class="relative w-8 h-10 flex items-start justify-center">
+        <svg viewBox="0 0 36 44" class="w-full h-full">
+          <path d="M18 0C8.06 0 0 8.06 0 18c0 11.25 18 26 18 26s18-14.75 18-26C36 8.06 27.94 0 18 0z" fill="#d3232a"/>
+          <circle cx="18" cy="17" r="11.5" fill="#ffffff"/>
+        </svg>
+        <span class="absolute top-[8px] text-[11px] font-bold text-neutral-700 tracking-tighter">12</span>
+      </div>
+    </div>
+
+  </main>
+</body>
+</html>

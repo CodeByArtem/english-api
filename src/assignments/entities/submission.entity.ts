@@ -46,9 +46,9 @@ export class Submission {
   @JoinColumn({ name: 'assignment_id' })
   assignment: Assignment | null;
 
-  @ManyToOne(() => Lesson, { nullable: false })
+  @ManyToOne(() => Lesson, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'lesson_id' })
-  lesson: Lesson;
+  lesson: Lesson | null;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'student_id' })
