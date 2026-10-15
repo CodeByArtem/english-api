@@ -58,6 +58,19 @@ export class SeedService implements OnApplicationBootstrap {
       await this.unitRepository.save(unit);
     }
 
+    let unit2 = await this.unitRepository.findOne({
+      where: { id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13' },
+    });
+    if (!unit2) {
+      unit2 = this.unitRepository.create({
+        id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13',
+        title: 'Unit 2: Families and Friends',
+        order: 2,
+        textbook,
+      });
+      await this.unitRepository.save(unit2);
+    }
+
     const lesson1 = await this.lessonRepository.save({
       id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22',
       title: '1A Hello',
@@ -421,6 +434,292 @@ export class SeedService implements OnApplicationBootstrap {
       lesson: lesson3,
     });
     await this.exerciseRepository.save(exercise6);
+
+    const lesson4 = await this.lessonRepository.save({
+      id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55',
+      title: '1D English in action & Check and reflect',
+      order: 4,
+      content: `
+        <div class="lesson-section">
+          <h3>1D English in action</h3>
+          <p>Goal: ask for and give contact information. Practice useful phrases for asking, giving and checking information.</p>
+          <h3>Check and reflect</h3>
+          <p>Review Unit 1 vocabulary, grammar (be: singular and plural), countries, nationalities, jobs, and self-assessment.</p>
+        </div>
+      `,
+      theory: `
+        <div class="theory-section">
+          <p><strong>Goal:</strong> ask for and give contact information. Check and reflect on Unit 1.</p>
+          <h4>Useful phrases</h4>
+          <ul>
+            <li><strong>Asking for information:</strong> What's your first name? / What's your family name? / What's your phone number? / What's your email address?</li>
+            <li><strong>Checking information:</strong> Sorry, can you say that again? / How do you spell (your first name)?</li>
+            <li><strong>Giving information:</strong> My first name is... / My family name is... / My number is... / My email address is...</li>
+          </ul>
+        </div>
+      `,
+      answerKey: {
+        exercise_1_location: {
+          '1': ['b', 'in a language school'],
+        },
+        exercise_2_audio: {
+          student: ['Selin', 'Selin Atakan'],
+          country: ['Turkey', 'from Turkey'],
+        },
+        exercise_3b_contact: {
+          '1': ['First name', 'first name', 'firstname'],
+          '2': ['Family name', 'family name', 'Surname', 'surname', 'last name'],
+          '3': ['Phone number', 'phone number', 'phone', 'number'],
+          '4': ['Email address', 'email address', 'email', 'e-mail'],
+        },
+        exercise_4a_dialogue: {
+          '1': [
+            "What's your name",
+            'What is your name',
+            "What's your full name",
+            'What is your full name',
+          ],
+          '2': ['How do you spell your', 'How do you spell'],
+          '3': [
+            "what's your family name",
+            'your family name',
+            'what is your family name',
+            "what's your surname",
+            'your surname',
+          ],
+          '4': [
+            "What's your phone number",
+            'What is your phone number',
+            'What is your number',
+            "What's your number",
+          ],
+          '5': ['can you say that again', 'could you say that again'],
+          '6': [
+            "what's your email address",
+            'what is your email address',
+            "what's your email",
+            'what is your email',
+          ],
+        },
+        exercise_1_wordsearch: {
+          argentina: ['Argentina', 'argentina'],
+          brazil: ['Brazil', 'brazil'],
+          canada: ['Canada', 'canada'],
+          italy: ['Italy', 'italy'],
+          japan: ['Japan', 'japan'],
+          mexico: ['Mexico', 'mexico'],
+          poland: ['Poland', 'poland'],
+          spain: ['Spain', 'spain'],
+          thailand: ['Thailand', 'thailand'],
+          turkey: ['Turkey', 'turkey'],
+        },
+        exercise_2a_order: {
+          '2': [
+            'I am not from London',
+            'I am not from London.',
+            "I'm not from London",
+            "I'm not from London.",
+          ],
+          '3': ['Are you in my class?', 'Are you in my class'],
+          '4': ['Where are you from?', 'Where are you from'],
+          '5': [
+            'No, you are not in my class',
+            'No, you are not in my class.',
+            'No you are not in my class',
+            "No, you're not in my class",
+            "No, you aren't in my class",
+          ],
+        },
+        exercise_3_be: {
+          '1_a': ['Are', 'are'],
+          '1_b': ["'m", 'am', "I'm", 'm'],
+          '2_a1': ["'m", 'am'],
+          '2_a2': ['Are', 'are'],
+          '2_b1': ["'m not", 'am not'],
+          '2_b2': ["'m", 'am'],
+          '3_a1': ["'m", 'am'],
+          '3_a2': ["'m", 'am'],
+          '3_b': ["'m", 'am'],
+          '4_a': ['Am', 'am'],
+          '4_b': ["aren't", 'are not', "'re not"],
+        },
+        exercise_4_jobs: {
+          '2': ['school teacher', 'teacher'],
+          '3': ['farmer'],
+          '4': ['office worker'],
+          '5': ['pilot'],
+          '6': ['doctor'],
+          '7': ['taxi driver'],
+          '8': ['nurse'],
+        },
+        exercise_5_is_isnt: {
+          '1': [
+            'Lionel Messi is a football player',
+            'Lionel Messi is a football player.',
+          ],
+          '2': ['Is Marina from Italy?', 'Is Marina from Italy'],
+          '3': [
+            'Yes, Yoko is in Class 5',
+            'Yes, Yoko is in Class 5.',
+            "Yes, Yoko's in Class 5.",
+          ],
+          '4': [
+            "The White House isn't in New York",
+            "The White House isn't in New York.",
+            'The White House is not in New York',
+            'The White House is not in New York.',
+          ],
+          '5': ['Is Pete a doctor?', 'Is Pete a doctor'],
+          '6': [
+            "No, he isn't",
+            "No, he isn't.",
+            'No, he is not',
+            'No, he is not.',
+          ],
+        },
+        exercise_6_corrections: {
+          '2': [
+            "Cristiano Ronaldo isn't a doctor. He's a football player.",
+            "Cristiano Ronaldo isn't a doctor. He's a football player",
+            'Cristiano Ronaldo is not a doctor. He is a football player.',
+          ],
+          '3': [
+            "The students aren't at a British university. They're at an American university.",
+            "The students aren't at a British university. They're American.",
+            'The students are not at a British university. They are at an American university.',
+          ],
+          '4': [
+            "Celine Dion isn't from Spain. She's from Canada.",
+            "Celine Dion isn't from Spain. She's from Canada",
+            'Celine Dion is not from Spain. She is from Canada.',
+          ],
+          '5': [
+            "We aren't from Spain. We're from all over the world.",
+            "We aren't from Spain. We're from all over the world",
+            'We are not from Spain. We are from all over the world.',
+          ],
+        },
+        exercise_7a_nationalities: {
+          '2': ['Turkish', 'turkish'],
+          '3': ['Japanese', 'japanese'],
+          '4': ['Canadian', 'canadian'],
+          '5': ['Brazilian', 'brazilian'],
+          '6': ['Spanish', 'spanish'],
+          '7': ['Argentinian', 'argentinian'],
+          '8': ['Mexican', 'mexican'],
+          '9': ['Polish', 'polish'],
+          '10': ['Thai', 'thai'],
+        },
+        exercise_8_alternatives: {
+          '1': ["They're", "they're"],
+          '2': ['are we'],
+          '3': ['They are', 'they are'],
+          '4_a': ['Are you', 'are you'],
+          '4_b1': ["We aren't", "we aren't"],
+          '4_b2': ["We're", "we're"],
+          '5': ["You aren't", "you aren't"],
+        },
+        exercise_9_text: {
+          '1': ['are'],
+          '2': ["aren't", 'are not'],
+          '3': ["'re", 'are'],
+        },
+      },
+      media_links: ['/audio/1.14.mp3', '/audio/1.15.mp3'],
+      unit,
+    });
+
+    const lesson5 = await this.lessonRepository.save({
+      id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a66',
+      title: '2A Families',
+      order: 5,
+      content: `
+        <div class="lesson-section">
+          <h3>Vocabulary: Family</h3>
+          <p>Learn family members and relationships: mother, father, parents, son, daughter, children, brother, sister, husband, wife.</p>
+          <h3>Listening: Family Photos</h3>
+          <p>Listen to people describing their families and complete the sentences with possessive adjectives.</p>
+          <h3>Grammar: Possessive 's & Possessive Adjectives</h3>
+          <p>Practice possessive 's (Rafael is Cristina's husband) and possessive adjectives (my, your, his, her, its, our, their).</p>
+        </div>
+      `,
+      theory: `
+        <div class="theory-section">
+          <p><strong>Goal:</strong> talk about your family.<br/>
+          <strong>Grammar:</strong> possessive 's, I/my, you/your, he/his, she/her, it/its, we/our, they/their.<br/>
+          <strong>Vocabulary:</strong> family.</p>
+          <h4>Possessive 's</h4>
+          <ul>
+            <li>name + 's: <em>Rafael is Cristina's husband.</em></li>
+            <li>word + 's: <em>My mother's name is Lily.</em></li>
+          </ul>
+          <h4>Possessive Adjectives</h4>
+          <ul>
+            <li>I → my</li>
+            <li>you → your</li>
+            <li>he → his</li>
+            <li>she → her</li>
+            <li>it → its</li>
+            <li>we → our</li>
+            <li>they → their</li>
+          </ul>
+        </div>
+      `,
+      answerKey: {
+        exercise_1_family_tree: {
+          maria: ['Maria', 'maria'],
+          alonzo: ['Alonzo', 'alonzo'],
+          jose: ['José', 'Jose', 'josé', 'jose'],
+          luisa: ['Luisa', 'luisa'],
+        },
+        exercise_2a_table: {
+          '2': ['father'],
+          '3': ['daughter'],
+          '4': ['brother'],
+          '5': ['wife'],
+        },
+        exercise_3_sentences: {
+          '1': ['daughter'],
+          '2': ['husband'],
+          '3': ['son'],
+          '4': ['brother'],
+          '5': ['father', 'dad', 'father/dad'],
+          '6': ['wife'],
+          '7': ['children'],
+          '8': ['parents'],
+        },
+        exercise_4b_listening: {
+          '1_husband': ['husband'],
+          '1_son': ['son', 'baby'],
+          '2_children': ['children', 'kids'],
+          '3_sons': ['sons'],
+          '4_parents': ['parents'],
+          '4_father': ['father', 'dad'],
+          '4_mother': ['mother', 'mum'],
+        },
+        exercise_5_grammar: {
+          '1': ['my'],
+          '2': ['his'],
+          '3': ['its'],
+          '4': ['our'],
+          '5': ['their'],
+        },
+        exercise_7_dialogue: {
+          '1': ['my'],
+          '2': ['your'],
+          '3': ['their'],
+          '4': ["father's"],
+          '5': ["He's", "he's"],
+          '6': ['Her', 'her'],
+          '7': ['your'],
+          '8': ['our'],
+          '9': ['His', 'his'],
+          '10': ["friend's"],
+        },
+      },
+      media_links: ['/audio/2.1.mp3', '/audio/2.2.mp3', '/audio/2.3.mp3', '/audio/2.4.mp3'],
+      unit: unit2,
+    });
 
     const material = this.materialRepository.create({
       id: 'd0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
