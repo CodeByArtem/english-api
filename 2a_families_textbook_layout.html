@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2A Families — Interactive Textbook Layout (Pages 14–15)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Inter:wght@400;500;600;700;800&family=Merriweather:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --brand-red: #d32027;
+      --brand-coral: #d95e52;
+      --brand-teal: #214354;
+      --tree-bg: #cde3f0;
+      --table-peach: #ecc2b3;
+      --table-peach-header: #e5ae9b;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #2b2d31;
+      color: #222;
+      margin: 0;
+      padding: 0;
+    }
+
+    .font-serif-slab {
+      font-family: 'Merriweather', Georgia, serif;
+    }
+
+    .font-handwriting {
+      font-family: 'Caveat', cursive;
+    }
+
+    /* Page container styling */
+    .book-page {
+      width: 100%;
+      max-width: 820px;
+      background: #ffffff;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Striped patterns */
+    .stripes-gray {
+      background-image: repeating-linear-gradient(
+        -60deg,
+        #8c8c8c,
+        #8c8c8c 1.5px,
+        transparent 1.5px,
+        transparent 6px
+      );
+    }
+
+    .stripes-white {
+      background-image: repeating-linear-gradient(
+        -45deg,
+        rgba(255, 255, 255, 0.75),
+        rgba(255, 255, 255, 0.75) 2px,
+        transparent 2px,
+        transparent 7px
+      );
+    }
+
+    .stripes-red-tab {
+      background-image: repeating-linear-gradient(
+        -45deg,
+        #d32027,
+        #d32027 3px,
+        #ffffff 3px,
+        #ffffff 6px
+      );
+    }
+
+    /* Custom shapes */
+    .header-red-chevron {
+      clip-path: polygon(0 0, 72% 0, 100% 50%, 72% 100%, 0 100%);
+    }
+
+    .header-left-triangle {
+      clip-path: polygon(0 0, 100% 50%, 0 100%);
+    }
+
+    .ribbon-tag {
+      clip-path: polygon(0 0, 90% 0, 100% 50%, 90% 100%, 0 100%, 6% 50%);
+    }
+
+    .chevron-green {
+      clip-path: polygon(0 0, 70% 0, 100% 50%, 70% 100%, 0 100%, 30% 50%);
+    }
+
+    .chevron-red-badge {
+      clip-path: polygon(0 0, 84% 0, 100% 50%, 84% 100%, 0 100%, 16% 50%);
+    }
+
+    /* Textbook blank input styling */
+    .tb-input {
+      border: none;
+      border-bottom: 1.5px solid #555;
+      background: rgba(255, 255, 255, 0.45);
+      font-family: 'Caveat', cursive;
+      font-size: 1.15rem;
+      color: #0284c7;
+      text-align: center;
+      padding: 0 4px;
+      height: 22px;
+      line-height: 20px;
+      transition: all 0.2s ease;
+      border-radius: 2px 2px 0 0;
+    }
+
+    .tb-input:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.9);
+      border-bottom-color: #0284c7;
+    }
+
+    .tb-input.correct {
+      border-bottom: 2px solid #16a34a;
+      color: #15803d;
+      background-color: rgba(220, 252, 231, 0.65);
+    }
+
+    .tb-input.incorrect {
+      border-bottom: 2px solid #dc2626;
+      color: #b91c1c;
+      background-color: rgba(254, 226, 226, 0.65);
+    }
+
+    /* Selectable word pills for Exercise 7 */
+    .alt-choice {
+      cursor: pointer;
+      padding: 0 3px;
+      border-radius: 4px;
+      transition: all 0.15s ease;
+      font-style: italic;
+    }
+
+    .alt-choice:hover {
+      background-color: #e0f2fe;
+    }
+
+    .alt-choice.selected {
+      background-color: #bae6fd;
+      color: #0369a1;
+      font-weight: 600;
+      text-decoration: underline;
+    }
+
+    .alt-choice.correct-choice {
+      background-color: #dcfce7;
+      color: #15803d;
+      font-weight: 700;
+      border: 1px solid #86efac;
+    }
+
+    .alt-choice.wrong-choice {
+      background-color: #fee2e2;
+      color: #b91c1c;
+      text-decoration: line-through;
+    }
+
+    /* Page number pin */
+    .page-pin {
+      width: 34px;
+      height: 34px;
+      background: #d32027;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(211, 32, 39, 0.4);
+    }
+
+    .page-pin-inner {
+      width: 24px;
+      height: 24px;
+      background: #fff;
+      border-radius: 50%;
+      transform: rotate(45deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #444;
+    }
+
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      body {
+        background: #fff;
+      }
+      .book-page {
+        box-shadow: none;
+        margin: 0;
+        page-break-after: always;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center pb-12">
+
+  <!-- Interactive Control Bar -->
+  <header class="no-print sticky top-0 z-50 w-full bg-slate-900/95 backdrop-blur border-b border-slate-700 px-4 py-2.5 text-white shadow-lg">
+    <div class="max-w-[1680px] mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <span class="bg-red-600 text-white font-extrabold px-2.5 py-1 rounded text-sm tracking-wider">2A</span>
+        <div>
+          <h1 class="text-sm sm:text-base font-bold leading-tight">Families — Interactive Textbook Spread (Pages 14 & 15)</h1>
+          <p class="text-xs text-slate-400">Заполните пропуски, выберите ответы в диалоге или нажмите на иконки аудио для прослушивания</p>
+        </div>
+      </div>
+
+      <!-- View & Action Controls -->
+      <div class="flex flex-wrap items-center gap-2">
+        <div class="bg-slate-800 p-1 rounded-lg flex items-center text-xs border border-slate-700">
+          <button onclick="setViewMode('spread')" id="btn-spread" class="px-2.5 py-1 rounded bg-slate-600 text-white font-medium transition">Разворот (2 стр.)</button>
+          <button onclick="setViewMode('page14')" id="btn-page14" class="px-2.5 py-1 rounded text-slate-300 hover:text-white transition">Стр. 14</button>
+          <button onclick="setViewMode('page15')" id="btn-page15" class="px-2.5 py-1 rounded text-slate-300 hover:text-white transition">Стр. 15</button>
+        </div>
+
+        <button onclick="checkAllAnswers()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg shadow transition flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          Проверить
+        </button>
+        <button onclick="fillAllAnswers()" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold rounded-lg shadow transition flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+          Ответы
+        </button>
+        <button onclick="resetAllAnswers()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold rounded-lg transition">
+          Сбросить
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Audio Toast Notification -->
+  <div id="audio-toast" class="no-print fixed bottom-5 right-5 z-50 hidden max-w-md bg-slate-900 text-white border border-red-500/40 rounded-xl shadow-2xl p-4 transition-all">
+    <div class="flex items-start justify-between gap-3">
+      <div class="flex items-center gap-2.5">
+        <span class="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center shrink-0 animate-pulse">
+          <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414z"/></svg>
+        </span>
+        <div>
+          <div id="audio-title" class="text-xs font-bold uppercase tracking-wider text-red-400">Audio Track</div>
+          <p id="audio-transcript" class="text-xs text-slate-200 mt-1 leading-relaxed"></p>
+        </div>
+      </div>
+      <button onclick="stopAudio()" class="text-slate-400 hover:text-white text-xs font-bold px-1.5">✕</button>
+    </div>
+  </div>
+
+  <!-- Reusable SVG Definitions for Avatars & Icons -->
+  <svg class="hidden">
+    <!-- Male Avatar Icon -->
+    <symbol id="avatar-male" viewBox="0 0 64 64">
+      <circle cx="32" cy="32" r="30" fill="#78c6d0" />
+      <!-- Suit / Shoulders -->
+      <path d="M12 55 C14 44, 24 42, 32 42 C40 42, 50 44, 52 55 A30 30 0 0 1 12 55 Z" fill="#1e3a5f" />
+      <!-- Neck / Shirt -->
+      <polygon points="26,42 38,42 32,51" fill="#ffffff" />
+      <path d="M27 36 L27 43 L32 47 L37 43 L37 36 Z" fill="#f3d1b0" />
+      <!-- Head -->
+      <path d="M22 22 C22 14, 42 14, 42 22 L41 33 C41 38, 36 41, 32 41 C28 41, 23 38, 23 33 Z" fill="#f7d7b5" />
+      <!-- Hair -->
+      <path d="M21 24 C20 15, 25 12, 32 12 C39 12, 44 15, 43 24 C42 20, 39 17, 32 17 C25 17, 22 20, 21 24 Z" fill="#5a4638" />
+    </symbol>
+
+    <!-- Female Avatar Icon -->
+    <symbol id="avatar-female" viewBox="0 0 64 64">
+      <circle cx="32" cy="32" r="30" fill="#f18999" />
+      <!-- Hair back -->
+      <path d="M19 22 C17 34, 18 43, 21 46 L43 46 C46 43, 47 34, 45 22 Z" fill="#8c583a" />
+      <!-- Shoulders -->
+      <path d="M13 56 C16 45, 24 43, 32 43 C40 43, 48 45, 51 56 A30 30 0 0 1 13 56 Z" fill="#463730" />
+      <!-- Neck -->
+      <path d="M28 36 L28 44 L32 48 L36 44 L36 36 Z" fill="#f7d7b5" />
+      <!-- Face -->
+      <path d="M23 23 C23 15, 41 15, 41 23 L40 33 C40 38, 36 41, 32 41 C28 41, 24 38, 24 33 Z" fill="#f9dcc0" />
+      <!-- Hair bangs -->
+      <path d="M21 26 C21 15, 26 12, 32 12 C38 12, 43 15, 43 26 C40 21, 35 19, 29 19 C25 19, 23 22, 21 26 Z" fill="#a06543" />
+    </symbol>
+
+    <!-- Pink Heart -->
+    <symbol id="icon-heart" viewBox="0 0 32 32">
+      <path d="M16 28.5 C16 28.5 3.5 20.2 3.5 11.2 C3.5 6.8 7 3.5 11.2 3.5 C13.7 3.5 15.2 4.8 16 6.2 C16.8 4.8 18.3 3.5 20.8 3.5 C25 3.5 28.5 6.8 28.5 11.2 C28.5 20.2 16 28.5 16 28.5 Z" fill="#e6007e" />
+    </symbol>
+
+    <!-- Red Diamond Audio Icon -->
+    <symbol id="icon-audio-diamond" viewBox="0 0 28 28">
+      <rect x="4" y="4" width="20" height="20" rx="2" transform="rotate(45 14 14)" fill="#d32027" />
+      <rect x="6.2" y="6.2" width="15.6" height="15.6" rx="1" transform="rotate(45 14 14)" fill="#ffffff" />
+      <path d="M10 12 H12.2 L15 9.5 V18.5 L12.2 16 H10 Z" fill="#d32027" />
+      <path d="M16.8 11.5 C17.8 12.6 17.8 15.4 16.8 16.5" stroke="#d32027" stroke-width="1.4" stroke-linecap="round" fill="none" />
+    </symbol>
+
+    <!-- Red Diamond App/Phone Icon -->
+    <symbol id="icon-phone-diamond" viewBox="0 0 28 28">
+      <rect x="4" y="4" width="20" height="20" rx="2" transform="rotate(45 14 14)" fill="#d32027" />
+      <rect x="6.2" y="6.2" width="15.6" height="15.6" rx="1" transform="rotate(45 14 14)" fill="#ffffff" />
+      <rect x="11" y="8.5" width="6" height="11" rx="1" stroke="#d32027" stroke-width="1.5" fill="none" />
+      <circle cx="14" cy="17.5" r="0.7" fill="#d32027" />
+    </symbol>
+  </svg>
+
+  <!-- Main Book Spread Container -->
+  <main id="spread-container" class="w-full max-w-[1660px] mx-auto px-2 sm:px-6 pt-5 grid grid-cols-1 xl:grid-cols-2 gap-6 justify-items-center items-start">
+
+    <!-- ==========================================
+         PAGE 14 (LEFT PAGE)
+         ========================================== -->
+    <section id="page-14" class="book-page flex flex-col justify-between min-h-[1120px] pb-12">
+      <div>
+        <!-- Top Header Banner & Right Photo Grid Wrapper -->
+        <div class="relative">
+          <!-- Top Gradient Background Strip -->
+          <div class="h-36 w-full bg-gradient-to-r from-slate-100 via-slate-50 to-[#d4e1e9] flex items-center relative">
+            <!-- Red Geometric 2A Chevron -->
+            <div class="relative h-full w-48 shrink-0 flex items-center">
+              <div class="absolute inset-0 bg-[#d32027] header-red-chevron"></div>
+              <div class="absolute top-0 left-0 w-24 h-16 bg-[#e0524b] opacity-80" style="clip-path: polygon(0 0, 100% 0, 55% 100%, 0 55%);"></div>
+              <div class="absolute inset-y-0 left-0 w-16 bg-white stripes-gray header-left-triangle"></div>
+              <div class="relative z-10 pl-16 flex items-baseline select-none">
+                <span class="text-white font-extrabold text-5xl tracking-tighter">2</span>
+                <span class="text-[#f39891] font-serif-slab font-black text-4xl ml-0.5">A</span>
+              </div>
+            </div>
+
+            <!-- Unit Title: Families -->
+            <h2 class="font-serif-slab text-[#214354] text-4xl font-bold tracking-tight ml-2">Families</h2>
+
+            <!-- Far right decorative light-blue vertical bar -->
+            <div class="ml-auto h-full w-16 bg-[#e2ecf2] border-l border-white/60"></div>
+          </div>
+
+          <!-- Two-Column Area Below Top Strip: Left = Goals + Vocabulary | Right = 4 Photos -->
+          <div class="px-8 sm:px-10 grid grid-cols-12 gap-5 relative">
+            <!-- Left Column (Cols 1-6): Goals Box + Vocabulary Instructions -->
+            <div class="col-span-12 sm:col-span-6 flex flex-col">
+              <!-- Coral Goals Box -->
+              <div class="bg-[#d95e52] text-white px-4 py-3 shadow-sm space-y-1.5 text-[13px] leading-snug -mt-0.5">
+                <div class="flex items-start gap-1.5">
+                  <span class="text-red-200 font-bold">❯</span>
+                  <p><strong class="font-bold">Goal:</strong> <span class="text-red-50 font-normal">talk about your family</span></p>
+                </div>
+                <div class="flex items-start gap-1.5">
+                  <span class="text-red-200 font-bold">❯</span>
+                  <p><strong class="font-bold">Grammar:</strong> <span class="text-red-50 font-normal">possessive <em>'s</em>, <em>I/my, you/your,</em> etc.</span></p>
+                </div>
+                <div class="flex items-start gap-1.5">
+                  <span class="text-red-200 font-bold">❯</span>
+                  <p><strong class="font-bold">Vocabulary:</strong> <span class="text-red-50 font-normal">family</span></p>
+                </div>
+              </div>
+
+              <!-- Vocabulary Heading & Tasks 1, 2a -->
+              <div class="mt-5 pr-2">
+                <h3 class="font-serif-slab text-[#214354] text-xl font-bold mb-2.5">Vocabulary</h3>
+                <div class="flex items-start gap-2.5 text-[12.5px] leading-snug font-semibold text-neutral-800 mb-2.5">
+                  <span class="text-[#d32027] font-bold text-sm shrink-0 w-4">1</span>
+                  <p>Look at the photos and complete the family tree with the correct names.</p>
+                </div>
+                <div class="flex items-start gap-1.5 text-[12.5px] leading-snug font-semibold text-neutral-800">
+                  <span class="text-[#d32027] font-bold text-sm shrink-0 w-5">2 a</span>
+                  <p>Look at the family tree again and complete the table below.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column (Cols 7-12): 2x2 Photo Grid overlapping the top banner -->
+            <div class="col-span-12 sm:col-span-6 sm:-mt-32 z-10">
+              <div class="grid grid-cols-2 gap-1.5 bg-white p-1 shadow-sm">
+                <!-- Luisa -->
+                <div class="flex flex-col">
+                  <div class="h-32 overflow-hidden bg-slate-200">
+                    <img src="https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=400&q=80"
+                         onerror="this.src='https://placehold.co/300x260/cbd5e1/1e293b?text=Luisa+(Nurse)'"
+                         alt="Luisa" class="w-full h-full object-cover" />
+                  </div>
+                  <div class="bg-[#d2bed6] text-center text-[11.5px] font-medium text-neutral-800 py-0.5 mt-0.5">Luisa</div>
+                </div>
+
+                <!-- Maria -->
+                <div class="flex flex-col">
+                  <div class="h-32 overflow-hidden bg-slate-200">
+                    <img src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=400&q=80"
+                         onerror="this.src='https://placehold.co/300x260/cbd5e1/1e293b?text=Maria'"
+                         alt="Maria" class="w-full h-full object-cover" />
+                  </div>
+                  <div class="bg-[#d2bed6] text-center text-[11.5px] font-medium text-neutral-800 py-0.5 mt-0.5">Maria</div>
+                </div>
+
+                <!-- Alonzo -->
+                <div class="flex flex-col">
+                  <div class="h-32 overflow-hidden bg-slate-200">
+                    <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=400&q=80"
+                         onerror="this.src='https://placehold.co/300x260/cbd5e1/1e293b?text=Alonzo'"
+                         alt="Alonzo" class="w-full h-full object-cover" />
+                  </div>
+                  <div class="bg-[#d2bed6] text-center text-[11.5px] font-medium text-neutral-800 py-0.5 mt-0.5">Alonzo</div>
+                </div>
+
+                <!-- José -->
+                <div class="flex flex-col">
+                  <div class="h-32 overflow-hidden bg-slate-200">
+                    <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&q=80"
+                         onerror="this.src='https://placehold.co/300x260/cbd5e1/1e293b?text=Jose'"
+                         alt="José" class="w-full h-full object-cover" />
+                  </div>
+                  <div class="bg-[#d2bed6] text-center text-[11.5px] font-medium text-neutral-800 py-0.5 mt-0.5">José</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Family Tree Container -->
+        <div class="mx-8 sm:mx-10 mt-3 bg-[#cde3f0] px-4 py-4 relative rounded-sm">
+          <!-- GENERATION 1 (Grandparents: Umberto & Maria) -->
+          <div class="flex justify-center items-start gap-6 sm:gap-10 relative z-10">
+            <!-- Umberto -->
+            <div class="flex flex-col items-center text-center w-36">
+              <svg class="w-12 h-12"><use href="#avatar-male"/></svg>
+              <p class="text-[11px] leading-tight text-neutral-800 mt-1">
+                <strong class="font-bold">Umberto:</strong> my father/dad,<br/>taxi driver
+              </p>
+            </div>
+
+            <!-- Heart & Vertical Connector -->
+            <div class="flex flex-col items-center mt-7">
+              <svg class="w-6 h-6 relative z-10"><use href="#icon-heart"/></svg>
+              <div class="w-1 h-8 bg-white -mt-1"></div>
+            </div>
+
+            <!-- Maria (Input 1) -->
+            <div class="flex flex-col items-center text-center w-40">
+              <svg class="w-12 h-12"><use href="#avatar-female"/></svg>
+              <div class="text-[11px] leading-tight text-neutral-800 mt-1">
+                <input type="text" data-answer="Maria" placeholder="......." class="tb-input w-16 font-semibold" />
+                <span>: my mother/mum,<br/>office worker</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Horizontal Branch Bar connecting Gen 1 to Cristina & José -->
+          <div class="relative mx-auto w-[64%] h-4 -mt-1">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-white"></div>
+            <div class="absolute top-0 left-0 w-1 h-4 bg-white"></div>
+            <div class="absolute top-0 right-0 w-1 h-4 bg-white"></div>
+          </div>
+
+          <!-- GENERATION 2 (Cristina + Rafael & José + Luisa) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-0.5 relative z-10">
+            <!-- Left Couple: Cristina & Rafael -->
+            <div class="flex flex-col items-center">
+              <div class="flex items-start justify-center gap-2 sm:gap-3">
+                <!-- Cristina -->
+                <div class="flex flex-col items-center text-center w-28">
+                  <svg class="w-12 h-12"><use href="#avatar-female"/></svg>
+                  <p class="text-[11px] leading-tight text-neutral-800 mt-1">
+                    <strong class="font-bold">Cristina:</strong> me,<br/>doctor
+                  </p>
+                </div>
+
+                <!-- Heart + Line Down -->
+                <div class="flex flex-col items-center mt-7">
+                  <svg class="w-6 h-6 relative z-10"><use href="#icon-heart"/></svg>
+                  <div class="w-1 h-9 bg-white -mt-1"></div>
+                </div>
+
+                <!-- Rafael -->
+                <div class="flex flex-col items-center text-center w-32">
+                  <svg class="w-12 h-12"><use href="#avatar-male"/></svg>
+                  <p class="text-[11px] leading-tight text-neutral-800 mt-1">
+                    <strong class="font-bold">Rafael:</strong> my husband,<br/>school teacher
+                  </p>
+                </div>
+              </div>
+
+              <!-- Branch bar to Alonzo & Sierra -->
+              <div class="relative w-44 h-3.5 -mt-1">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-white"></div>
+                <div class="absolute top-0 left-0 w-1 h-3.5 bg-white"></div>
+                <div class="absolute top-0 right-0 w-1 h-3.5 bg-white"></div>
+              </div>
+
+              <!-- Generation 3 Left: Alonzo & Sierra -->
+              <div class="flex items-start justify-center gap-8 sm:gap-12 mt-0.5">
+                <!-- Alonzo (Input) -->
+                <div class="flex flex-col items-center text-center w-32">
+                  <svg class="w-12 h-12"><use href="#avatar-male"/></svg>
+                  <div class="text-[11px] leading-tight text-neutral-800 mt-1">
+                    <input type="text" data-answer="Alonzo" placeholder="......." class="tb-input w-14" />
+                    <span>: my son,<br/>student</span>
+                  </div>
+                </div>
+
+                <!-- Sierra -->
+                <div class="flex flex-col items-center text-center w-32">
+                  <svg class="w-12 h-12"><use href="#avatar-female"/></svg>
+                  <p class="text-[11px] leading-tight text-neutral-800 mt-1">
+                    <strong class="font-bold">Sierra:</strong> my daughter,<br/>student
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Couple: José & Luisa -->
+            <div class="flex flex-col items-center">
+              <div class="flex items-start justify-center gap-2 sm:gap-3">
+                <!-- José (Input) -->
+                <div class="flex flex-col items-center text-center w-32">
+                  <svg class="w-12 h-12"><use href="#avatar-male"/></svg>
+                  <div class="text-[11px] leading-tight text-neutral-800 mt-1">
+                    <input type="text" data-answer="José|Jose" placeholder="......." class="tb-input w-14" />
+                    <span>: my brother,<br/>football player</span>
+                  </div>
+                </div>
+
+                <!-- Heart + Line Down -->
+                <div class="flex flex-col items-center mt-7">
+                  <svg class="w-6 h-6 relative z-10"><use href="#icon-heart"/></svg>
+                  <div class="w-1 h-9 bg-white -mt-1"></div>
+                </div>
+
+                <!-- Luisa (Input) -->
+                <div class="flex flex-col items-center text-center w-36">
+                  <svg class="w-12 h-12"><use href="#avatar-female"/></svg>
+                  <div class="text-[11px] leading-tight text-neutral-800 mt-1">
+                    <input type="text" data-answer="Luisa" placeholder="......." class="tb-input w-14" />
+                    <span>: my brother's wife,<br/>nurse</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Branch bar to Rosalyn & Esteban -->
+              <div class="relative w-44 h-3.5 -mt-1">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-white"></div>
+                <div class="absolute top-0 left-0 w-1 h-3.5 bg-white"></div>
+                <div class="absolute top-0 right-0 w-1 h-3.5 bg-white"></div>
+              </div>
+
+              <!-- Generation 3 Right: Rosalyn & Esteban -->
+              <div class="flex items-start justify-center gap-8 sm:gap-12 mt-0.5">
+                <!-- Rosalyn -->
+                <div class="flex flex-col items-center text-center w-32">
+                  <svg class="w-12 h-12"><use href="#avatar-female"/></svg>
+                  <p class="text-[11px] leading-tight text-neutral-800 mt-1">
+                    <strong class="font-bold">Rosalyn:</strong> my brother's<br/>daughter, student
+                  </p>
+                </div>
+
+                <!-- Esteban -->
+                <div class="flex flex-col items-center text-center w-36">
+                  <svg class="w-12 h-12"><use href="#avatar-male"/></svg>
+                  <p class="text-[11px] leading-tight text-neutral-800 mt-1">
+                    <strong class="font-bold">Esteban:</strong> my brother's son,<br/>student
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom 2-Column Section on Page 14 -->
+        <div class="px-8 sm:px-10 mt-4 grid grid-cols-12 gap-6 items-start">
+          <!-- Left Column (Cols 1-6): Vocabulary Table + Audio 2.1 -->
+          <div class="col-span-12 sm:col-span-6">
+            <div class="overflow-hidden border border-white">
+              <table class="w-full text-[11.5px] text-neutral-800 border-collapse bg-[#efc5b5]">
+                <thead>
+                  <tr class="bg-[#e7b29f] border-b border-white">
+                    <th class="py-1.5 px-2 border-r border-white text-center w-1/3">
+                      <svg class="w-9 h-9 mx-auto"><use href="#avatar-female"/></svg>
+                    </th>
+                    <th class="py-1.5 px-2 border-r border-white text-center w-1/3">
+                      <svg class="w-9 h-9 mx-auto"><use href="#avatar-male"/></svg>
+                    </th>
+                    <th class="py-1.5 px-2 text-center w-1/3">
+                      <div class="flex items-center justify-center gap-1">
+                        <svg class="w-8 h-8"><use href="#avatar-female"/></svg>
+                        <svg class="w-8 h-8"><use href="#avatar-male"/></svg>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white">
+                  <tr>
+                    <td class="py-1.5 px-2 border-r border-white">
+                      mother / <sup class="font-bold text-[9px]">1</sup><span class="font-handwriting text-sky-600 text-base underline px-1">mum</span>
+                    </td>
+                    <td class="py-1.5 px-2 border-r border-white">
+                      <sup class="font-bold text-[9px]">2</sup><input type="text" data-answer="father" class="tb-input w-12" /> / dad
+                    </td>
+                    <td class="py-1.5 px-2">parents</td>
+                  </tr>
+                  <tr>
+                    <td class="py-1.5 px-2 border-r border-white">
+                      <sup class="font-bold text-[9px]">3</sup><input type="text" data-answer="daughter" class="tb-input w-20" />
+                    </td>
+                    <td class="py-1.5 px-2 border-r border-white">son</td>
+                    <td class="py-1.5 px-2">children</td>
+                  </tr>
+                  <tr>
+                    <td class="py-1.5 px-2 border-r border-white">sister</td>
+                    <td class="py-1.5 px-2 border-r border-white">
+                      <sup class="font-bold text-[9px]">4</sup><input type="text" data-answer="brother" class="tb-input w-20" />
+                    </td>
+                    <td class="py-1.5 px-2 bg-[#f3cfc2]"></td>
+                  </tr>
+                  <tr>
+                    <td class="py-1.5 px-2 border-r border-white">
+                      <sup class="font-bold text-[9px]">5</sup><input type="text" data-answer="wife" class="tb-input w-20" />
+                    </td>
+                    <td class="py-1.5 px-2 border-r border-white">husband</td>
+                    <td class="py-1.5 px-2 bg-[#f3cfc2]"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- 2b Listen and check -->
+            <div class="mt-3 flex items-start gap-1.5 text-[12px] leading-snug">
+              <span class="text-[#d32027] font-bold">b</span>
+              <button onclick="playTrack('2.1')" title="Play Audio 2.1" class="inline-flex items-center gap-1 hover:scale-105 transition shrink-0 -mt-0.5">
+                <svg class="w-5 h-5"><use href="#icon-audio-diamond"/></svg>
+                <span class="text-[#d32027] font-bold text-[10px]">2.1</span>
+              </button>
+              <p class="font-semibold text-neutral-800">Listen and check your answers. Then listen again and repeat.</p>
+            </div>
+          </div>
+
+          <!-- Right Column (Cols 7-12): Exercise 3 -->
+          <div class="col-span-12 sm:col-span-6">
+            <div class="flex items-start gap-2 text-[12.5px] leading-snug font-semibold text-neutral-800 mb-2">
+              <span class="text-[#d32027] font-bold text-sm">3</span>
+              <p>Look at the family tree again. Complete the sentences.</p>
+            </div>
+
+            <ol class="space-y-1 text-[11.5px] text-neutral-800 pl-4">
+              <li><strong class="mr-1.5">1</strong>Cristina is Umberto's <input type="text" data-answer="daughter" class="tb-input w-24" />.</li>
+              <li><strong class="mr-1.5">2</strong>José is Luisa's <input type="text" data-answer="husband" class="tb-input w-24" />.</li>
+              <li><strong class="mr-1.5">3</strong>Esteban is José's <input type="text" data-answer="son" class="tb-input w-20" />.</li>
+              <li><strong class="mr-1.5">4</strong>Alonzo is Sierra's <input type="text" data-answer="brother" class="tb-input w-24" />.</li>
+              <li><strong class="mr-1.5">5</strong>Rafael is Alonzo's <input type="text" data-answer="father|dad|father/dad" class="tb-input w-24" />.</li>
+              <li><strong class="mr-1.5">6</strong>Cristina is Rafael's <input type="text" data-answer="wife" class="tb-input w-20" />.</li>
+              <li><strong class="mr-1.5">7</strong>Rosalyn and Esteban are José and Luisa's <input type="text" data-answer="children" class="tb-input w-20" />.</li>
+              <li><strong class="mr-1.5">8</strong>Umberto and Maria are Cristina and José's <input type="text" data-answer="parents" class="tb-input w-20" />.</li>
+            </ol>
+
+            <!-- App link note -->
+            <div class="mt-2.5 flex items-center gap-1.5 text-[10.5px] text-neutral-500">
+              <svg class="w-5 h-5 shrink-0"><use href="#icon-phone-diamond"/></svg>
+              <span>Go to page 137 or your app for more vocabulary and practice.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page 14 Footer Pin -->
+      <div class="px-5 pt-4 flex items-center">
+        <div class="page-pin">
+          <div class="page-pin-inner">14</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         PAGE 15 (RIGHT PAGE)
+         ========================================== -->
+    <section id="page-15" class="book-page flex flex-col justify-between min-h-[1120px] pb-12 relative">
+      <!-- Right Edge Vertical Tab (2A | Families) -->
+      <div class="absolute top-10 right-0 flex items-stretch h-36 z-20 select-none">
+        <div class="writing-vertical-rl text-[11px] text-neutral-500 font-medium tracking-wide px-1 py-1 flex items-center" style="writing-mode: vertical-rl;">
+          <strong class="text-[#d32027] font-bold mr-1">2A</strong> | Families
+        </div>
+        <div class="w-2.5 h-full stripes-red-tab"></div>
+      </div>
+
+      <!-- Main Two-Column Grid of Page 15 -->
+      <div class="px-8 sm:px-10 pt-10 grid grid-cols-12 gap-7 items-start">
+
+        <!-- LEFT COLUMN OF PAGE 15 (Listening + Grammar) -->
+        <div class="col-span-12 sm:col-span-6 space-y-4">
+          <!-- Listening Heading -->
+          <div>
+            <h3 class="font-serif-slab text-[#214354] text-xl font-bold mb-2">Listening</h3>
+            <div class="flex items-start gap-1.5 text-[12px] leading-snug font-semibold text-neutral-800">
+              <span class="text-[#d32027] font-bold shrink-0">4 a</span>
+              <button onclick="playTrack('2.2')" title="Play Audio 2.2" class="inline-flex items-center gap-0.5 hover:scale-105 transition shrink-0 -mt-0.5">
+                <svg class="w-5 h-5"><use href="#icon-audio-diamond"/></svg>
+                <span class="text-[#d32027] font-bold text-[10px]">2.2</span>
+              </button>
+              <p>Listen and match speakers 1–4 with photos A–D.</p>
+            </div>
+          </div>
+
+          <!-- 2x2 Photos A-D -->
+          <div class="grid grid-cols-2 gap-2">
+            <!-- Photo A -->
+            <div class="relative h-28 bg-slate-200 overflow-hidden group">
+              <img src="https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=400&q=80"
+                   onerror="this.src='https://placehold.co/300x220/cbd5e1/1e293b?text=Photo+A'"
+                   alt="Photo A" class="w-full h-full object-cover" />
+              <span class="absolute top-1 left-1 bg-[#78b7cd] text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center">A</span>
+            </div>
+
+            <!-- Photo B -->
+            <div class="relative h-28 bg-slate-200 overflow-hidden group">
+              <img src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=400&q=80"
+                   onerror="this.src='https://placehold.co/300x220/cbd5e1/1e293b?text=Photo+B'"
+                   alt="Photo B" class="w-full h-full object-cover" />
+              <span class="absolute top-1 left-1 bg-[#78b7cd] text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center">B</span>
+            </div>
+
+            <!-- Photo C -->
+            <div class="relative h-28 bg-slate-200 overflow-hidden group">
+              <img src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&w=400&q=80"
+                   onerror="this.src='https://placehold.co/300x220/cbd5e1/1e293b?text=Photo+C'"
+                   alt="Photo C" class="w-full h-full object-cover" />
+              <span class="absolute top-1 left-1 bg-[#78b7cd] text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center">C</span>
+            </div>
+
+            <!-- Photo D -->
+            <div class="relative h-28 bg-slate-200 overflow-hidden group">
+              <img src="https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=400&q=80"
+                   onerror="this.src='https://placehold.co/300x220/cbd5e1/1e293b?text=Photo+D'"
+                   alt="Photo D" class="w-full h-full object-cover" />
+              <span class="absolute top-1 left-1 bg-[#78b7cd] text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center">D</span>
+            </div>
+          </div>
+
+          <!-- Exercise 4b -->
+          <div>
+            <div class="flex items-start gap-2 text-[12px] font-semibold text-neutral-800 mb-1.5">
+              <span class="text-[#d32027] font-bold">b</span>
+              <p>Listen again and complete the sentences.</p>
+            </div>
+            <ol class="space-y-1.5 text-[11.5px] leading-relaxed text-neutral-800 pl-3">
+              <li>
+                <strong class="mr-1">1</strong>This is my family. This is <strong>my</strong>
+                <input type="text" data-answer="husband" class="tb-input w-20" />, Jon, and <strong>our</strong>
+                <input type="text" data-answer="son|baby" class="tb-input w-16" />. <strong>His</strong> name is James.
+              </li>
+              <li>
+                <strong class="mr-1">2</strong>This is a photo of <strong>my</strong>
+                <input type="text" data-answer="children|kids" class="tb-input w-20" />. <strong>Their</strong> names are Yuriko and Shinya. And this is <strong>our</strong> dog. <strong>Its</strong> name is Aki.
+              </li>
+              <li>
+                <strong class="mr-1">3</strong>This is a photo of <strong>my</strong>
+                <input type="text" data-answer="sons" class="tb-input w-16" />. <strong>Their</strong> names are Jan, Karol and Tomasz.
+              </li>
+              <li>
+                <strong class="mr-1">4</strong>This is a photo of <strong>my</strong>
+                <input type="text" data-answer="parents" class="tb-input w-20" />. <strong>My</strong>
+                <input type="text" data-answer="father|dad" class="tb-input w-16" />, Tony, is from Canada. <strong>His</strong> family are in Vancouver. <strong>My</strong>
+                <input type="text" data-answer="mother|mum" class="tb-input w-16" />'s name is Lily.
+              </li>
+            </ol>
+          </div>
+
+          <!-- Grammar Section -->
+          <div class="pt-1">
+            <h3 class="font-serif-slab text-[#214354] text-xl font-bold mb-1.5">Grammar</h3>
+            <div class="flex items-start gap-2 text-[12px] leading-snug font-semibold text-neutral-800 mb-2.5">
+              <span class="text-[#d32027] font-bold">5</span>
+              <p>Complete the grammar box with the words in bold in Exercise 4b.</p>
+            </div>
+
+            <!-- Grammar Box -->
+            <div class="bg-[#dce3e8] p-3.5 relative pr-9">
+              <!-- Diagonal white stripes on right edge -->
+              <div class="absolute top-3 bottom-3 right-0 w-6 stripes-white"></div>
+
+              <h4 class="text-[#214354] font-bold text-[13px] mb-1">Possessive <em>'s</em></h4>
+              <p class="text-[11.5px] text-neutral-700">
+                name + <em>'s</em> <span class="text-sky-600 italic ml-1">Rafael is Cristina<strong class="font-bold">'s</strong> husband.</span>
+              </p>
+              <p class="text-[11.5px] text-neutral-700 mb-2.5">
+                word + <em>'s</em> <span class="text-sky-600 italic ml-1.5">My mother<strong class="font-bold">'s</strong> name is Lily.</span>
+              </p>
+
+              <h4 class="text-[#214354] font-bold text-[13px] italic mb-1.5">I/my, you/your, <span class="not-italic">etc.</span></h4>
+
+              <table class="w-full text-[11.5px] border-collapse bg-[#cbd4dc]">
+                <thead>
+                  <tr class="bg-[#b2bec8] text-neutral-800 border-b border-white">
+                    <th class="py-1 px-2.5 text-left font-bold border-r border-white w-2/5"><em>I, you,</em> etc.</th>
+                    <th class="py-1 px-2.5 text-left font-bold">possessive adjectives</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white text-neutral-800">
+                  <tr>
+                    <td class="py-1 px-2.5 border-r border-white">I</td>
+                    <td class="py-1 px-2.5"><sup class="font-bold text-[9px] mr-0.5">1</sup><input type="text" data-answer="my" class="tb-input w-16" /></td>
+                  </tr>
+                  <tr>
+                    <td class="py-1 px-2.5 border-r border-white">you</td>
+                    <td class="py-1 px-2.5">your</td>
+                  </tr>
+                  <tr>
+                    <td class="py-1 px-2.5 border-r border-white">he</td>
+                    <td class="py-1 px-2.5"><sup class="font-bold text-[9px] mr-0.5">2</sup><input type="text" data-answer="his" class="tb-input w-16" /></td>
+                  </tr>
+                  <tr>
+                    <td class="py-1 px-2.5 border-r border-white">she</td>
+                    <td class="py-1 px-2.5">her</td>
+                  </tr>
+                  <tr>
+                    <td class="py-1 px-2.5 border-r border-white">it</td>
+                    <td class="py-1 px-2.5"><sup class="font-bold text-[9px] mr-0.5">3</sup><input type="text" data-answer="its" class="tb-input w-16" /></td>
+                  </tr>
+                  <tr>
+                    <td class="py-1 px-2.5 border-r border-white">we</td>
+                    <td class="py-1 px-2.5"><sup class="font-bold text-[9px] mr-0.5">4</sup><input type="text" data-answer="our" class="tb-input w-16" /></td>
+                  </tr>
+                  <tr>
+                    <td class="py-1 px-2.5 border-r border-white">they</td>
+                    <td class="py-1 px-2.5"><sup class="font-bold text-[9px] mr-0.5">5</sup><input type="text" data-answer="their" class="tb-input w-16" /></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Exercise 6a & 6b -->
+          <div class="pt-1 space-y-1.5">
+            <div class="flex items-start gap-1.5 text-[12px] leading-snug font-semibold text-neutral-800">
+              <span class="text-[#d32027] font-bold shrink-0">6 a</span>
+              <button onclick="playTrack('2.3')" title="Play Audio 2.3" class="inline-flex items-center gap-0.5 hover:scale-105 transition shrink-0 -mt-0.5">
+                <svg class="w-5 h-5"><use href="#icon-audio-diamond"/></svg>
+                <span class="text-[#d32027] font-bold text-[10px]">2.3</span>
+              </button>
+              <p>Listen to the sentences. Do the words in <span class="text-sky-600">blue</span> sound the same or different?</p>
+            </div>
+
+            <div class="pl-4 space-y-1 text-[11.5px] text-neutral-800">
+              <div>
+                <p><strong class="mr-1.5">1</strong> a <span class="text-sky-600">They're</span> from the UK.</p>
+                <p class="pl-3.5">b <span class="text-sky-600">Their</span> mother is English.</p>
+              </div>
+              <div>
+                <p><strong class="mr-1.5">2</strong> a <span class="text-sky-600">He's</span> an office worker.</p>
+                <p class="pl-3.5">b <span class="text-sky-600">His</span> sister is a nurse.</p>
+              </div>
+              <div>
+                <p><strong class="mr-1.5">3</strong> a <span class="text-sky-600">Your</span> family is great.</p>
+                <p class="pl-3.5">b <span class="text-sky-600">You're</span> from a big family.</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-2 text-[12px] font-semibold text-neutral-800 pt-0.5">
+              <span class="text-[#d32027] font-bold pl-2">b</span>
+              <p>Listen again and repeat.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN OF PAGE 15 (Exercise 7 + Speaking) -->
+        <div class="col-span-12 sm:col-span-6 space-y-4">
+          <!-- Exercise 7 Header -->
+          <div class="flex items-start gap-1.5 text-[12px] leading-snug font-semibold text-neutral-800">
+            <span class="text-[#d32027] font-bold mr-1">7</span>
+            <button onclick="playTrack('2.4')" title="Play Audio 2.4" class="inline-flex items-center gap-0.5 hover:scale-105 transition shrink-0 -mt-0.5">
+              <svg class="w-5 h-5"><use href="#icon-audio-diamond"/></svg>
+              <span class="text-[#d32027] font-bold text-[10px]">2.4</span>
+            </button>
+            <p>Choose the correct alternatives. Then listen and check your answers.</p>
+          </div>
+
+          <!-- Large Photo of Yasemin & Tara -->
+          <div class="h-60 w-full bg-slate-200 overflow-hidden shadow-sm">
+            <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=700&q=80"
+                 onerror="this.src='https://placehold.co/600x480/cbd5e1/1e293b?text=Yasemin+and+Tara'"
+                 alt="Yasemin and Tara looking at phone" class="w-full h-full object-cover" />
+          </div>
+
+          <!-- Interactive Dialogue (Exercise 7) -->
+          <div class="space-y-1.5 text-[11.5px] leading-snug text-neutral-800">
+            <div class="grid grid-cols-12">
+              <span class="col-span-3 font-bold text-[#214354]">Yasemin:</span>
+              <p class="col-span-9">
+                This is a photo of <sup class="font-bold text-[9px]">1</sup>
+                <span class="alt-group" data-correct="my">
+                  <span class="alt-choice" onclick="selectAlt(this)">my</span> /
+                  <span class="alt-choice" onclick="selectAlt(this)">you</span>
+                </span> family.
+              </p>
+            </div>
+
+            <div class="grid grid-cols-12">
+              <span class="col-span-3 font-bold text-[#214354]">Tara:</span>
+              <p class="col-span-9">
+                Wow! Is this <sup class="font-bold text-[9px]">2</sup>
+                <span class="alt-group" data-correct="your">
+                  <span class="alt-choice" onclick="selectAlt(this)">you</span> /
+                  <span class="alt-choice" onclick="selectAlt(this)">your</span>
+                </span> mother and father? What are <sup class="font-bold text-[9px]">3</sup>
+                <span class="alt-group" data-correct="their">
+                  <span class="alt-choice" onclick="selectAlt(this)">they're</span> /
+                  <span class="alt-choice" onclick="selectAlt(this)">their</span>
+                </span> names?
+              </p>
+            </div>
+
+            <div class="grid grid-cols-12">
+              <span class="col-span-3 font-bold text-[#214354]">Yasemin:</span>
+              <p class="col-span-9">
+                My <sup class="font-bold text-[9px]">4</sup>
+                <span class="alt-group" data-correct="father's">
+                  <span class="alt-choice" onclick="selectAlt(this)">father's</span> /
+                  <span class="alt-choice" onclick="selectAlt(this)">father is</span>
+                </span> name is Emir. <sup class="font-bold text-[9px]">5</sup>
+                <span class="alt-group" data-correct="He's">
+                  <span class="alt-choice" onclick="selectAlt(this)">He's</span> /
+                  <span class="alt-choice" onclick="selectAlt(this)">His</span>
+                </span> from Turkey. My mother's English. <sup class="font-bold text-[9px]">6</sup>
+                <span class="alt-group" data-correct="Her">
+                  <span class="alt-choice" onclick="selectAlt(this)">His</span> /
+                  <span class="alt-choice" onclick="selectAlt(this)">Her</span>
+                </span> name's Linda.
+              </p>
+            </div>
+
+            <div class="grid grid-cols-12">
+              <span class="col-span-3 font-bold text-[#214354]">Tara:</span>
+              <p class="col-span-9">
+                OK. So is this <sup class="font-bold text-[9px]">7</sup>
+                <span class="alt-group" data-correct="your">
+                  <span class="alt-choice" onclick="selectAlt(this)">you</span> /
+                  <span class="alt-choice" onclick="selectAlt(this)">your</span>
+                </span> brother?
+              </p>
+            </div>
+
+            <div class="grid grid-cols-12">
+              <span class="col-span-3 font-bold text-[#214354]">Yasemin:</span>
+              <p class="col-span-9">
+                No, it isn't. That's <sup class="font-bold text-[9px]">8</sup>
+                <span class="alt-group" data-correct="our">
+                  <span class="alt-choice" onclick="selectAlt(this)">our</span> /
+                  <span class="alt-choice" onclick="selectAlt(this)">we</span>
+                </span> friend from Ankara. This is my brother here. <sup class="font-bold text-[9px]">9</sup>
+                <span class="alt-group" data-correct="His">
+                  <span class="alt-choice" onclick="selectAlt(this)">Her</span> /
+                  <span class="alt-choice" onclick="selectAlt(this)">His</span>
+                </span> name's Ali.
+              </p>
+            </div>
+
+            <div class="grid grid-cols-12">
+              <span class="col-span-3 font-bold text-[#214354]">Tara:</span>
+              <p class="col-span-9">
+                Right. What's your <sup class="font-bold text-[9px]">10</sup>
+                <span class="alt-group" data-correct="friend's">
+                  <span class="alt-choice" onclick="selectAlt(this)">friends</span> /
+                  <span class="alt-choice" onclick="selectAlt(this)">friend's</span>
+                </span> name?
+              </p>
+            </div>
+
+            <div class="grid grid-cols-12">
+              <span class="col-span-3 font-bold text-[#214354]">Yasemin:</span>
+              <p class="col-span-9">Yusuf. He's a student in the UK.</p>
+            </div>
+          </div>
+
+          <!-- App Reference Note -->
+          <div class="flex items-center gap-1.5 text-[10.5px] text-neutral-500 pt-1">
+            <svg class="w-5 h-5 shrink-0"><use href="#icon-phone-diamond"/></svg>
+            <span>Go to page 118 or your app for more information and practice.</span>
+          </div>
+
+          <!-- Speaking Section -->
+          <div class="pt-2 space-y-3">
+            <h3 class="font-serif-slab text-[#214354] text-xl font-bold">Speaking</h3>
+
+            <!-- PREPARE -->
+            <div class="space-y-2">
+              <div class="inline-block bg-[#d95e52] text-white text-[11px] font-bold tracking-wider uppercase px-4 py-1 ribbon-tag">
+                PREPARE
+              </div>
+              <div class="flex items-start gap-2.5 text-[12px] leading-snug font-semibold text-neutral-800">
+                <span class="text-[#d32027] font-bold">8</span>
+                <p>Draw a picture of your family, or find a photo on your phone.</p>
+              </div>
+            </div>
+
+            <!-- SPEAK -->
+            <div class="space-y-2 pt-1">
+              <div class="inline-block bg-[#d95e52] text-white text-[11px] font-bold tracking-wider uppercase px-5 py-1 ribbon-tag">
+                SPEAK
+              </div>
+              <div class="flex items-start gap-2.5 text-[12px] leading-snug font-semibold text-neutral-800">
+                <span class="text-[#d32027] font-bold">9</span>
+                <div>
+                  <p>Work in pairs. Tell your partner about your family.</p>
+                  <p class="text-sky-600 italic font-normal mt-1">
+                    <strong class="font-bold not-italic">A:</strong> This is a photo of my family. This is my father.<br/>
+                    His name is Michael. He's an office worker.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page 15 Bottom Right Badge & Page Number Pin -->
+      <div class="px-6 pt-6 flex items-end justify-end gap-2 relative">
+        <!-- Develop your reading chevron graphic -->
+        <div class="flex items-center select-none">
+          <div class="w-14 h-20 bg-[#a3d179] chevron-green -mr-5"></div>
+          <div class="w-14 h-20 bg-[#87c45b] chevron-green -mr-6 z-10"></div>
+          <div class="w-40 h-20 bg-[#d32027] chevron-red-badge z-20 flex flex-col items-center justify-center text-white text-center pl-4 pr-2 leading-tight">
+            <span class="font-serif-slab font-bold text-[13px]">Develop<br/>your<br/>reading</span>
+            <span class="text-[10px] text-red-100 mt-0.5">page 89</span>
+          </div>
+        </div>
+
+        <!-- Page 15 Pin -->
+        <div class="page-pin -mb-4">
+          <div class="page-pin-inner">15</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // Handle alternative word choice in Exercise 7
+    function selectAlt(element) {
+      const group = element.closest('.alt-group');
+      if (!group) return;
+      group.querySelectorAll('.alt-choice').forEach(el => {
+        el.classList.remove('selected', 'correct-choice', 'wrong-choice');
+      });
+      element.classList.add('selected');
+    }
+
+    // Check all user inputs and selected alternatives
+    function checkAllAnswers() {
+      // Check text inputs
+      const inputs = document.querySelectorAll('.tb-input');
+      inputs.forEach(input => {
+        const rawExpected = input.getAttribute('data-answer') || '';
+        const acceptedAnswers = rawExpected.toLowerCase().split('|').map(s => s.trim());
+        const userVal = input.value.trim().toLowerCase();
+
+        input.classList.remove('correct', 'incorrect');
+        if (!userVal) {
+          input.classList.add('incorrect');
+        } else if (acceptedAnswers.includes(userVal)) {
+          input.classList.add('correct');
+        } else {
+          input.classList.add('incorrect');
+        }
+      });
+
+      // Check Exercise 7 alternatives
+      const groups = document.querySelectorAll('.alt-group');
+      groups.forEach(group => {
+        const correctText = (group.getAttribute('data-correct') || '').trim().toLowerCase();
+        const choices = group.querySelectorAll('.alt-choice');
+        choices.forEach(choice => {
+          const text = choice.textContent.trim().toLowerCase();
+          if (choice.classList.contains('selected')) {
+            choice.classList.remove('selected');
+            if (text === correctText) {
+              choice.classList.add('correct-choice');
+            } else {
+              choice.classList.add('wrong-choice');
+            }
+          }
+        });
+      });
+    }
+
+    // Show all correct answers
+    function fillAllAnswers() {
+      const inputs = document.querySelectorAll('.tb-input');
+      inputs.forEach(input => {
+        const rawExpected = input.getAttribute('data-answer') || '';
+        const primaryAnswer = rawExpected.split('|')[0];
+        input.value = primaryAnswer;
+        input.classList.remove('incorrect');
+        input.classList.add('correct');
+      });
+
+      const groups = document.querySelectorAll('.alt-group');
+      groups.forEach(group => {
+        const correctText = (group.getAttribute('data-correct') || '').trim().toLowerCase();
+        group.querySelectorAll('.alt-choice').forEach(choice => {
+          choice.classList.remove('selected', 'wrong-choice', 'correct-choice');
+          if (choice.textContent.trim().toLowerCase() === correctText) {
+            choice.classList.add('correct-choice');
+          }
+        });
+      });
+    }
+
+    // Reset all fields
+    function resetAllAnswers() {
+      document.querySelectorAll('.tb-input').forEach(input => {
+        input.value = '';
+        input.classList.remove('correct', 'incorrect');
+      });
+      document.querySelectorAll('.alt-choice').forEach(choice => {
+        choice.classList.remove('selected', 'correct-choice', 'wrong-choice');
+      });
+    }
+
+    // Switch between 2-page spread and single-page view
+    function setViewMode(mode) {
+      const container = document.getElementById('spread-container');
+      const page14 = document.getElementById('page-14');
+      const page15 = document.getElementById('page-15');
+      const btnSpread = document.getElementById('btn-spread');
+      const btn14 = document.getElementById('btn-page14');
+      const btn15 = document.getElementById('btn-page15');
+
+      [btnSpread, btn14, btn15].forEach(b => {
+        b.className = 'px-2.5 py-1 rounded text-slate-300 hover:text-white transition';
+      });
+
+      if (mode === 'spread') {
+        btnSpread.className = 'px-2.5 py-1 rounded bg-slate-600 text-white font-medium transition';
+        container.classList.add('xl:grid-cols-2');
+        page14.classList.remove('hidden');
+        page15.classList.remove('hidden');
+      } else if (mode === 'page14') {
+        btn14.className = 'px-2.5 py-1 rounded bg-slate-600 text-white font-medium transition';
+        container.classList.remove('xl:grid-cols-2');
+        page14.classList.remove('hidden');
+        page15.classList.add('hidden');
+      } else if (mode === 'page15') {
+        btn15.className = 'px-2.5 py-1 rounded bg-slate-600 text-white font-medium transition';
+        container.classList.remove('xl:grid-cols-2');
+        page14.classList.add('hidden');
+        page15.classList.remove('hidden');
+      }
+    }
+
+    // Audio Track Transcripts & Web Speech Synthesis
+    const audioTracks = {
+      '2.1': {
+        title: 'Audio 2.1 — Family Vocabulary',
+        text: '1: mother, mum. father, dad. parents. 2: daughter. son. children. 3: sister. brother. 4: wife. husband.'
+      },
+      '2.2': {
+        title: 'Audio 2.2 — Listening (Speakers 1–4)',
+        text: '1: This is my family. This is my husband, Jon, and our son. His name is James. 2: This is a photo of my children. Their names are Yuriko and Shinya. And this is our dog. Its name is Aki. 3: This is a photo of my sons. Their names are Jan, Karol and Tomasz. 4: This is a photo of my parents. My father, Tony, is from Canada. His family are in Vancouver. My mother\'s name is Lily.'
+      },
+      '2.3': {
+        title: 'Audio 2.3 — Pronunciation',
+        text: '1 a: They\'re from the UK. 1 b: Their mother is English. 2 a: He\'s an office worker. 2 b: His sister is a nurse. 3 a: Your family is great. 3 b: You\'re from a big family.'
+      },
+      '2.4': {
+        title: 'Audio 2.4 — Yasemin and Tara',
+        text: 'Yasemin: This is a photo of my family. Tara: Wow! Is this your mother and father? What are their names? Yasemin: My father\'s name is Emir. He\'s from Turkey. My mother\'s English. Her name\'s Linda. Tara: OK. So is this your brother? Yasemin: No, it isn\'t. That\'s our friend from Ankara. This is my brother here. His name\'s Ali. Tara: Right. What\'s your friend\'s name? Yasemin: Yusuf. He\'s a student in the UK.'
+      }
+    };
+
+    function playTrack(trackId) {
+      const track = audioTracks[trackId];
+      if (!track) return;
+
+      const toast = document.getElementById('audio-toast');
+      document.getElementById('audio-title').textContent = track.title;
+      document.getElementById('audio-transcript').textContent = track.text;
+      toast.classList.remove('hidden');
+
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(track.text);
+        utterance.lang = 'en-GB';
+        utterance.rate = 0.95;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function stopAudio() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      document.getElementById('audio-toast').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
