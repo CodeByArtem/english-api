@@ -29,8 +29,8 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
       },
       exercise_2a_stress: {
         Spain: 'o',
-        Poland: 'Oo',
-        Japan: 'oO',
+        Thailand: 'Oo',
+        Brazil: 'oO',
       },
       exercise_4a_dialogues: {
         gap_1: 'Mexico',

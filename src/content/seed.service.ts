@@ -134,10 +134,8 @@ export class SeedService implements OnApplicationBootstrap {
         },
         exercise_2a_stress: {
           "Spain": "o",
-          "Poland": "Oo",
           "Thailand": "Oo",
           "Turkey": "Oo",
-          "Japan": "oO",
           "Brazil": "oO",
           "Canada": "Ooo",
           "Italy": "Ooo",

@@ -359,12 +359,22 @@ export class AssignmentsService {
     if (answerKey.exercise_2a_stress) {
       const expectedStress = answerKey.exercise_2a_stress;
       for (const [country, expectedPattern] of Object.entries(expectedStress)) {
+        // В уроке 1A Poland и Japan уже напечатаны в таблице учебника как примеры (static text)
+        // и не имеют полей ввода для студента, поэтому исключаем их из проверяемых вопросов
+        const normalizedCountry = this.normalizeAnswer(country);
+        if (
+          lesson.id === 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22' &&
+          (normalizedCountry === 'poland' || normalizedCountry === 'japan')
+        ) {
+          continue;
+        }
+
         totalQuestions++;
         // Ищем ответ студента для этой страны
         let studentPattern: string | null = null;
         for (const [key, value] of Object.entries(stressTableInputs)) {
           if (key === 'my_country') continue;
-          if (this.normalizeAnswer(value) === this.normalizeAnswer(country)) {
+          if (this.normalizeAnswer(value) === normalizedCountry) {
             studentPattern = key.replace(/_\d+$/, ''); // Remove _1, _2 suffix
             break;
           }
