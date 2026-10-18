@@ -38,7 +38,9 @@ import {
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         const databaseUrl = configService.get<string>('DATABASE_URL');
-        const dbSync = configService.get<string>('DB_SYNC') === 'true';
+        // По умолчанию авто-синхронизация включена (как и было до commit fa56ccb),
+        // если явно не передано DB_SYNC=false. Это гарантирует создание новых таблиц на Render.
+        const dbSync = configService.get<string>('DB_SYNC') !== 'false';
 
         // Если есть DATABASE_URL (продакшн на Render)
         if (databaseUrl) {

@@ -4,6 +4,7 @@ import {
   BadRequestException,
   ForbiddenException,
   PayloadTooLargeException,
+  Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -19,6 +20,7 @@ import { UploadedAudioFile } from './interfaces/audio-file.interface';
 
 @Injectable()
 export class AssignmentsService {
+  private readonly logger = new Logger(AssignmentsService.name);
   constructor(
     @InjectRepository(Assignment)
     private readonly assignmentRepository: Repository<Assignment>,
@@ -385,7 +387,7 @@ export class AssignmentsService {
 
       for (const [gapKey, expectedCountry] of Object.entries(expectedDialogues)) {
         totalQuestions++;
-        const frontendKey = Object.entries(keyMapping).find(([_, v]) => v === gapKey)?.[0];
+        const frontendKey = Object.entries(keyMapping).find(([, v]) => v === gapKey)?.[0];
         const studentAnswer = frontendKey ? dialogInputs[frontendKey] : null;
         if (this.matchesAnswer(studentAnswer, expectedCountry)) {
           correctAnswers++;
@@ -536,17 +538,39 @@ export class AssignmentsService {
   }
 
   async getSubmissionById(id: string, user: any) {
-    const submission = await this.submissionRepository.findOne({
-      where: { id },
-      relations: {
-        student: true,
-        lesson: {
-          exercises: true,
+    let submission: Submission | null = null;
+    try {
+      submission = await this.submissionRepository.findOne({
+        where: { id },
+        relations: {
+          student: true,
+          lesson: {
+            exercises: true,
+          },
+          assignment: {
+            lesson: true,
+          },
+          audios: true,
         },
-        assignment: true,
-        audios: true,
-      },
-    });
+      });
+    } catch (dbErr: any) {
+      // Безопасный откат: если таблица submission_audio ещё отсутствует в БД (до синхронизации)
+      // или relation audios вызывает ошибку, загружаем сущность без audios,
+      // чтобы учитель и ученик не получали 500 ошибку при открытии страницы
+      this.logger.warn(`Failed to fetch submission with audios relation: ${dbErr?.message || dbErr}`);
+      submission = await this.submissionRepository.findOne({
+        where: { id },
+        relations: {
+          student: true,
+          lesson: {
+            exercises: true,
+          },
+          assignment: {
+            lesson: true,
+          },
+        },
+      });
+    }
 
     if (!submission) {
       throw new NotFoundException('Submission not found');

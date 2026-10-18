@@ -1076,6 +1076,22 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
       expect((res.audios[0] as any).data).toBeUndefined();
     });
 
+    it('should fall back gracefully without failing if audios relation query throws an error', async () => {
+      mockSubmissionRepo.findOne
+        .mockRejectedValueOnce(new Error('relation "submission_audio" does not exist'))
+        .mockResolvedValueOnce({
+          ...mockSubmission,
+          audios: undefined,
+        });
+
+      const tutorUser = { id: 'tutor-1', role: 'TUTOR' };
+      const res = await audioService.getSubmissionById('sub-abc', tutorUser);
+
+      expect(res.id).toBe('sub-abc');
+      expect(res.audios).toEqual([]);
+      expect(mockSubmissionRepo.findOne).toHaveBeenCalledTimes(2);
+    });
+
     it('should verify teacher-stats and student lists do not include audio data', async () => {
       mockSubmissionRepo.find.mockResolvedValueOnce([
         {
