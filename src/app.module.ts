@@ -19,6 +19,7 @@ import { Exercise } from './content/entities/exercise.entity';
 import { Material } from './content/entities/material.entity';
 import { Assignment } from './assignments/entities/assignment.entity';
 import { Submission } from './assignments/entities/submission.entity';
+import { SubmissionAudio } from './assignments/entities/submission-audio.entity';
 import { RefreshToken } from './auth/entities/refresh-token.entity';
 import {
   THROTTLE_TTL,
@@ -37,14 +38,15 @@ import {
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         const databaseUrl = configService.get<string>('DATABASE_URL');
+        const dbSync = configService.get<string>('DB_SYNC') === 'true';
 
         // Если есть DATABASE_URL (продакшн на Render)
         if (databaseUrl) {
           return {
             type: 'postgres',
             url: databaseUrl,
-            entities: [User, Textbook, Unit, Lesson, Exercise, Material, Assignment, Submission, Invite, RefreshToken],
-            synchronize: true, // Внимание: в реальном production лучше использовать миграции
+            entities: [User, Textbook, Unit, Lesson, Exercise, Material, Assignment, Submission, SubmissionAudio, Invite, RefreshToken],
+            synchronize: dbSync,
             ssl: databaseUrl.includes('render.com') ? {
               rejectUnauthorized: false, // SSL только для облачной базы данных Render
             } : false,
@@ -59,8 +61,8 @@ import {
           username: configService.get<string>('DB_USER') || 'postgres',
           password: configService.get<string>('DB_PASSWORD') || 'password',
           database: configService.get<string>('DB_NAME') || 'english_db',
-          entities: [User, Textbook, Unit, Lesson, Exercise, Material, Assignment, Submission, Invite, RefreshToken],
-          synchronize: true,
+          entities: [User, Textbook, Unit, Lesson, Exercise, Material, Assignment, Submission, SubmissionAudio, Invite, RefreshToken],
+          synchronize: dbSync,
         };
       },
     }),

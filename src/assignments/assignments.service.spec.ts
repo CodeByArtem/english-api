@@ -1,8 +1,15 @@
-import { ValidationPipe } from '@nestjs/common';
+import {
+  ValidationPipe,
+  ForbiddenException,
+  BadRequestException,
+  PayloadTooLargeException,
+} from '@nestjs/common';
 import { AssignmentsService } from './assignments.service';
 import { Lesson } from '../content/entities/lesson.entity';
+import { Submission } from './entities/submission.entity';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
 import { ReviewSubmissionDto } from './dto/review-submission.dto';
+import { UploadedAudioFile } from './interfaces/audio-file.interface';
 
 describe('AssignmentsService - calculateScore & Answer Checking', () => {
   let service: AssignmentsService;
@@ -79,6 +86,8 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
 
   beforeEach(() => {
     service = new AssignmentsService(
+      {} as any,
+      {} as any,
       {} as any,
       {} as any,
       {} as any,
@@ -469,6 +478,7 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
         mockSubmissionRepo,
         mockLessonRepo,
         mockUserRepo as any,
+        {} as any,
       );
     });
 
@@ -884,6 +894,204 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
       expect((result.details as any)?.totalQuestions).toBe(43);
       expect((result.details as any)?.correctAnswers).toBe(43);
       expect(result.score).toBe(100);
+    });
+  });
+
+  describe('assertCanAccessSubmission', () => {
+    const mockSubmission = {
+      id: 'sub-123',
+      student: { id: 'student-1', email: 'student1@example.com' },
+    } as Submission;
+
+    it('should allow student to access their own submission', () => {
+      const user = { id: 'student-1', role: 'STUDENT' };
+      expect(() => service.assertCanAccessSubmission(user, mockSubmission)).not.toThrow();
+    });
+
+    it('should throw ForbiddenException if student tries to access another student submission', () => {
+      const user = { id: 'student-2', role: 'STUDENT' };
+      expect(() => service.assertCanAccessSubmission(user, mockSubmission)).toThrow(ForbiddenException);
+    });
+
+    it('should allow tutor to access any student submission', () => {
+      const tutor = { id: 'tutor-1', role: 'TUTOR' };
+      expect(() => service.assertCanAccessSubmission(tutor, mockSubmission)).not.toThrow();
+    });
+  });
+
+  describe('SubmissionAudio - upload, access control & data exclusion', () => {
+    let audioService: AssignmentsService;
+    let mockSubmissionRepo: any;
+    let mockAudioRepo: any;
+
+    const mockSubmission: Submission = {
+      id: 'sub-abc',
+      student: { id: 'student-owner' } as any,
+      answers: {},
+      status: 'submitted',
+      grade: null,
+      score: null,
+      details: null,
+      reviewedAnswers: null,
+      tutorComment: null,
+      createdAt: new Date(),
+      assignment: null,
+      lesson: null,
+      audios: [],
+    };
+
+    beforeEach(() => {
+      mockSubmissionRepo = {
+        findOne: jest.fn(async () => mockSubmission),
+        find: jest.fn(async () => [mockSubmission]),
+      };
+      mockAudioRepo = {
+        findOne: jest.fn(),
+        create: jest.fn((dto) => ({ id: 'audio-id-1', ...dto })),
+        save: jest.fn(async (entity) => ({ id: 'audio-id-1', ...entity })),
+      };
+
+      audioService = new AssignmentsService(
+        {} as any,
+        mockSubmissionRepo,
+        {} as any,
+        {} as any,
+        mockAudioRepo,
+      );
+    });
+
+    it('should reject audio upload if user is a TUTOR (only students can upload)', async () => {
+      const tutorUser = { id: 'tutor-1', role: 'TUTOR' };
+      const file: UploadedAudioFile = {
+        fieldname: 'file',
+        originalname: 'test.webm',
+        encoding: '7bit',
+        mimetype: 'audio/webm',
+        size: 1024,
+        buffer: Buffer.from('test audio'),
+      };
+
+      await expect(
+        audioService.saveSubmissionAudio('sub-abc', 'ex_1', file, tutorUser),
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('should reject audio upload if mimeType is not in whitelist', async () => {
+      const studentUser = { id: 'student-owner', role: 'STUDENT' };
+      const invalidFile: UploadedAudioFile = {
+        fieldname: 'file',
+        originalname: 'test.wav',
+        encoding: '7bit',
+        mimetype: 'audio/wav',
+        size: 1024,
+        buffer: Buffer.from('wav data'),
+      };
+
+      await expect(
+        audioService.saveSubmissionAudio('sub-abc', 'ex_1', invalidFile, studentUser),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should accept valid mimeType with codec parameters (audio/webm;codecs=opus)', async () => {
+      const studentUser = { id: 'student-owner', role: 'STUDENT' };
+      const fileWithParams: UploadedAudioFile = {
+        fieldname: 'file',
+        originalname: 'test.webm',
+        encoding: '7bit',
+        mimetype: 'audio/webm;codecs=opus',
+        size: 2048,
+        buffer: Buffer.from('webm opus data'),
+      };
+
+      const result = await audioService.saveSubmissionAudio('sub-abc', 'ex_1', fileWithParams, studentUser);
+      expect(result.exerciseKey).toBe('ex_1');
+      expect(result.sizeBytes).toBe(2048);
+      expect(mockAudioRepo.save).toHaveBeenCalled();
+    });
+
+    it('should reject file exceeding 1.5 MB limit with PayloadTooLargeException (HTTP 413)', async () => {
+      const studentUser = { id: 'student-owner', role: 'STUDENT' };
+      const largeFile: UploadedAudioFile = {
+        fieldname: 'file',
+        originalname: 'large.webm',
+        encoding: '7bit',
+        mimetype: 'audio/webm',
+        size: 1.6 * 1024 * 1024,
+        buffer: Buffer.alloc(1.6 * 1024 * 1024),
+      };
+
+      await expect(
+        audioService.saveSubmissionAudio('sub-abc', 'ex_1', largeFile, studentUser),
+      ).rejects.toThrow(PayloadTooLargeException);
+    });
+
+    it('should replace existing record when re-uploading with the same exerciseKey', async () => {
+      const studentUser = { id: 'student-owner', role: 'STUDENT' };
+      const existingAudio = {
+        id: 'existing-audio-id',
+        exerciseKey: 'ex_1',
+        mimeType: 'audio/ogg',
+        sizeBytes: 500,
+        data: Buffer.from('old data'),
+      };
+      mockAudioRepo.findOne.mockResolvedValueOnce(existingAudio);
+
+      const newFile: UploadedAudioFile = {
+        fieldname: 'file',
+        originalname: 'new.webm',
+        encoding: '7bit',
+        mimetype: 'audio/webm',
+        size: 1200,
+        buffer: Buffer.from('new data'),
+      };
+
+      const result = await audioService.saveSubmissionAudio('sub-abc', 'ex_1', newFile, studentUser);
+      expect(result.exerciseKey).toBe('ex_1');
+      expect(result.sizeBytes).toBe(1200);
+      expect(existingAudio.sizeBytes).toBe(1200);
+      expect(existingAudio.mimeType).toBe('audio/webm');
+      expect(existingAudio.data).toEqual(Buffer.from('new data'));
+    });
+
+    it('should return metadata list in getSubmissionById without binary data', async () => {
+      const submissionWithAudios = {
+        ...mockSubmission,
+        audios: [
+          {
+            id: 'aud-1',
+            exerciseKey: 'ex_8b',
+            mimeType: 'audio/webm',
+            sizeBytes: 15000,
+          },
+        ],
+      };
+      mockSubmissionRepo.findOne.mockResolvedValueOnce(submissionWithAudios);
+
+      const tutorUser = { id: 'tutor-1', role: 'TUTOR' };
+      const res = await audioService.getSubmissionById('sub-abc', tutorUser);
+
+      expect(res.audios).toEqual([
+        { exerciseKey: 'ex_8b', mimeType: 'audio/webm', sizeBytes: 15000 },
+      ]);
+      expect((res.audios[0] as any).data).toBeUndefined();
+    });
+
+    it('should verify teacher-stats and student lists do not include audio data', async () => {
+      mockSubmissionRepo.find.mockResolvedValueOnce([
+        {
+          id: 'sub-abc',
+          score: 100,
+          status: 'submitted',
+          answers: {},
+          reviewedAnswers: null,
+          details: null,
+          tutorComment: null,
+        },
+      ]);
+
+      const stats = await audioService.getTeacherStats();
+      expect(stats[0]).not.toHaveProperty('audios');
+      expect(stats[0]).not.toHaveProperty('data');
     });
   });
 });

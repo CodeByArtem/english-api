@@ -5,10 +5,12 @@ import {
   CreateDateColumn,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { Assignment } from './assignment.entity';
 import { User } from '../../users/user.entity';
 import { Lesson } from '../../content/entities/lesson.entity';
+import { SubmissionAudio } from './submission-audio.entity';
 
 @Entity('submissions')
 export class Submission {
@@ -53,4 +55,7 @@ export class Submission {
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'student_id' })
   student: User;
+
+  @OneToMany(() => SubmissionAudio, (audio) => audio.submission)
+  audios: SubmissionAudio[];
 }

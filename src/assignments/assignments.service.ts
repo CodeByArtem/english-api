@@ -3,16 +3,19 @@ import {
   NotFoundException,
   BadRequestException,
   ForbiddenException,
+  PayloadTooLargeException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Assignment } from './entities/assignment.entity';
 import { Submission } from './entities/submission.entity';
+import { SubmissionAudio } from './entities/submission-audio.entity';
 import { Lesson } from '../content/entities/lesson.entity';
 import { User } from '../users/user.entity';
 import { Role } from '../common/role.enum';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
 import { ReviewSubmissionDto } from './dto/review-submission.dto';
+import { UploadedAudioFile } from './interfaces/audio-file.interface';
 
 @Injectable()
 export class AssignmentsService {
@@ -25,6 +28,8 @@ export class AssignmentsService {
     private readonly lessonRepository: Repository<Lesson>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(SubmissionAudio)
+    private readonly submissionAudioRepository: Repository<SubmissionAudio>,
   ) {}
 
   async getStudentsList() {
@@ -516,6 +521,20 @@ export class AssignmentsService {
     });
   }
 
+  assertCanAccessSubmission(user: any, submission: Submission): void {
+    const role = user?.role?.toUpperCase();
+    if (role === 'TUTOR') {
+      return;
+    }
+    if (role === 'STUDENT') {
+      if (submission.student?.id === user?.id) {
+        return;
+      }
+      throw new ForbiddenException('You can only access your own submissions');
+    }
+    throw new ForbiddenException('Access denied');
+  }
+
   async getSubmissionById(id: string, user: any) {
     const submission = await this.submissionRepository.findOne({
       where: { id },
@@ -525,6 +544,7 @@ export class AssignmentsService {
           exercises: true,
         },
         assignment: true,
+        audios: true,
       },
     });
 
@@ -532,20 +552,136 @@ export class AssignmentsService {
       throw new NotFoundException('Submission not found');
     }
 
-    const role = user.role?.toUpperCase();
-    if (role === 'STUDENT' && submission.student.id !== user.id) {
-      throw new ForbiddenException('You can only access your own submissions');
-    }
+    this.assertCanAccessSubmission(user, submission);
 
+    const audios = (submission.audios || []).map((a) => ({
+      exerciseKey: a.exerciseKey,
+      mimeType: a.mimeType,
+      sizeBytes: a.sizeBytes,
+    }));
+
+    const role = user?.role?.toUpperCase();
     if (role === 'STUDENT' && submission.lesson) {
       const { answerKey: _answerKey, ...lessonWithoutAnswerKey } = submission.lesson;
       return {
         ...submission,
         lesson: lessonWithoutAnswerKey,
+        audios,
       };
     }
 
-    return submission;
+    return {
+      ...submission,
+      audios,
+    };
+  }
+
+  async saveSubmissionAudio(
+    submissionId: string,
+    exerciseKey: string,
+    file: UploadedAudioFile,
+    user: any,
+  ) {
+    const role = user?.role?.toUpperCase();
+    if (role !== 'STUDENT') {
+      throw new ForbiddenException('Only students can upload audio submissions');
+    }
+
+    if (!file) {
+      throw new BadRequestException('Audio file is required');
+    }
+
+    const MAX_FILE_SIZE = 1.5 * 1024 * 1024; // 1.5 MB
+    if (file.size > MAX_FILE_SIZE) {
+      throw new PayloadTooLargeException('File size exceeds 1.5 MB limit');
+    }
+
+    const rawMime = file.mimetype || '';
+    const normalizedMimeType = rawMime.split(';')[0].trim().toLowerCase();
+    const allowedMimeTypes = ['audio/webm', 'audio/ogg', 'audio/mp4'];
+    if (!allowedMimeTypes.includes(normalizedMimeType)) {
+      throw new BadRequestException(
+        `Invalid audio mimeType: "${file.mimetype}". Allowed mime types: ${allowedMimeTypes.join(', ')}`,
+      );
+    }
+
+    const submission = await this.submissionRepository.findOne({
+      where: { id: submissionId },
+      relations: { student: true },
+    });
+
+    if (!submission) {
+      throw new NotFoundException('Submission not found');
+    }
+
+    this.assertCanAccessSubmission(user, submission);
+
+    let audioRecord = await this.submissionAudioRepository.findOne({
+      where: {
+        submission: { id: submissionId },
+        exerciseKey,
+      },
+    });
+
+    if (audioRecord) {
+      audioRecord.data = file.buffer;
+      audioRecord.mimeType = file.mimetype;
+      audioRecord.sizeBytes = file.size;
+    } else {
+      audioRecord = this.submissionAudioRepository.create({
+        submission,
+        exerciseKey,
+        mimeType: file.mimetype,
+        sizeBytes: file.size,
+        data: file.buffer,
+      });
+    }
+
+    const saved = await this.submissionAudioRepository.save(audioRecord);
+
+    return {
+      id: saved.id,
+      exerciseKey: saved.exerciseKey,
+      mimeType: saved.mimeType,
+      sizeBytes: saved.sizeBytes,
+    };
+  }
+
+  async getSubmissionAudio(
+    submissionId: string,
+    exerciseKey: string,
+    user: any,
+  ) {
+    const submission = await this.submissionRepository.findOne({
+      where: { id: submissionId },
+      relations: { student: true },
+    });
+
+    if (!submission) {
+      throw new NotFoundException('Submission not found');
+    }
+
+    this.assertCanAccessSubmission(user, submission);
+
+    const audio = await this.submissionAudioRepository.findOne({
+      where: {
+        submission: { id: submissionId },
+        exerciseKey,
+      },
+      select: {
+        id: true,
+        exerciseKey: true,
+        mimeType: true,
+        sizeBytes: true,
+        data: true,
+      },
+    });
+
+    if (!audio) {
+      throw new NotFoundException(`Audio not found for exercise "${exerciseKey}"`);
+    }
+
+    return audio;
   }
 
   async getSubmissionsByStudent(studentId: string) {
