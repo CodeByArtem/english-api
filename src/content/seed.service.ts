@@ -111,8 +111,11 @@ export class SeedService implements OnApplicationBootstrap {
         </div>
       `,
       media_links: [
-        'https://example.com/audio/roadmap_a1_1a_conv1.mp3',
-        'https://example.com/audio/roadmap_a1_1a_conv2.mp3',
+        '/audio/1.1.mp3',
+        '/audio/1.2.mp3',
+        '/audio/1.3.mp3',
+        '/audio/1.4.mp3',
+        '/audio/1.5.mp3',
       ],
       answerKey: {
         exercise_1a_flags: {
@@ -692,7 +695,7 @@ export class SeedService implements OnApplicationBootstrap {
           '1_husband': ['husband'],
           '1_son': ['son', 'baby'],
           '2_children': ['children', 'kids'],
-          '3_sons': ['sons'],
+          '3_sons': ['sons', 'son', 'brothers', 'brother'],
           '4_parents': ['parents'],
           '4_father': ['father', 'dad'],
           '4_mother': ['mother', 'mum'],
@@ -703,6 +706,11 @@ export class SeedService implements OnApplicationBootstrap {
           '3': ['its'],
           '4': ['our'],
           '5': ['their'],
+        },
+        exercise_6_pronunciation: {
+          '1': ['S', 's', 'same', 'Same'],
+          '2': ['D', 'd', 'different', 'Different'],
+          '3': ['S', 's', 'same', 'Same'],
         },
         exercise_7_dialogue: {
           '1': ['my'],
@@ -721,15 +729,118 @@ export class SeedService implements OnApplicationBootstrap {
       unit: unit2,
     });
 
+    await this.lessonRepository.save({
+      id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a77',
+      title: '2B Everyday things',
+      order: 6,
+      content: `
+        <div class="lesson-section">
+          <h3>Vocabulary: Everyday objects (1)</h3>
+          <p>Learn common everyday objects: a book, a phone, a desk, a key, a table, a clock, a photo, a computer, a box, a chair, a cup, a pen.</p>
+          <h3>Listening: Max and Carla</h3>
+          <p>Listen to Max welcoming Carla to the company and showing her around the office.</p>
+          <h3>Grammar: this, that, these, those</h3>
+          <p>Learn demonstrative pronouns to talk about singular and plural objects that are near or far.</p>
+        </div>
+      `,
+      theory: `
+        <div class="theory-section">
+          <p><strong>Goal:</strong> talk about everyday objects.<br/>
+          <strong>Grammar:</strong> this, that, these, those.<br/>
+          <strong>Vocabulary:</strong> everyday objects (a book, a phone, a desk, a key, a table, a clock, a photo, a computer, a box, a chair, a cup, a pen).</p>
+          <h4>Demonstratives (this / that / these / those)</h4>
+          <ul>
+            <li><strong>this</strong> (singular, near): <em>This is your desk. / Is this your cup?</em></li>
+            <li><strong>that</strong> (singular, far): <em>That is my computer. / What's that?</em></li>
+            <li><strong>these</strong> (plural, near): <em>These are your keys. / These are my books.</em></li>
+            <li><strong>those</strong> (plural, far): <em>Are those photos of your family? / Those are Jack's pens.</em></li>
+          </ul>
+        </div>
+      `,
+      answerKey: {
+        exercise_1b_vocab: {
+          '1': ['clock', 'a clock', 'f'],
+          '2': ['chair', 'a chair', 'j'],
+          '3': ['table', 'a table', 'e'],
+          '4': ['pen', 'a pen', 'l'],
+          '5': ['cup', 'a cup', 'k'],
+          '6': ['phone', 'a phone', 'b'],
+          '7': ['photo', 'a photo', 'photos', 'g'],
+          '8': ['key', 'a key', 'keys', 'd'],
+          '9': ['computer', 'a computer', 'h'],
+          '10': ['chair', 'a chair', 'j', 'desk', 'a desk', 'c'],
+          '11': ['box', 'a box', 'i', 'desk', 'a desk', 'c'],
+          '12': ['book', 'a book', 'books', 'a'],
+        },
+        exercise_3_photos: {
+          '1': ['pen', 'a pen', 'l'],
+          '2': ['clock', 'a clock', 'f'],
+          '3': ['chair', 'a chair', 'j'],
+          '4': ['book', 'a book', 'a'],
+          '5': ['cup', 'a cup', 'k'],
+          '6': ['key', 'a key', 'd'],
+          '7': ['box', 'a box', 'i'],
+          '8': ['phone', 'a phone', 'b'],
+        },
+        exercise_5a_picture: {
+          'choice': ['B', 'b', 'Picture B', 'picture b'],
+        },
+        exercise_5b_dialogue: {
+          '1': ['desk', 'a desk'],
+          '2': ['keys', 'the keys', 'key'],
+          '3': ['computer', 'a computer'],
+          '4': ['desk', 'a desk', 'phone', 'a phone', 'office'],
+          '5': ['photos', 'pictures', 'photo'],
+          '6': ['cup', 'a cup', 'mug'],
+        },
+        exercise_6_grammar: {
+          '1': ['this'],
+          '2': ['that'],
+          '3': ['these'],
+          '4': ['those'],
+        },
+        exercise_7a_choice: {
+          '1': ['a', 'This is my key.', 'This is my key'],
+          '2': ['b', 'This is my book.', 'This is my book'],
+          '3': ['a', "What's in this box?", "What's in this box"],
+        },
+        exercise_8_conversations: {
+          '1': ['this'],
+          '2': ['those'],
+          '3_1': ['this'],
+          '3_2': ['It', 'it', "It's", "it's", 'That', 'that'],
+          '4_1': ['those'],
+          '4_2': ['these'],
+        },
+      },
+      media_links: [
+        '/audio/2.5.mp3',
+        '/audio/2.6.mp3',
+        '/audio/2.7.mp3',
+        '/audio/2.8.mp3',
+      ],
+      unit: unit2,
+    });
+
     const material = this.materialRepository.create({
       id: 'd0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
       title: 'Unit 1 Audio',
       type: 'audio',
-      url: 'https://example.com/audio/unit1.mp3',
+      url: '/audio/1.1.mp3',
       description: 'Audio materials for Unit 1 - Greetings and Introductions',
       unit,
     });
     await this.materialRepository.save(material);
+
+    const material2 = this.materialRepository.create({
+      id: 'd0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22',
+      title: 'Unit 2 Audio',
+      type: 'audio',
+      url: '/audio/2.1.mp3',
+      description: 'Audio materials for Unit 2 - Families and Everyday Things',
+      unit: unit2,
+    });
+    await this.materialRepository.save(material2);
 
     console.log('Database seeding completed successfully!');
   }
