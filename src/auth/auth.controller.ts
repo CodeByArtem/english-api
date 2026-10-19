@@ -14,6 +14,7 @@ import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import {
   THROTTLE_TTL,
@@ -23,13 +24,13 @@ import {
 
 const isProd = process.env.NODE_ENV === 'production';
 
-// В проде фронт (vercel.app) и API (onrender.com) на разных сайтах,
-// поэтому нужны SameSite=None и Secure. Локально (http) это не работает,
-// поэтому там lax без secure.
+// После перехода на Next.js rewrites (/api/:path* → Render) cookie стали first-party
+// для браузера (оба домена — vercel.app), поэтому SameSite=None больше не нужен.
+// Lax безопасен и работает как в проде, так и локально (в том числе без HTTPS).
 const baseCookieOptions: CookieOptions = {
   httpOnly: true,
   secure: isProd,
-  sameSite: isProd ? 'none' : 'lax',
+  sameSite: 'lax',
   path: '/',
 };
 
@@ -70,7 +71,12 @@ export class AuthController {
   async login(
     @Body() loginDto: LoginDto,
     @Res({ passthrough: true }) res: Response,
+    @Req() req: ExpressRequest,
   ) {
+    // TODO: Временное логирование для проверки trust proxy в проде на Render. Удалить после проверки логов!
+    console.log(
+      `[DEBUG /auth/login IP] req.ip: "${req.ip}", x-forwarded-for: "${req.headers['x-forwarded-for']}"`,
+    );
     const tokens = await this.authService.login(loginDto);
     this.setAuthCookies(res, tokens);
     return tokens;
@@ -80,8 +86,9 @@ export class AuthController {
   async logout(
     @Req() req: ExpressRequest,
     @Res({ passthrough: true }) res: Response,
+    @Body() body?: RefreshTokenDto,
   ) {
-    const refreshToken = req.cookies?.refreshToken;
+    const refreshToken = req.cookies?.refreshToken || body?.refreshToken;
     if (refreshToken) {
       await this.authService.revokeFamily(refreshToken);
     }
@@ -97,8 +104,9 @@ export class AuthController {
   async refresh(
     @Req() req: ExpressRequest,
     @Res({ passthrough: true }) res: Response,
+    @Body() body?: RefreshTokenDto,
   ) {
-    const refreshToken = req.cookies?.refreshToken;
+    const refreshToken = req.cookies?.refreshToken || body?.refreshToken;
     if (!refreshToken) {
       throw new UnauthorizedException('No refresh token provided');
     }

@@ -1,12 +1,21 @@
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
+import { getAllowedOrigins } from './common/cors.config';
 
 async function bootstrap() {
+  const logger = new Logger('Bootstrap');
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.set('trust proxy', 1);
+
+  if (!process.env.FRONTEND_URL) {
+    logger.warn(
+      'FRONTEND_URL environment variable is not defined! CORS and CsrfGuard will only accept localhost origins. Production requests will be rejected with 403 Forbidden.',
+    );
+  }
+
   app.use(cookieParser());
   app.useGlobalPipes(
     new ValidationPipe({
@@ -16,11 +25,7 @@ async function bootstrap() {
     }),
   );
 
-  const allowedOrigins = [
-    process.env.FRONTEND_URL,
-    'http://localhost:3000',
-    'http://localhost:3001',
-  ].filter(Boolean);
+  const allowedOrigins = getAllowedOrigins(process.env.FRONTEND_URL);
 
   app.enableCors({
     // Явно указываем тип (string | undefined) для параметра origin
@@ -28,7 +33,8 @@ async function bootstrap() {
       origin: string | undefined,
       callback: (err: Error | null, allow?: boolean) => void,
     ) => {
-      if (!origin || allowedOrigins.includes(origin)) {
+      const normalized = origin ? origin.trim().replace(/\/+$/, '') : undefined;
+      if (!normalized || allowedOrigins.includes(normalized)) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));

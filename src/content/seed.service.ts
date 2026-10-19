@@ -71,6 +71,19 @@ export class SeedService implements OnApplicationBootstrap {
       await this.unitRepository.save(unit2);
     }
 
+    let unit3 = await this.unitRepository.findOne({
+      where: { id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14' },
+    });
+    if (!unit3) {
+      unit3 = this.unitRepository.create({
+        id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14',
+        title: 'Unit 3: Places',
+        order: 3,
+        textbook,
+      });
+      await this.unitRepository.save(unit3);
+    }
+
     const lesson1 = await this.lessonRepository.save({
       id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22',
       title: '1A Hello',
@@ -818,6 +831,280 @@ export class SeedService implements OnApplicationBootstrap {
         '/audio/2.8.mp3',
       ],
       unit: unit2,
+    });
+
+    await this.lessonRepository.save({
+      id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a88',
+      title: '2C Numbers',
+      order: 7,
+      content: `
+        <div class="lesson-section">
+          <h3>Vocabulary: Numbers 1–100</h3>
+          <p>Learn numbers from 1 to 100, teens (11–19), and tens (20, 30, 40... 100).</p>
+          <h3>Listening: People's Profiles</h3>
+          <p>Listen to conversations about people's ages, origins, and occupations.</p>
+          <h3>Grammar: Question words with be</h3>
+          <p>Learn how to ask questions about other people using who, what, where, how old.</p>
+        </div>
+      `,
+      theory: `
+        <div class="theory-section">
+          <p><strong>Goal:</strong> ask questions about other people.<br/>
+          <strong>Grammar:</strong> question words with be.<br/>
+          <strong>Vocabulary:</strong> numbers 1–100.</p>
+          <h4>Numbers 1–100</h4>
+          <ul>
+            <li>1 one, 2 two, 3 three, 4 four, 5 five, 6 six, 7 seven, 8 eight, 9 nine, 10 ten</li>
+            <li>11 eleven, 12 twelve, 13 thirteen, 14 fourteen, 15 fifteen, 16 sixteen, 17 seventeen, 18 eighteen, 19 nineteen</li>
+            <li>20 twenty, 30 thirty, 40 forty, 50 fifty, 60 sixty, 70 seventy, 80 eighty, 90 ninety, 100 a hundred</li>
+          </ul>
+          <h4>Question Words with be</h4>
+          <ul>
+            <li><strong>How old:</strong> <em>How old is she? She's twenty-six.</em></li>
+            <li><strong>Where:</strong> <em>Where is he from? He's from Japan.</em></li>
+            <li><strong>What:</strong> <em>What's his job? He's an engineer.</em></li>
+            <li><strong>Who:</strong> <em>Who's that? That's Anna.</em></li>
+          </ul>
+        </div>
+      `,
+      answerKey: {
+        exercise_1a_match: {
+          '1': ['one'],
+          '2': ['two'],
+          '3': ['three'],
+          '4': ['four'],
+          '5': ['five'],
+          '6': ['six'],
+        },
+        exercise_2_choice: {
+          '1': ['13', '30'],
+          '2': ['14', '40'],
+          '3': ['15', '50'],
+          '4': ['16', '60'],
+          '5': ['17', '70'],
+          '6': ['18', '80'],
+          '7': ['19', '90'],
+        },
+        exercise_3a_sequence: {
+          'text': ['twenty-four', 'twenty-five', 'twenty four', 'twenty five'],
+        },
+        exercise_4_profiles: {
+          'anna_age': ['26', 'twenty-six', 'twenty six', '25', '24', '28'],
+          'anna_from': ['the UK', 'UK', 'London', 'England', 'Britain'],
+          'anna_job': ['receptionist', 'a receptionist', 'hotel receptionist'],
+          'bill_age': ['42', 'forty-two', 'forty two', '35', '40'],
+          'bill_from': ['the USA', 'USA', 'US', 'the US', 'America', 'New York'],
+          'bill_job': ['doctor', 'a doctor'],
+          'satoru_age': ['31', 'thirty-one', 'thirty one', '30'],
+          'satoru_from': ['Japan', 'Tokyo'],
+          'satoru_job': ['engineer', 'an engineer', 'software engineer'],
+        },
+        exercise_5_grammar_rules: {
+          '1': ['before'],
+          '2': ['before'],
+        },
+        exercise_7_questions: {
+          '1': ["Who is he?", "Who's he?", "Who is he", "Who's he", "Who is that?", "Who's that?", "Who is that"],
+          '2': ["Where is he from?", "Where's he from?", "Where is he from", "Where's he from"],
+          '3': ["How old is he?", "How old is he"],
+          '4': ["What is his job?", "What's his job?", "What is his job", "What's his job"],
+          '5': ["Who are they?", "Who are they"],
+        },
+      },
+      media_links: [
+        '/audio/2.9.mp3',
+        '/audio/2.10.mp3',
+        '/audio/2.11.mp3',
+        '/audio/2.12.mp3',
+        '/audio/2.13.mp3',
+        '/audio/2.14.mp3',
+      ],
+      unit: unit2,
+    });
+
+    await this.lessonRepository.save({
+      id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a99',
+      title: '2D English in action',
+      order: 8,
+      content: `
+        <div class="lesson-section">
+          <h3>Function: Pay for things in a shop</h3>
+          <p>Learn customer and shop assistant phrases: How much is/are...?, Can I pay by card?, Cash or card?, Here's your change/card.</p>
+          <h3>Check and Reflect (Unit 2)</h3>
+          <p>Review family vocabulary, possessive 's, demonstrative pronouns (this, that, these, those), numbers and arithmetic words.</p>
+        </div>
+      `,
+      theory: `
+        <div class="theory-section">
+          <p><strong>Goal:</strong> pay for things in a shop.<br/>
+          <strong>Review:</strong> Unit 2 Check and reflect.</p>
+          <h4>Useful Phrases: In a Shop</h4>
+          <ul>
+            <li><strong>Customer:</strong> <em>How much is this book? How much are those cups? Can I pay by card? Here's my card.</em></li>
+            <li><strong>Shop Assistant:</strong> <em>It's £12. That's £9.99. Cash or card? Here's your change. Here's your card.</em></li>
+          </ul>
+        </div>
+      `,
+      answerKey: {
+        exercise_3a_dialogue: {
+          '1': ['How much is', 'how much is'],
+          '2': ["It's", "it's", "That's", "that's"],
+          '3': ['how much is', 'How much is'],
+          '4': ['How much are', 'how much are'],
+          '5': ["That's", "that's", "It's", "it's"],
+          '6': ['Cash or card', 'cash or card', 'Cash or card?', 'cash or card?'],
+          '7': ["Here's my card", "here's my card"],
+          '8': ["Here's your card", "here's your card"],
+        },
+        exercise_1_family: {
+          '2': ['wife'],
+          '3': ['son'],
+          '4': ['daughter'],
+          '5': ['brother'],
+          '6': ['parents'],
+          '7': ['sister'],
+          '8': ['father'],
+        },
+        exercise_2_possessive: {
+          '2': ["Julie's family", "Julie's family."],
+          '3': ["Martin's parents", "Martin's parents."],
+          '4': ["my friend's dog", "my friend's dog."],
+          '5': ["my teacher's pen", "my teacher's pen."],
+          '6': ["my brother's book", "my brother's book."],
+        },
+        exercise_3_alternatives: {
+          '1': ['Our'],
+          '2': ['Her'],
+          '3': ['his'],
+          '4': ['their'],
+          '5': ['its'],
+          '6': ['my'],
+          '6_b': ['His'],
+        },
+        exercise_5_anagrams: {
+          '2': ['hair'],
+          '3': ['hone'],
+          '4': ['en'],
+          '5': ['esk'],
+          '6': ['omputer'],
+          '7': ['ey'],
+          '8': ['hoto'],
+          '9': ['up'],
+          '10': ['ook'],
+          '11': ['ox'],
+          '12': ['lock'],
+        },
+        exercise_6_demonstratives: {
+          '1': ['this'],
+          '2': ["That's"],
+          '3': ['these'],
+          '4': ['those'],
+        },
+        exercise_7a_math: {
+          '2': ['thirteen', '13'],
+          '3': ['thirty', '30'],
+          '4': ['fifty-six', '56'],
+          '5': ['fifteen', '15'],
+          '6': ['fifty', '50'],
+          '7': ['forty-two', '42'],
+          '8': ['fifty-six', '56'],
+          '9': ['twenty-nine', '29'],
+          '10': ['eighty-one', '81'],
+          '11': ['thirty-six', '36'],
+          '12': ['sixty-three', '63'],
+        },
+      },
+      media_links: ['/audio/2.20.mp3', '/audio/2.21.mp3'],
+      unit: unit2,
+    });
+
+    await this.lessonRepository.save({
+      id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380b01',
+      title: '3A My town',
+      order: 9,
+      content: `
+        <div class="lesson-section">
+          <h3>Vocabulary: Places in town</h3>
+          <p>Learn places in a town: train station, hotel, café, bank, restaurant, supermarket, cinema, park, market, bookshop, house, flat.</p>
+          <h3>Listening: People talking about their town</h3>
+          <p>Listen to descriptions of towns, facilities, shops and amenities.</p>
+          <h3>Grammar: There is / There are</h3>
+          <p>Learn singular and plural forms with There is / There are, no, and any.</p>
+        </div>
+      `,
+      theory: `
+        <div class="theory-section">
+          <p><strong>Goal:</strong> say what's in a town.<br/>
+          <strong>Grammar:</strong> There is / There are; singular and plural nouns.<br/>
+          <strong>Vocabulary:</strong> places in town.</p>
+          <h4>Grammar: There is / There are</h4>
+          <ul>
+            <li><strong>Singular (+):</strong> <em>There's a park. / There is a park.</em></li>
+            <li><strong>Singular (-):</strong> <em>There isn't a bank.</em></li>
+            <li><strong>Plural (+):</strong> <em>There are three cafés.</em></li>
+            <li><strong>Plural (-):</strong> <em>There aren't any supermarkets. / There are no supermarkets.</em></li>
+          </ul>
+        </div>
+      `,
+      answerKey: {
+        exercise_1a_places: {
+          '1': ['B'],
+          '2': ['C'],
+          '3': ['A'],
+          '4': ['J'],
+          '5': ['F'],
+          '6': ['L'],
+          '7': ['D'],
+          '8': ['G'],
+          '9': ['I'],
+          '10': ['E'],
+          '11': ['K'],
+          '12': ['H'],
+        },
+        exercise_3_speakers: {
+          '1': ['C'],
+          '2': ['A'],
+          '3': ['B'],
+        },
+        exercise_4_choices: {
+          '1': ['b'],
+          '2': ['b'],
+          '3': ['b'],
+          '4': ['a'],
+          '5': ['b'],
+          '6': ['a'],
+        },
+        exercise_5_grammar: {
+          '1': ['There is', 'there is', "There's", "there's"],
+          '2': ['There are', 'there are'],
+          '3': ['There are', 'there are'],
+        },
+        exercise_7a_alternatives: {
+          '1': ['are'],
+          '2': ['a'],
+          '3': ['is'],
+          '4': ['any'],
+          '5': ['no'],
+          '6': ['two bookshops'],
+          '7': ["There's"],
+          '8': ['no'],
+        },
+        exercise_7b_lists: {
+          '1': ['parks'],
+          '2': ['café', 'cafe'],
+          '3': ['restaurants'],
+        },
+        exercise_8_text: {
+          '1': ['are'],
+          '2': ['a'],
+          '3': ["There's", 'there is', 'There is'],
+          '4': ['there', 'There'],
+          '5': ['are'],
+          '6': ['no'],
+        },
+      },
+      media_links: ['/audio/3.1.mp3', '/audio/3.2.mp3', '/audio/3.3.mp3'],
+      unit: unit3,
     });
 
     const material = this.materialRepository.create({

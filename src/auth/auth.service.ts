@@ -42,7 +42,15 @@ export class AuthService {
         Role.STUDENT,
       );
 
-      return this.createTokenFamily(user);
+      const tokens = await this.createTokenFamily(user);
+      return {
+        ...tokens,
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        },
+      };
     }
 
     const codeHash = crypto
@@ -80,7 +88,15 @@ export class AuthService {
       return savedUser;
     });
 
-    return this.createTokenFamily(user);
+    const tokens = await this.createTokenFamily(user);
+    return {
+      ...tokens,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      },
+    };
   }
 
   async login(loginDto: LoginDto) {
@@ -97,7 +113,15 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    return this.createTokenFamily(user);
+    const tokens = await this.createTokenFamily(user);
+    return {
+      ...tokens,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      },
+    };
   }
 
   private hashToken(token: string): string {

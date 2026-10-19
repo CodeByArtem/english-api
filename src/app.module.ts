@@ -8,6 +8,8 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ContentModule } from './content/content.module';
+import { CsrfGuard } from './common/guards/csrf.guard';
+import { getAllowedOrigins } from './common/cors.config';
 import { AssignmentsModule } from './assignments/assignments.module';
 import { InvitesModule } from './invites/invites.module';
 import { User } from './users/user.entity';
@@ -90,6 +92,18 @@ import {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
     },
+    // CSRF guard проверяет Origin/Referer для всех небезопасных HTTP-методов,
+    // если в запросе присутствуют auth-cookie (accessToken или refreshToken).
+    {
+      provide: APP_GUARD,
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService): CsrfGuard => {
+        const allowedOrigins = getAllowedOrigins(
+          configService.get<string>('FRONTEND_URL'),
+        );
+        return new CsrfGuard(allowedOrigins);
+      },
+    },
   ],
 })
-export class AppModule {}
+export class AppModule {}
