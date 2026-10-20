@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -9,6 +9,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ContentModule } from './content/content.module';
 import { CsrfGuard } from './common/guards/csrf.guard';
+import { AppThrottlerGuard } from './common/guards/app-throttler.guard';
 import { getAllowedOrigins } from './common/cors.config';
 import { AssignmentsModule } from './assignments/assignments.module';
 import { InvitesModule } from './invites/invites.module';
@@ -90,7 +91,7 @@ import {
     AppService,
     {
       provide: APP_GUARD,
-      useClass: ThrottlerGuard,
+      useClass: AppThrottlerGuard,
     },
     // CSRF guard проверяет Origin/Referer для всех небезопасных HTTP-методов,
     // если в запросе присутствуют auth-cookie (accessToken или refreshToken).
@@ -106,4 +107,4 @@ import {
     },
   ],
 })
-export class AppModule {}
+export class AppModule {}

@@ -19,6 +19,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import {
   THROTTLE_TTL,
   THROTTLE_AUTH_LIMIT,
+  THROTTLE_LOGIN_LIMIT,
   THROTTLE_REFRESH_LIMIT,
 } from './throttle.constants';
 
@@ -66,17 +67,13 @@ export class AuthController {
     return tokens;
   }
 
-  @Throttle({ default: { limit: THROTTLE_AUTH_LIMIT, ttl: THROTTLE_TTL } })
+  // Лимит считается по email через AppThrottlerGuard: общий IP на Render не блокирует других пользователей
+  @Throttle({ default: { limit: THROTTLE_LOGIN_LIMIT, ttl: THROTTLE_TTL } })
   @Post('login')
   async login(
     @Body() loginDto: LoginDto,
     @Res({ passthrough: true }) res: Response,
-    @Req() req: ExpressRequest,
   ) {
-    // TODO: Временное логирование для проверки trust proxy в проде на Render. Удалить после проверки логов!
-    console.log(
-      `[DEBUG /auth/login IP] req.ip: "${req.ip}", x-forwarded-for: "${req.headers['x-forwarded-for']}"`,
-    );
     const tokens = await this.authService.login(loginDto);
     this.setAuthCookies(res, tokens);
     return tokens;
