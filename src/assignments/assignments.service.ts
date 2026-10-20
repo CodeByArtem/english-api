@@ -304,6 +304,8 @@ export class AssignmentsService {
       .trim()
       .toLowerCase()
       .replace(/[’‘`´]/g, "'")
+      .replace(/[,;!]/g, '')
+      .replace(/\s+/g, ' ')
       .replace(/\.+$/, '');
   }
 

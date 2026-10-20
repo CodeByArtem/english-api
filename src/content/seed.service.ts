@@ -220,12 +220,12 @@ export class SeedService implements OnApplicationBootstrap {
       theory: 'Goal: ask and answer about jobs. Grammar: be (he/she/it). Vocabulary: jobs.',
       answerKey: {
         exercise_1b_jobs: {
-          "1": "taxi driver",
-          "2": "farmer",
-          "3": "doctor",
-          "4": "football player",
-          "5": "nurse",
-          "6": "school teacher"
+          "1": ["taxi driver", "a taxi driver", "g"],
+          "2": ["farmer", "a farmer", "e"],
+          "3": ["doctor", "a doctor", "b"],
+          "4": ["football player", "a football player", "a"],
+          "5": ["nurse", "a nurse", "f"],
+          "6": ["school teacher", "a school teacher", "teacher", "c"]
         },
         exercise_3_reading: {
           "1": ["b", "doctor"],
@@ -259,11 +259,72 @@ export class SeedService implements OnApplicationBootstrap {
           "9": ["He's", "9He's", "he is"]
         },
         exercise_7a_qa: {
-          "2": ["No, he isn't. He's a taxi driver", "No, he isn't", "taxi driver", "He's a taxi driver"],
-          "3": ["No, she isn't. She's an architect", "No, she isn't", "architect", "She's an architect"],
-          "4": ["No, he isn't. He's a doctor", "No, he isn't", "doctor", "He's a doctor"],
-          "5": ["Yes, he is", "He's a school teacher", "school teacher", "teacher"],
-          "6": ["No, she isn't. She's a nurse", "No, she isn't", "nurse", "She's a nurse"]
+          "2": [
+            "No, he isn't. He's a football player",
+            "No, he isn't. He is football player",
+            "No, he isn't. He is a football player",
+            "No, he's a football player",
+            "No, he isn't",
+            "football player",
+            "He's a football player",
+            "He is a football player",
+            "He is football player",
+            "a football player",
+            "No, he is not"
+          ],
+          "3": [
+            "No, she isn't. She's an architect",
+            "No, she isn't. She is architect",
+            "No, she isn't. She is an architect",
+            "No, she's an architect",
+            "No, she isn't",
+            "architect",
+            "She's an architect",
+            "She is an architect",
+            "She is architect",
+            "an architect",
+            "No, she is not"
+          ],
+          "4": [
+            "No, he isn't. He's a nurse",
+            "No, he isn't. He is nurse",
+            "No, he isn't. He is a nurse",
+            "No, he's a nurse",
+            "No, he isn't",
+            "nurse",
+            "He's a nurse",
+            "He is a nurse",
+            "He is nurse",
+            "a nurse",
+            "No, he is not",
+            "Yes, he is",
+            "Yes he is"
+          ],
+          "5": [
+            "No, he isn't. He's a taxi driver",
+            "No, he isn't. He is taxi driver",
+            "No, he isn't. He is a taxi driver",
+            "No, he's a taxi driver",
+            "No, he isn't",
+            "taxi driver",
+            "He's a taxi driver",
+            "He is a taxi driver",
+            "He is taxi driver",
+            "a taxi driver",
+            "No, he is not",
+            "Yes, he is",
+            "Yes he is"
+          ],
+          "6": [
+            "Yes, she is",
+            "Yes she is",
+            "She's a doctor",
+            "She is a doctor",
+            "She is doctor",
+            "doctor",
+            "a doctor",
+            "Yes, she's a doctor"
+          ]
         }
       },
       media_links: ['/audio/1.6.mp3', '/audio/1.7.mp3', '/audio/1.8.mp3'],

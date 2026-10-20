@@ -666,47 +666,109 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
       expect(result.details.totalQuestions).toBe(9);
       expect(result.score).toBe(78);
     });
-    it('should accurately score 100% for all exercises in Lesson 1B (Page 8 + Page 9)', () => {
-      const mockLesson1BFull: Lesson = {
-        ...mockLesson1B,
-        answerKey: {
-          ...mockLesson1B.answerKey,
-          exercise_page9_profiles: {
-            lidia: ['pilot', 'a pilot'],
-            sakura: ['architect', 'an architect'],
-          },
-          exercise_4a_reading: {
-            '1': ['b', "no, it isn't", 'no'],
-            '2': ['a', 'yes, he is', 'yes'],
-            '3': ['b', "no, she isn't a doctor. she's an office worker", "no, she isn't"],
-          },
-          exercise_5a_grammar: {
-            '1': ["'s", 'is'],
-            '2': ["'s", 'is'],
-            '3': ["isn't", 'is not'],
-            '4': ["'s", 'is'],
-          },
-          exercise_6_dialogue: {
-            '1': ["'m", "I'm"],
-            '2': 'Is it',
-            '3': 'it is',
-            '4': 'Is the manager',
-            '5': "he's",
-            '6': ['Is he', "He's"],
-            '7': ["he isn't", 'not', "isn't"],
-            '8': "'s he",
-            '9': "He's",
-          },
-          exercise_7a_qa: {
-            '2': ["No, he isn't. He's a taxi driver", "No, he isn't", 'taxi driver'],
-            '3': ["No, she isn't. She's an architect", "No, she isn't", 'architect'],
-            '4': ["No, he isn't. He's a doctor", "No, he isn't", 'doctor'],
-            '5': ['Yes, he is', 'teacher'],
-            '6': ["No, she isn't. She's a nurse", "No, she isn't", 'nurse'],
-          },
-        },
-      };
 
+    const mockLesson1BFull: Lesson = {
+      ...mockLesson1B,
+      answerKey: {
+        ...mockLesson1B.answerKey,
+        exercise_page9_profiles: {
+          lidia: ['pilot', 'a pilot'],
+          sakura: ['architect', 'an architect'],
+        },
+        exercise_4a_reading: {
+          '1': ['b', "no, it isn't", 'no'],
+          '2': ['a', 'yes, he is', 'yes'],
+          '3': ['b', "no, she isn't a doctor. she's an office worker", "no, she isn't"],
+        },
+        exercise_5a_grammar: {
+          '1': ["'s", 'is'],
+          '2': ["'s", 'is'],
+          '3': ["isn't", 'is not'],
+          '4': ["'s", 'is'],
+        },
+        exercise_6_dialogue: {
+          '1': ["'m", "I'm"],
+          '2': 'Is it',
+          '3': 'it is',
+          '4': 'Is the manager',
+          '5': "he's",
+          '6': ['Is he', "He's"],
+          '7': ["he isn't", 'not', "isn't"],
+          '8': "'s he",
+          '9': "He's",
+        },
+        exercise_7a_qa: {
+            '2': [
+              "No, he isn't. He's a football player",
+              "No, he isn't. He is football player",
+              "No, he isn't. He is a football player",
+              "No, he's a football player",
+              "No, he isn't",
+              'football player',
+              "He's a football player",
+              'He is football player',
+              'He is a football player',
+              'a football player',
+              'No, he is not',
+            ],
+            '3': [
+              "No, she isn't. She's an architect",
+              "No, she isn't. She is architect",
+              "No, she isn't. She is an architect",
+              "No, she's an architect",
+              "No, she isn't",
+              'architect',
+              "She's an architect",
+              'She is architect',
+              'She is an architect',
+              'an architect',
+              'No, she is not',
+            ],
+            '4': [
+              "No, he isn't. He's a nurse",
+              "No, he isn't. He is nurse",
+              "No, he isn't. He is a nurse",
+              "No, he's a nurse",
+              "No, he isn't",
+              'nurse',
+              "He's a nurse",
+              'He is nurse',
+              'He is a nurse',
+              'a nurse',
+              'No, he is not',
+              'Yes, he is',
+              'Yes he is',
+            ],
+            '5': [
+              "No, he isn't. He's a taxi driver",
+              "No, he isn't. He is taxi driver",
+              "No, he isn't. He is a taxi driver",
+              "No, he's a taxi driver",
+              "No, he isn't",
+              'taxi driver',
+              "He's a taxi driver",
+              'He is taxi driver',
+              'He is a taxi driver',
+              'a taxi driver',
+              'No, he is not',
+              'Yes, he is',
+              'Yes he is',
+            ],
+            '6': [
+              'Yes, she is',
+              'Yes she is',
+              "She's a doctor",
+              'She is doctor',
+              'She is a doctor',
+              'doctor',
+              'a doctor',
+              "Yes, she's a doctor",
+            ],
+          },
+      },
+    };
+
+    it('should accurately score 100% for all exercises in Lesson 1B (Page 8 + Page 9)', () => {
       const studentAnswers = {
         exercise_1b_jobs: {
           '1': 'taxi driver',
@@ -748,17 +810,41 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
           '9': "He's",
         },
         exercise_7a_qa: {
-          '2': "No, he isn't. He's a taxi driver.", // with trailing period
+          '2': "No, he isn't. He's a football player.", // with trailing period
           '3': "No, she isn't. She's an architect",
-          '4': "No, he isn't. He's a doctor.",
-          '5': "Yes, he is.",
-          '6': "No, she isn't. She's a nurse",
+          '4': "No, he isn't. He's a nurse.",
+          '5': "No, he isn't. He's a taxi driver.",
+          '6': "Yes, she is.",
         },
       };
 
       const result = service.calculateScore(mockLesson1BFull, studentAnswers);
       expect(result.details.totalQuestions).toBe(32);
       expect(result.details.correctAnswers).toBe(32);
+      expect(result.score).toBe(100);
+    });
+
+    it('should match student answers in 7a with missing commas, contractions, and articles', () => {
+      const studentAnswers = {
+        exercise_7a_qa: {
+          '2': "No he isn't. He is football player",
+          '3': "No she isn't. She is architect",
+          '4': "Yes he is",
+          '5': "No he isn't. He is taxi driver",
+          '6': "Yes she is",
+        },
+      };
+
+      const mock7aOnly: Lesson = {
+        id: 'mock-7a',
+        answerKey: {
+          exercise_7a_qa: mockLesson1BFull.answerKey.exercise_7a_qa,
+        },
+      } as any;
+
+      const result = service.calculateScore(mock7aOnly, studentAnswers);
+      expect(result.details.correctAnswers).toBe(5);
+      expect(result.details.totalQuestions).toBe(5);
       expect(result.score).toBe(100);
     });
   });
