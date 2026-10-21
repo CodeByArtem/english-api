@@ -124,6 +124,22 @@ export class AuthService {
     };
   }
 
+  private getJwtAccessSecret(): string {
+    const secret = this.configService.get<string>('JWT_ACCESS_SECRET');
+    if (!secret) {
+      throw new Error('JWT_ACCESS_SECRET environment variable is required');
+    }
+    return secret;
+  }
+
+  private getJwtRefreshSecret(): string {
+    const secret = this.configService.get<string>('JWT_REFRESH_SECRET');
+    if (!secret) {
+      throw new Error('JWT_REFRESH_SECRET environment variable is required');
+    }
+    return secret;
+  }
+
   private hashToken(token: string): string {
     return crypto.createHash('sha256').update(token).digest('hex');
   }
@@ -139,14 +155,14 @@ export class AuthService {
 
     const accessToken = this.jwtService.sign(payload, {
       expiresIn: ACCESS_TOKEN_EXPIRES_IN,
-      secret: this.configService.get<string>('JWT_ACCESS_SECRET') || 'fallback-access-secret',
+      secret: this.getJwtAccessSecret(),
     });
 
     const refreshToken = this.jwtService.sign(
       { ...payload, jti, familyId },
       {
         expiresIn: REFRESH_TOKEN_EXPIRES_IN,
-        secret: this.configService.get<string>('JWT_REFRESH_SECRET') || 'fallback-refresh-secret',
+        secret: this.getJwtRefreshSecret(),
       },
     );
 
@@ -191,7 +207,7 @@ export class AuthService {
     let payload: any;
     try {
       payload = this.jwtService.verify(refreshToken, {
-        secret: this.configService.get<string>('JWT_REFRESH_SECRET') || 'fallback-refresh-secret',
+        secret: this.getJwtRefreshSecret(),
       });
     } catch {
       throw new UnauthorizedException('Invalid or expired refresh token');
@@ -304,7 +320,7 @@ export class AuthService {
   async revokeFamily(refreshToken: string): Promise<void> {
     try {
       this.jwtService.verify(refreshToken, {
-        secret: this.configService.get<string>('JWT_REFRESH_SECRET') || 'fallback-refresh-secret',
+        secret: this.getJwtRefreshSecret(),
       });
 
       const tokenHash = this.hashToken(refreshToken);

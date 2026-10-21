@@ -18,7 +18,11 @@ import { RefreshToken } from './entities/refresh-token.entity';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_ACCESS_SECRET') || 'fallback-access-secret',
+        secret: (() => {
+          const s = configService.get<string>('JWT_ACCESS_SECRET');
+          if (!s) throw new Error('JWT_ACCESS_SECRET environment variable is required');
+          return s;
+        })(),
         signOptions: { expiresIn: '15m' },
       }),
     }),

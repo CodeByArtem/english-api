@@ -84,6 +84,19 @@ export class SeedService implements OnApplicationBootstrap {
       await this.unitRepository.save(unit3);
     }
 
+    let unit4 = await this.unitRepository.findOne({
+      where: { id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15' },
+    });
+    if (!unit4) {
+      unit4 = this.unitRepository.create({
+        id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15',
+        title: 'Unit 4: Possessions and People',
+        order: 4,
+        textbook,
+      });
+      await this.unitRepository.save(unit4);
+    }
+
     const lesson1 = await this.lessonRepository.save({
       id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22',
       title: '1A Hello',
@@ -146,6 +159,8 @@ export class SeedService implements OnApplicationBootstrap {
           "12": "Italy"
         },
         exercise_2a_stress: {
+          "Poland": { "value": "Oo", "isExample": true },
+          "Japan": { "value": "oO", "isExample": true },
           "Spain": "o",
           "Thailand": "Oo",
           "Turkey": "Oo",
@@ -510,7 +525,7 @@ export class SeedService implements OnApplicationBootstrap {
     });
     await this.exerciseRepository.save(exercise6);
 
-    const lesson4 = await this.lessonRepository.save({
+    await this.lessonRepository.save({
       id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a55',
       title: '1D English in action & Check and reflect',
       order: 4,
@@ -704,7 +719,7 @@ export class SeedService implements OnApplicationBootstrap {
       unit,
     });
 
-    const lesson5 = await this.lessonRepository.save({
+    await this.lessonRepository.save({
       id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a66',
       title: '2A Families',
       order: 5,
@@ -1166,6 +1181,133 @@ export class SeedService implements OnApplicationBootstrap {
       },
       media_links: ['/audio/3.1.mp3', '/audio/3.2.mp3', '/audio/3.3.mp3'],
       unit: unit3,
+    });
+
+    await this.lessonRepository.save({
+      id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380b02',
+      title: '3B Flat to rent',
+      order: 10,
+      content: `
+        <div class="lesson-section">
+          <h3>Vocabulary: Rooms and furniture</h3>
+          <p>Learn rooms in a home: living room, bedroom, kitchen, bathroom, balcony. Learn things in a home: bed, sofa, fridge, shower, table, cooker.</p>
+          <h3>Listening: Looking for a flat</h3>
+          <p>Listen to an estate agent showing a modern flat to potential tenants.</p>
+          <h3>Grammar: Is there a...? / Are there any...?</h3>
+          <p>Practice asking questions and giving short answers about rooms and furniture.</p>
+        </div>
+      `,
+      theory: `
+        <div class="theory-section">
+          <p><strong>Goal:</strong> talk about a flat and rooms.<br/>
+          <strong>Grammar:</strong> Is there a/an...? / Are there any...?; short answers; adjectives before nouns.<br/>
+          <strong>Vocabulary:</strong> rooms (living room, bedroom, kitchen, bathroom, balcony) and things in a home (bed, sofa, fridge, shower, table, cooker).</p>
+          <h4>Questions with Is there / Are there</h4>
+          <ul>
+            <li><strong>Singular:</strong> <em>Is there a shower?</em> → <em>Yes, there is. / No, there isn't.</em></li>
+            <li><strong>Plural:</strong> <em>Are there any chairs?</em> → <em>Yes, there are. / No, there aren't.</em></li>
+          </ul>
+          <h4>Adjectives</h4>
+          <p>Adjectives go before nouns: <em>a modern kitchen</em>, <em>a quiet bedroom</em>, <em>comfortable chairs</em>.</p>
+        </div>
+      `,
+      answerKey: {
+        exercise_1_rooms: {
+          sample: { value: 'living room', isExample: true },
+          '1': ['bedroom'],
+          '2': ['kitchen'],
+          '3': ['bathroom'],
+          '4': ['balcony'],
+        },
+        exercise_2_furniture: {
+          '1': ['bed', 'a bed'],
+          '2': ['sofa', 'a sofa'],
+          '3': ['fridge', 'a fridge', 'refrigerator'],
+          '4': ['shower', 'a shower'],
+          '5': ['table', 'a table'],
+          '6': ['cooker', 'a cooker', 'stove'],
+        },
+        exercise_3_questions: {
+          sample: { value: 'Is there a', isExample: true },
+          '1': ['Is there a', 'is there a'],
+          '2': ['Yes, there is', 'yes, there is', 'Yes there is'],
+          '3': ['Are there any', 'are there any'],
+          '4': ["No, there aren't", "no, there aren't", "No there aren't", 'No, there are not'],
+          '5': ['Is there a', 'is there a'],
+          '6': ["No, there isn't", "no, there isn't", "No there isn't", 'No, there is not'],
+        },
+        exercise_4_description: {
+          '1': ['modern'],
+          '2': ['big', 'large'],
+          '3': ['quiet'],
+          '4': ['comfortable'],
+        },
+      },
+      media_links: ['/audio/3.4.mp3', '/audio/3.5.mp3'],
+      unit: unit3,
+    });
+
+    await this.lessonRepository.save({
+      id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380c01',
+      title: "4A You've got a friend",
+      order: 11,
+      content: `
+        <div class="lesson-section">
+          <h3>Vocabulary: Appearance and face</h3>
+          <p>Learn adjectives for describing appearance: tall, short, dark hair, fair hair, long hair, short hair, blue/brown/green eyes, glasses, beard.</p>
+          <h3>Grammar: have / has got</h3>
+          <p>Learn have got / has got (affirmative, negative, and short forms 've got, 's got, haven't got, hasn't got).</p>
+          <h3>Reading: Meet my best friends</h3>
+          <p>Read about Sophie, Leo, and Marco and match each person to their description.</p>
+        </div>
+      `,
+      theory: `
+        <div class="theory-section">
+          <p><strong>Goal:</strong> describe people and friends.<br/>
+          <strong>Grammar:</strong> have / has got (affirmative and negative, short forms).<br/>
+          <strong>Vocabulary:</strong> describing people (tall, short, hair, eyes, glasses).</p>
+          <h4>have got / has got</h4>
+          <ul>
+            <li><strong>I / You / We / They:</strong> <em>have got ('ve got)</em> / <em>haven't got</em></li>
+            <li><strong>He / She / It:</strong> <em>has got ('s got)</em> / <em>hasn't got</em></li>
+          </ul>
+          <p>Examples: <em>She's got long dark hair. He hasn't got glasses. They've got blue eyes.</em></p>
+        </div>
+      `,
+      answerKey: {
+        exercise_1_appearance: {
+          sample: { value: 'blue eyes', isExample: true },
+          '1': ['tall'],
+          '2': ['short'],
+          '3': ['long hair', 'long'],
+          '4': ['short hair', 'short'],
+          '5': ['dark hair', 'dark'],
+          '6': ['fair hair', 'fair'],
+        },
+        exercise_2_have_got: {
+          sample: { value: 'has got', isExample: true },
+          '1': ['has got', "'s got"],
+          '2': ['have got', "'ve got"],
+          '3': ["hasn't got", 'has not got'],
+          '4': ["haven't got", 'have not got'],
+          '5': ["'ve got", 'have got'],
+          '6': ["'s got", 'has got'],
+        },
+        exercise_3_reading: {
+          '1': ['Sophie', 'sophie'],
+          '2': ['Leo', 'leo'],
+          '3': ['Marco', 'marco'],
+        },
+        exercise_4_descriptions: {
+          '1': ["'s got", 'has got'],
+          '2': ['blue'],
+          '3': ["hasn't got", 'has not got'],
+          '4': ['glasses'],
+          '5': ["'ve got", 'have got'],
+        },
+      },
+      media_links: ['/audio/4.1.mp3', '/audio/4.2.mp3'],
+      unit: unit4,
     });
 
     const material = this.materialRepository.create({

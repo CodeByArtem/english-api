@@ -54,8 +54,6 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
     },
     unit: null as any,
     exercises: [],
-    submissions: [],
-    assignments: [],
   };
 
   const mockLessonOldExercisesOnly: Lesson = {
@@ -80,8 +78,6 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
     },
     unit: null as any,
     exercises: [],
-    submissions: [],
-    assignments: [],
   };
 
   beforeEach(() => {
@@ -143,7 +139,7 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
               '3': "aren't",
             },
           },
-        } as Lesson,
+        } as unknown as Lesson,
         studentAnswers,
       );
 
@@ -171,7 +167,7 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
               '3': "aren't",
             },
           },
-        } as Lesson,
+        } as unknown as Lesson,
         studentAnswers,
       );
 
@@ -201,9 +197,9 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
         {
           id: 'test',
           answerKey: {
-            exercise_7a_dialogue: mockLessonWithAllExercises.answerKey.exercise_7a_dialogue,
+            exercise_7a_dialogue: mockLessonWithAllExercises.answerKey!.exercise_7a_dialogue,
           },
-        } as Lesson,
+        } as unknown as Lesson,
         answersVariant1,
       );
 
@@ -229,9 +225,9 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
         {
           id: 'test',
           answerKey: {
-            exercise_7a_dialogue: mockLessonWithAllExercises.answerKey.exercise_7a_dialogue,
+            exercise_7a_dialogue: mockLessonWithAllExercises.answerKey!.exercise_7a_dialogue,
           },
-        } as Lesson,
+        } as unknown as Lesson,
         answersVariant2,
       );
 
@@ -267,7 +263,7 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
               '3': "aren't",
             },
           },
-        } as Lesson,
+        } as unknown as Lesson,
         studentAnswers,
       );
 
@@ -302,7 +298,7 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
     });
 
     it('should gracefully handle empty answers, missing answers, or missing answerKey', () => {
-      expect(service.calculateScore({} as Lesson, {})).toEqual({ score: 0, details: {} });
+      expect(service.calculateScore({} as unknown as Lesson, {})).toEqual({ score: 0, details: {} });
 
       const result = service.calculateScore(mockLessonWithAllExercises, {});
       // Total questions across 1a (3) + 2a (3) + 4a (2) + 5 (3) + 7a (8) = 19
@@ -346,6 +342,87 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
       expect(result.details.totalQuestions).toBe(3);
       expect(result.details.correctAnswers).toBe(2);
       expect(result.score).toBe(67);
+    });
+
+    it('should exclude items marked with isExample: true or ignored: true from totalQuestions and score', () => {
+      const lessonWithExamples: Lesson = {
+        id: 'lesson-with-examples',
+        title: 'Lesson with Examples',
+        order: 4,
+        content: '',
+        theory: '',
+        media_links: [],
+        answerKey: {
+          exercise_2a_stress: {
+            Poland: { value: 'Oo', isExample: true },
+            Japan: { value: 'oO', isExample: true },
+            Spain: 'o',
+            Brazil: 'oO',
+          },
+          generic_section: {
+            sample_1: { value: 'Sample Answer', ignored: true },
+            sample_2: { value: 'Another Sample', isExample: true },
+            real_question: { value: 'Real Answer' },
+          },
+        },
+        unit: null as any,
+        exercises: [],
+      } as Lesson;
+
+      const studentAnswers = {
+        stressTableInputs: {
+          o_1: 'Spain',
+          oO_2: 'Brazil',
+        },
+        generic_section: {
+          real_question: 'real answer',
+        },
+      };
+
+      const result = service.calculateScore(lessonWithExamples, studentAnswers);
+      // exercise_2a_stress: Spain (1) + Brazil (1) = 2 (Poland and Japan ignored)
+      // generic_section: real_question (1) = 1 (sample_1 and sample_2 ignored)
+      expect(result.details.totalQuestions).toBe(3);
+      expect(result.details.correctAnswers).toBe(3);
+      expect(result.score).toBe(100);
+    });
+
+    it('should ignore metadata keys starting with _ and keys listed in _examples or _ignored', () => {
+      const lessonWithListExamples: Lesson = {
+        id: 'lesson-list-examples',
+        title: 'Lesson with List Examples',
+        order: 5,
+        content: '',
+        theory: '',
+        media_links: [],
+        answerKey: {
+          exercise_2a_stress: {
+            _examples: ['Poland', 'Japan'],
+            Poland: 'Oo',
+            Japan: 'oO',
+            Spain: 'o',
+            Brazil: 'oO',
+          },
+          _metadata: {
+            version: 1,
+            author: 'Admin',
+          },
+        },
+        unit: null as any,
+        exercises: [],
+      } as Lesson;
+
+      const studentAnswers = {
+        stressTableInputs: {
+          o_1: 'Spain',
+          oO_2: 'Brazil',
+        },
+      };
+
+      const result = service.calculateScore(lessonWithListExamples, studentAnswers);
+      expect(result.details.totalQuestions).toBe(2);
+      expect(result.details.correctAnswers).toBe(2);
+      expect(result.score).toBe(100);
     });
 
     it('should dynamically score lessons using exercise entities when answerKey is empty', () => {
@@ -617,8 +694,6 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
       },
       unit: null as any,
       exercises: [],
-      submissions: [],
-      assignments: [],
     };
 
     it('should accurately score 100% for full correct answers in Lesson 1B', () => {
@@ -838,9 +913,9 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
       const mock7aOnly: Lesson = {
         id: 'mock-7a',
         answerKey: {
-          exercise_7a_qa: mockLesson1BFull.answerKey.exercise_7a_qa,
+          exercise_7a_qa: mockLesson1BFull.answerKey!.exercise_7a_qa,
         },
-      } as any;
+      } as unknown as Lesson;
 
       const result = service.calculateScore(mock7aOnly, studentAnswers);
       expect(result.details.correctAnswers).toBe(5);

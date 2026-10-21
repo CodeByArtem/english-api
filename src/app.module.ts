@@ -24,11 +24,24 @@ import { Assignment } from './assignments/entities/assignment.entity';
 import { Submission } from './assignments/entities/submission.entity';
 import { SubmissionAudio } from './assignments/entities/submission-audio.entity';
 import { RefreshToken } from './auth/entities/refresh-token.entity';
+import { AddLessonIdToSubmissions1728045200000 } from './migrations/1728045200000-AddLessonIdToSubmissions';
+import { AddReviewedAnswersToSubmissions1728054000000 } from './migrations/1728054000000-AddReviewedAnswersToSubmissions';
+import { AddAnswerKeyToLessons1728055000000 } from './migrations/1728055000000-AddAnswerKeyToLessons';
+import { CreateRefreshTokensTable1791486895272 } from './migrations/1791486895272-CreateRefreshTokensTable';
+import { CreateSubmissionAudioTable1792000000000 } from './migrations/1792000000000-CreateSubmissionAudioTable';
 import {
   THROTTLE_TTL,
   THROTTLE_GLOBAL_LIMIT,
   THROTTLE_ERROR_MESSAGE,
 } from './auth/throttle.constants';
+
+const databaseMigrations = [
+  AddLessonIdToSubmissions1728045200000,
+  AddReviewedAnswersToSubmissions1728054000000,
+  AddAnswerKeyToLessons1728055000000,
+  CreateRefreshTokensTable1791486895272,
+  CreateSubmissionAudioTable1792000000000,
+];
 
 @Module({
   imports: [
@@ -51,6 +64,8 @@ import {
             type: 'postgres',
             url: databaseUrl,
             entities: [User, Textbook, Unit, Lesson, Exercise, Material, Assignment, Submission, SubmissionAudio, Invite, RefreshToken],
+            migrations: databaseMigrations,
+            migrationsRun: true,
             synchronize: dbSync,
             ssl: databaseUrl.includes('render.com') ? {
               rejectUnauthorized: false, // SSL только для облачной базы данных Render
@@ -67,6 +82,8 @@ import {
           password: configService.get<string>('DB_PASSWORD') || 'password',
           database: configService.get<string>('DB_NAME') || 'english_db',
           entities: [User, Textbook, Unit, Lesson, Exercise, Material, Assignment, Submission, SubmissionAudio, Invite, RefreshToken],
+          migrations: databaseMigrations,
+          migrationsRun: true,
           synchronize: dbSync,
         };
       },

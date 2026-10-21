@@ -18,6 +18,18 @@ import { CreateSubmissionDto } from './dto/create-submission.dto';
 import { ReviewSubmissionDto } from './dto/review-submission.dto';
 import { UploadedAudioFile } from './interfaces/audio-file.interface';
 
+export interface GradingDetails {
+  totalQuestions?: number;
+  correctAnswers?: number;
+  gradedAt?: string;
+  [key: string]: unknown;
+}
+
+export interface GradingResult {
+  score: number;
+  details: GradingDetails;
+}
+
 @Injectable()
 export class AssignmentsService {
   private readonly logger = new Logger(AssignmentsService.name);
@@ -223,7 +235,7 @@ export class AssignmentsService {
     }
 
     if (lesson) {
-      console.log('Lesson found:', lesson.id, lesson.title);
+      this.logger.debug(`Lesson found: ${lesson.id} ${lesson.title}`);
     }
 
     // Check if student already has a submission for this lesson / assignment
@@ -321,7 +333,58 @@ export class AssignmentsService {
     return this.normalizeAnswer(expected) === normalizedStudent;
   }
 
-  public calculateScore(lesson: Lesson, studentAnswers: Record<string, any>) {
+  /**
+   * Проверяет, является ли элемент ключа примером учебника или исключённым из проверки
+   */
+  public isIgnoredOrExample(
+    key: string,
+    item: unknown,
+    container?: Record<string, any>,
+  ): boolean {
+    if (key.startsWith('_')) {
+      return true;
+    }
+
+    if (item && typeof item === 'object' && !Array.isArray(item)) {
+      const obj = item as Record<string, any>;
+      if (obj.isExample === true || obj.ignored === true) {
+        return true;
+      }
+    }
+
+    if (container) {
+      const ignoredList =
+        container._ignored ||
+        container._examples ||
+        container.ignoredKeys ||
+        container.examples;
+      if (Array.isArray(ignoredList)) {
+        const normKey = this.normalizeAnswer(key);
+        if (ignoredList.some((k: unknown) => this.normalizeAnswer(k) === normKey)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Извлекает фактическое эталонное значение ответа из примитива или объекта с метаданными
+   */
+  public extractExpectedValue(val: any): any {
+    if (val && typeof val === 'object' && !Array.isArray(val)) {
+      if ('value' in val) return val.value;
+      if ('expected' in val) return val.expected;
+      if ('answer' in val) return val.answer;
+    }
+    return val;
+  }
+
+  public calculateScore(
+    lesson: Lesson,
+    studentAnswers: Record<string, any>,
+  ): GradingResult {
     if (!lesson) {
       return { score: 0, details: {} };
     }
@@ -349,9 +412,13 @@ export class AssignmentsService {
     if (answerKey.exercise_1a_flags) {
       const expectedFlags = answerKey.exercise_1a_flags;
       for (const [flagId, expectedCountry] of Object.entries(expectedFlags)) {
+        if (this.isIgnoredOrExample(flagId, expectedCountry, expectedFlags)) {
+          continue;
+        }
         totalQuestions++;
         const studentAnswer = flagAnswers[flagId];
-        if (this.matchesAnswer(studentAnswer, expectedCountry)) {
+        const actualExpected = this.extractExpectedValue(expectedCountry);
+        if (this.matchesAnswer(studentAnswer, actualExpected)) {
           correctAnswers++;
         }
       }
@@ -361,18 +428,13 @@ export class AssignmentsService {
     if (answerKey.exercise_2a_stress) {
       const expectedStress = answerKey.exercise_2a_stress;
       for (const [country, expectedPattern] of Object.entries(expectedStress)) {
-        // В уроке 1A Poland и Japan уже напечатаны в таблице учебника как примеры (static text)
-        // и не имеют полей ввода для студента, поэтому исключаем их из проверяемых вопросов
-        const normalizedCountry = this.normalizeAnswer(country);
-        if (
-          lesson.id === 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22' &&
-          (normalizedCountry === 'poland' || normalizedCountry === 'japan')
-        ) {
+        if (this.isIgnoredOrExample(country, expectedPattern, expectedStress)) {
           continue;
         }
 
         totalQuestions++;
         // Ищем ответ студента для этой страны
+        const normalizedCountry = this.normalizeAnswer(country);
         let studentPattern: string | null = null;
         for (const [key, value] of Object.entries(stressTableInputs)) {
           if (key === 'my_country') continue;
@@ -381,7 +443,8 @@ export class AssignmentsService {
             break;
           }
         }
-        if (this.matchesAnswer(studentPattern, expectedPattern)) {
+        const actualExpected = this.extractExpectedValue(expectedPattern);
+        if (this.matchesAnswer(studentPattern, actualExpected)) {
           correctAnswers++;
         }
       }
@@ -398,10 +461,14 @@ export class AssignmentsService {
       };
 
       for (const [gapKey, expectedCountry] of Object.entries(expectedDialogues)) {
+        if (this.isIgnoredOrExample(gapKey, expectedCountry, expectedDialogues)) {
+          continue;
+        }
         totalQuestions++;
         const frontendKey = Object.entries(keyMapping).find(([, v]) => v === gapKey)?.[0];
         const studentAnswer = frontendKey ? dialogInputs[frontendKey] : null;
-        if (this.matchesAnswer(studentAnswer, expectedCountry)) {
+        const actualExpected = this.extractExpectedValue(expectedCountry);
+        if (this.matchesAnswer(studentAnswer, actualExpected)) {
           correctAnswers++;
         }
       }
@@ -411,9 +478,13 @@ export class AssignmentsService {
     if (answerKey.exercise_5_grammar) {
       const expectedGrammar = answerKey.exercise_5_grammar;
       for (const [gapId, expected] of Object.entries(expectedGrammar)) {
+        if (this.isIgnoredOrExample(gapId, expected, expectedGrammar)) {
+          continue;
+        }
         totalQuestions++;
         const studentAnswer = grammarInputs[gapId];
-        if (this.matchesAnswer(studentAnswer, expected)) {
+        const actualExpected = this.extractExpectedValue(expected);
+        if (this.matchesAnswer(studentAnswer, actualExpected)) {
           correctAnswers++;
         }
       }
@@ -423,9 +494,13 @@ export class AssignmentsService {
     if (answerKey.exercise_7a_dialogue) {
       const expectedDialogue7a = answerKey.exercise_7a_dialogue;
       for (const [gapId, expected] of Object.entries(expectedDialogue7a)) {
+        if (this.isIgnoredOrExample(gapId, expected, expectedDialogue7a)) {
+          continue;
+        }
         totalQuestions++;
         const studentAnswer = dialogue7aInputs[gapId];
-        if (this.matchesAnswer(studentAnswer, expected)) {
+        const actualExpected = this.extractExpectedValue(expected);
+        if (this.matchesAnswer(studentAnswer, actualExpected)) {
           correctAnswers++;
         }
       }
@@ -433,21 +508,29 @@ export class AssignmentsService {
 
     // Универсальная динамическая проверка остальных секций в answerKey
     for (const [sectionKey, sectionValue] of Object.entries(answerKey)) {
-      if (handledLesson1AKeys.has(sectionKey)) continue;
+      if (handledLesson1AKeys.has(sectionKey) || sectionKey.startsWith('_')) continue;
 
       if (sectionValue && typeof sectionValue === 'object' && !Array.isArray(sectionValue)) {
         const studentSection = answers[sectionKey] || {};
         for (const [qKey, expectedVal] of Object.entries(sectionValue as Record<string, any>)) {
+          if (this.isIgnoredOrExample(qKey, expectedVal, sectionValue as Record<string, any>)) {
+            continue;
+          }
           totalQuestions++;
           const studentVal = studentSection[qKey] ?? answers[qKey];
-          if (this.matchesAnswer(studentVal, expectedVal)) {
+          const actualExpected = this.extractExpectedValue(expectedVal);
+          if (this.matchesAnswer(studentVal, actualExpected)) {
             correctAnswers++;
           }
         }
       } else {
+        if (this.isIgnoredOrExample(sectionKey, sectionValue, answerKey as Record<string, any>)) {
+          continue;
+        }
         totalQuestions++;
         const studentVal = answers[sectionKey];
-        if (this.matchesAnswer(studentVal, sectionValue)) {
+        const actualExpected = this.extractExpectedValue(sectionValue);
+        if (this.matchesAnswer(studentVal, actualExpected)) {
           correctAnswers++;
         }
       }
