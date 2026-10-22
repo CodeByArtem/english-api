@@ -11,5 +11,5 @@ export class CreateSubmissionDto {
 
   @IsObject()
   @IsNotEmpty()
-  answers: Record<string, any>;
+  answers: Record<string, unknown>;
 }

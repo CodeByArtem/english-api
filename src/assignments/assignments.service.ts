@@ -834,8 +834,9 @@ export class AssignmentsService {
       throw new NotFoundException('Submission not found');
     }
 
-    if (dto.answers !== undefined) {
-      submission.reviewedAnswers = dto.answers;
+    const updatedAnswers = dto.answers !== undefined ? dto.answers : dto.reviewedAnswers;
+    if (updatedAnswers !== undefined) {
+      submission.reviewedAnswers = updatedAnswers;
     }
     if (dto.grade !== undefined) {
       submission.grade = dto.grade;

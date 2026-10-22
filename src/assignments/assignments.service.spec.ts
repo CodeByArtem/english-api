@@ -524,6 +524,22 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
 
       expect(transformedReview.answers?.grammarInputs).toBeDefined();
       expect(transformedReview.answers?.conferenceCard).toBeDefined();
+
+      const rawRevisionPayload = {
+        grade: null,
+        tutorComment: 'Please revise exercise 1',
+        status: 'needs_revision',
+        reviewedAnswers: transformedCreate.answers,
+      };
+
+      const transformedRevision: ReviewSubmissionDto = await pipe.transform(rawRevisionPayload, {
+        type: 'body',
+        metatype: ReviewSubmissionDto,
+      });
+
+      expect(transformedRevision.status).toBe('needs_revision');
+      expect(transformedRevision.tutorComment).toBe('Please revise exercise 1');
+      expect(transformedRevision.reviewedAnswers?.grammarInputs).toBeDefined();
     });
   });
 
@@ -636,12 +652,14 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
       const res = await lifecycleService.reviewSubmission('sub-review-id', {
         tutorComment: 'Fix exercise 5',
         status: 'needs_revision',
+        reviewedAnswers: { flagAnswers: { 1: 'Spain' } },
       });
 
       expect(mockSubmissionRepo.save).toHaveBeenCalledWith(
         expect.objectContaining({
           status: 'needs_revision',
           tutorComment: 'Fix exercise 5',
+          reviewedAnswers: { flagAnswers: { 1: 'Spain' } },
         }),
       );
       expect(res.status).toBe('needs_revision');
