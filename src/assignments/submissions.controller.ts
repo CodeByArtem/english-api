@@ -6,6 +6,7 @@ import {
   Delete,
   Param,
   Body,
+  Query,
   UseGuards,
   Request,
   UseInterceptors,
@@ -58,8 +59,9 @@ export class SubmissionsController {
 
   @Get('teacher-stats')
   @Roles(Role.TUTOR)
-  async getTeacherStats() {
-    return this.assignmentsService.getTeacherStats();
+  async getTeacherStats(@Query('limit') limit?: string) {
+    const parsedLimit = limit ? parseInt(limit, 10) : undefined;
+    return this.assignmentsService.getTeacherStats(parsedLimit);
   }
 
   @Get(':id')

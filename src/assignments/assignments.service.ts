@@ -21,6 +21,7 @@ import { UploadedAudioFile } from './interfaces/audio-file.interface';
 export interface GradingDetails {
   totalQuestions?: number;
   correctAnswers?: number;
+  failedQuestions?: string[];
   gradedAt?: string;
   [key: string]: unknown;
 }
@@ -238,76 +239,108 @@ export class AssignmentsService {
       this.logger.debug(`Lesson found: ${lesson.id} ${lesson.title}`);
     }
 
-    // Check if student already has a submission for this lesson / assignment
-    const existingSubmission = await this.submissionRepository.findOne({
-      where: lesson
-        ? { student: { id: studentId }, lesson: { id: lesson.id } }
-        : { student: { id: studentId }, assignment: { id: assignment!.id } },
-      order: { createdAt: 'DESC' },
-    });
+    // Выполняем проверку и запись сдачи.
+    // Хелпер executeSubmissionWrite позволяет работать как внутри TypeORM-транзакции в БД,
+    // так и напрямую с submissionRepository в юнит-тестах с моками.
+    const executeSubmissionWrite = async (repo: Repository<Submission>) => {
+      // Check if student already has a submission for this lesson / assignment
+      const existingSubmission = await repo.findOne({
+        where: lesson
+          ? { student: { id: studentId }, lesson: { id: lesson.id } }
+          : { student: { id: studentId }, assignment: { id: assignment!.id } },
+        order: { createdAt: 'DESC' },
+      });
 
-    if (existingSubmission) {
-      if (existingSubmission.status === 'submitted') {
+      if (existingSubmission) {
+        if (existingSubmission.status === 'submitted') {
+          throw new BadRequestException(
+            'You have already submitted this homework. It is currently under review by your teacher.',
+          );
+        }
+        if (existingSubmission.status === 'graded') {
+          throw new BadRequestException(
+            'This homework has already been graded and cannot be resubmitted.',
+          );
+        }
+        if (existingSubmission.status === 'needs_revision') {
+          // Upon revision request, update the existing submission instead of creating duplicate
+          const { score, details } = lesson
+            ? this.calculateScore(lesson, dto.answers)
+            : { score: 0, details: null };
+          existingSubmission.answers = dto.answers;
+          existingSubmission.reviewedAnswers = null; // Сбрасываем старые рецензии учителя
+          existingSubmission.grade = null; // Сбрасываем старую ручную оценку
+          existingSubmission.tutorComment = null; // Сбрасываем старый комментарий ревизии
+          existingSubmission.score = score;
+          existingSubmission.details = details;
+          existingSubmission.status = 'submitted'; // return to teacher for re-checking
+          const updated = await repo.save(existingSubmission);
+          return {
+            id: updated.id,
+            score: updated.score,
+            status: updated.status,
+            answers: updated.answers,
+            lesson: updated.lesson
+              ? { id: updated.lesson.id, title: updated.lesson.title }
+              : null,
+            assignment: updated.assignment,
+            createdAt: updated.createdAt,
+          };
+        }
+      }
+
+      // Автоматическая проверка ответов (если есть урок)
+      const { score, details } = lesson
+        ? this.calculateScore(lesson, dto.answers)
+        : { score: 0, details: null };
+
+      const submission = repo.create({
+        answers: dto.answers,
+        assignment: assignment || null,
+        lesson: lesson || null,
+        student: { id: studentId } as any,
+        score,
+        details,
+        status: 'submitted',
+      });
+
+      const savedSubmission = await repo.save(submission);
+
+      // Возвращаем score и answers для студента (без details)
+      return {
+        id: savedSubmission.id,
+        score: savedSubmission.score,
+        status: savedSubmission.status,
+        answers: savedSubmission.answers,
+        lesson: savedSubmission.lesson
+          ? { id: savedSubmission.lesson.id, title: savedSubmission.lesson.title }
+          : null,
+        assignment: savedSubmission.assignment,
+        createdAt: savedSubmission.createdAt,
+      };
+    };
+
+    try {
+      if (typeof this.submissionRepository.manager?.transaction === 'function') {
+        return await this.submissionRepository.manager.transaction(async (manager) => {
+          const transactionalRepo = manager.getRepository(Submission);
+          return await executeSubmissionWrite(transactionalRepo);
+        });
+      }
+      return await executeSubmissionWrite(this.submissionRepository);
+    } catch (error: any) {
+      if (
+        error?.code === '23505' ||
+        (typeof error?.message === 'string' &&
+          (error.message.includes('idx_submissions_unique_student_lesson') ||
+            error.message.includes('duplicate key value violates unique constraint')))
+      ) {
         throw new BadRequestException(
           'You have already submitted this homework. It is currently under review by your teacher.',
         );
       }
-      if (existingSubmission.status === 'graded') {
-        throw new BadRequestException(
-          'This homework has already been graded and cannot be resubmitted.',
-        );
-      }
-      if (existingSubmission.status === 'needs_revision') {
-        // Upon revision request, update the existing submission instead of creating duplicate
-        const { score, details } = lesson
-          ? this.calculateScore(lesson, dto.answers)
-          : { score: 0, details: null };
-        existingSubmission.answers = dto.answers;
-        existingSubmission.score = score;
-        existingSubmission.details = details;
-        existingSubmission.status = 'submitted'; // return to teacher for re-checking
-        const updated = await this.submissionRepository.save(existingSubmission);
-        return {
-          id: updated.id,
-          score: updated.score,
-          status: updated.status,
-          lesson: updated.lesson
-            ? { id: updated.lesson.id, title: updated.lesson.title }
-            : null,
-          assignment: updated.assignment,
-          createdAt: updated.createdAt,
-        };
-      }
+      throw error;
     }
-
-    // Автоматическая проверка ответов (если есть урок)
-    const { score, details } = lesson
-      ? this.calculateScore(lesson, dto.answers)
-      : { score: 0, details: null };
-
-    const submission = this.submissionRepository.create({
-      answers: dto.answers,
-      assignment: assignment || null,
-      lesson: lesson || null,
-      student: { id: studentId } as any,
-      score,
-      details,
-      status: 'submitted',
-    });
-    
-    const savedSubmission = await this.submissionRepository.save(submission);
-
-    // Возвращаем только score для студента (без details)
-    return {
-      id: savedSubmission.id,
-      score: savedSubmission.score,
-      status: savedSubmission.status,
-      lesson: savedSubmission.lesson
-        ? { id: savedSubmission.lesson.id, title: savedSubmission.lesson.title }
-        : null,
-      assignment: savedSubmission.assignment,
-      createdAt: savedSubmission.createdAt
-    };
   }
 
   normalizeAnswer(val: any): string {
@@ -399,6 +432,7 @@ export class AssignmentsService {
 
     let totalQuestions = 0;
     let correctAnswers = 0;
+    const failedQuestions: string[] = [];
 
     const handledLesson1AKeys = new Set([
       'exercise_1a_flags',
@@ -420,6 +454,8 @@ export class AssignmentsService {
         const actualExpected = this.extractExpectedValue(expectedCountry);
         if (this.matchesAnswer(studentAnswer, actualExpected)) {
           correctAnswers++;
+        } else {
+          failedQuestions.push(`exercise_1a_flags.${flagId}`);
         }
       }
     }
@@ -446,6 +482,8 @@ export class AssignmentsService {
         const actualExpected = this.extractExpectedValue(expectedPattern);
         if (this.matchesAnswer(studentPattern, actualExpected)) {
           correctAnswers++;
+        } else {
+          failedQuestions.push(`exercise_2a_stress.${country}`);
         }
       }
     }
@@ -470,6 +508,8 @@ export class AssignmentsService {
         const actualExpected = this.extractExpectedValue(expectedCountry);
         if (this.matchesAnswer(studentAnswer, actualExpected)) {
           correctAnswers++;
+        } else {
+          failedQuestions.push(`exercise_4a_dialogues.${gapKey}`);
         }
       }
     }
@@ -486,6 +526,8 @@ export class AssignmentsService {
         const actualExpected = this.extractExpectedValue(expected);
         if (this.matchesAnswer(studentAnswer, actualExpected)) {
           correctAnswers++;
+        } else {
+          failedQuestions.push(`exercise_5_grammar.${gapId}`);
         }
       }
     }
@@ -502,6 +544,8 @@ export class AssignmentsService {
         const actualExpected = this.extractExpectedValue(expected);
         if (this.matchesAnswer(studentAnswer, actualExpected)) {
           correctAnswers++;
+        } else {
+          failedQuestions.push(`exercise_7a_dialogue.${gapId}`);
         }
       }
     }
@@ -521,6 +565,8 @@ export class AssignmentsService {
           const actualExpected = this.extractExpectedValue(expectedVal);
           if (this.matchesAnswer(studentVal, actualExpected)) {
             correctAnswers++;
+          } else {
+            failedQuestions.push(`${sectionKey}.${qKey}`);
           }
         }
       } else {
@@ -532,6 +578,8 @@ export class AssignmentsService {
         const actualExpected = this.extractExpectedValue(sectionValue);
         if (this.matchesAnswer(studentVal, actualExpected)) {
           correctAnswers++;
+        } else {
+          failedQuestions.push(`${sectionKey}`);
         }
       }
     }
@@ -545,12 +593,16 @@ export class AssignmentsService {
           const studentVal = answers[exercise.id] ?? answers[exercise.order];
           if (this.matchesAnswer(studentVal, payload.correctAnswer)) {
             correctAnswers++;
+          } else {
+            failedQuestions.push(String(exercise.id || exercise.order));
           }
         } else if (exercise.type === 'text_input' && payload.answer) {
           totalQuestions++;
           const studentVal = answers[exercise.id] ?? answers[exercise.order];
           if (this.matchesAnswer(studentVal, payload.answer)) {
             correctAnswers++;
+          } else {
+            failedQuestions.push(String(exercise.id || exercise.order));
           }
         } else if (exercise.type === 'fill_in_the_blank' && Array.isArray(payload.gaps)) {
           const studentGaps = answers[exercise.id] || answers;
@@ -560,6 +612,8 @@ export class AssignmentsService {
               const studentVal = studentGaps[gap.id];
               if (this.matchesAnswer(studentVal, gap.answer)) {
                 correctAnswers++;
+              } else {
+                failedQuestions.push(`${exercise.id || exercise.order}.${gap.id}`);
               }
             }
           }
@@ -573,34 +627,37 @@ export class AssignmentsService {
 
     const finalScore = Math.round((correctAnswers / totalQuestions) * 100);
 
-    const details = {
+    const details: GradingDetails = {
       totalQuestions,
       correctAnswers,
+      failedQuestions,
       gradedAt: new Date().toISOString(),
     };
 
     return { score: finalScore, details };
   }
 
-  async getTeacherStats() {
+  async getTeacherStats(limit: number = 100) {
+    const safeLimit = Math.min(Math.max(Number(limit) || 100, 1), 500);
+
     return this.submissionRepository.find({
       relations: {
         student: true,
         lesson: true,
-        assignment: true,
+        assignment: {
+          lesson: true,
+        },
       },
       order: {
         createdAt: 'DESC',
       },
+      take: safeLimit,
       select: {
         id: true,
         score: true,
         grade: true,
         status: true,
-        answers: true,
-        reviewedAnswers: true,
         tutorComment: true,
-        details: true,
         createdAt: true,
         student: {
           id: true,
@@ -613,6 +670,9 @@ export class AssignmentsService {
         assignment: {
           id: true,
           title: true,
+          lesson: {
+            title: true,
+          },
         },
       },
     });
@@ -900,6 +960,9 @@ export class AssignmentsService {
         );
       }
       submission.answers = { text: content };
+      submission.reviewedAnswers = null;
+      submission.grade = null;
+      submission.tutorComment = null;
       submission.status = 'submitted';
     } else {
       submission = this.submissionRepository.create({

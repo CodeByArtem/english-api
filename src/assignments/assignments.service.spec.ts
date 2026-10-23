@@ -173,6 +173,7 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
 
       expect(result.details.totalQuestions).toBe(3);
       expect(result.details.correctAnswers).toBe(2);
+      expect(result.details.failedQuestions).toEqual(['exercise_5_grammar.2']);
       expect(result.score).toBe(67);
     });
   });
@@ -341,6 +342,7 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
       const result = service.calculateScore(dynamicLesson, studentAnswers);
       expect(result.details.totalQuestions).toBe(3);
       expect(result.details.correctAnswers).toBe(2);
+      expect(result.details.failedQuestions).toEqual(['vocabulary.q2']);
       expect(result.score).toBe(67);
     });
 
@@ -608,6 +610,9 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
         id: 'existing-sub-id',
         status: 'needs_revision',
         answers: { flagAnswers: { 1: 'Wrong' } },
+        reviewedAnswers: { flagAnswers: { 1: 'Old review' } },
+        grade: 50,
+        tutorComment: 'Old feedback',
         score: 0,
       };
       mockSubmissionRepo.findOne.mockResolvedValueOnce(existing);
@@ -622,10 +627,64 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
         expect.objectContaining({
           id: 'existing-sub-id',
           status: 'submitted',
+          reviewedAnswers: null,
+          grade: null,
+          tutorComment: null,
         }),
       );
       expect(result.id).toBe('existing-sub-id');
       expect(result.status).toBe('submitted');
+      expect(result.answers).toEqual({ flagAnswers: { 1: 'Canada' } });
+    });
+
+    it('should throw BadRequestException when database unique constraint 23505 is violated', async () => {
+      mockSubmissionRepo.findOne.mockResolvedValueOnce(null);
+      mockSubmissionRepo.save.mockRejectedValueOnce({
+        code: '23505',
+        message: 'duplicate key value violates unique constraint "idx_submissions_unique_student_lesson"',
+      });
+
+      await expect(
+        lifecycleService.createSubmission(
+          { lessonId: mockLessonWithAllExercises.id, answers: {} },
+          'student-123',
+        ),
+      ).rejects.toThrow('You have already submitted this homework. It is currently under review by your teacher.');
+    });
+
+    it('should query getTeacherStats with default take limit and exclude heavy jsonb columns', async () => {
+      mockSubmissionRepo.find = jest.fn().mockResolvedValueOnce([]);
+      await lifecycleService.getTeacherStats();
+
+      expect(mockSubmissionRepo.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          take: 100,
+          order: { createdAt: 'DESC' },
+          select: expect.not.objectContaining({
+            answers: true,
+            reviewedAnswers: true,
+            details: true,
+          }),
+        }),
+      );
+    });
+
+    it('should clamp custom limit in getTeacherStats between 1 and 500', async () => {
+      mockSubmissionRepo.find = jest.fn().mockResolvedValueOnce([]);
+      await lifecycleService.getTeacherStats(1000);
+      expect(mockSubmissionRepo.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          take: 500,
+        }),
+      );
+
+      mockSubmissionRepo.find.mockResolvedValueOnce([]);
+      await lifecycleService.getTeacherStats(-5);
+      expect(mockSubmissionRepo.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          take: 1,
+        }),
+      );
     });
 
     it('should delete submission and return success', async () => {

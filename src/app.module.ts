@@ -29,6 +29,7 @@ import { AddReviewedAnswersToSubmissions1728054000000 } from './migrations/17280
 import { AddAnswerKeyToLessons1728055000000 } from './migrations/1728055000000-AddAnswerKeyToLessons';
 import { CreateRefreshTokensTable1791486895272 } from './migrations/1791486895272-CreateRefreshTokensTable';
 import { CreateSubmissionAudioTable1792000000000 } from './migrations/1792000000000-CreateSubmissionAudioTable';
+import { AddUniqueIndexToSubmissions1792100000000 } from './migrations/1792100000000-AddUniqueIndexToSubmissions';
 import {
   THROTTLE_TTL,
   THROTTLE_GLOBAL_LIMIT,
@@ -41,6 +42,7 @@ const databaseMigrations = [
   AddAnswerKeyToLessons1728055000000,
   CreateRefreshTokensTable1791486895272,
   CreateSubmissionAudioTable1792000000000,
+  AddUniqueIndexToSubmissions1792100000000,
 ];
 
 @Module({
