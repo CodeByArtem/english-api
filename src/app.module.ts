@@ -55,7 +55,17 @@ const databaseMigrations = [
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        const databaseUrl = configService.get<string>('DATABASE_URL');
+        let databaseUrl =
+          process.env.DATABASE_URL || configService.get<string>('DATABASE_URL');
+        // Если указан хост @db:, но мы запускаемся на хост-машине Windows вне docker,
+        // заменяем на localhost, чтобы локальные скрипты (например, npm run seed) успешно подключались к базе
+        if (
+          databaseUrl &&
+          databaseUrl.includes('@db:') &&
+          process.platform === 'win32'
+        ) {
+          databaseUrl = databaseUrl.replace('@db:', '@localhost:');
+        }
         // По умолчанию авто-синхронизация включена (как и было до commit fa56ccb),
         // если явно не передано DB_SYNC=false. Это гарантирует создание новых таблиц на Render.
         const dbSync = configService.get<string>('DB_SYNC') !== 'false';
@@ -76,9 +86,16 @@ const databaseMigrations = [
         }
 
         // Если DATABASE_URL нет (локальная разработка)
+        const configuredHost =
+          configService.get<string>('DB_HOST') || 'localhost';
+        const dbHost =
+          process.platform === 'win32' && configuredHost === 'db'
+            ? 'localhost'
+            : configuredHost;
+
         return {
           type: 'postgres',
-          host: configService.get<string>('DB_HOST') || 'localhost',
+          host: dbHost,
           port: configService.get<number>('DB_PORT') || 5432,
           username: configService.get<string>('DB_USER') || 'postgres',
           password: configService.get<string>('DB_PASSWORD') || 'password',
