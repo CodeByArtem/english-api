@@ -511,7 +511,8 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
       expect(transformedCreate.answers.grammarInputs).toBeDefined();
       expect(transformedCreate.answers.dialogue7aInputs).toBeDefined();
       expect(transformedCreate.answers.conferenceCard).toBeDefined();
-      expect(transformedCreate.answers.conferenceCard.roles).toEqual(['student']);
+      const conferenceCard = transformedCreate.answers.conferenceCard as { roles?: string[] };
+      expect(conferenceCard.roles).toEqual(['student']);
 
       const rawReviewPayload = {
         grade: 95,
