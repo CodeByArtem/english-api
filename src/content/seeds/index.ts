@@ -4,4 +4,5 @@ export * from './unit3.seed';
 export * from './unit4.seed';
 export * from './unit5.seed';
 export * from './unit6.seed';
+export * from './unit7.seed';
 
