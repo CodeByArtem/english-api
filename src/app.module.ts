@@ -24,6 +24,7 @@ import { Assignment } from './assignments/entities/assignment.entity';
 import { Submission } from './assignments/entities/submission.entity';
 import { SubmissionAudio } from './assignments/entities/submission-audio.entity';
 import { RefreshToken } from './auth/entities/refresh-token.entity';
+import { InitialSchema1700000000000 } from './migrations/1700000000000-InitialSchema';
 import { AddLessonIdToSubmissions1728045200000 } from './migrations/1728045200000-AddLessonIdToSubmissions';
 import { AddReviewedAnswersToSubmissions1728054000000 } from './migrations/1728054000000-AddReviewedAnswersToSubmissions';
 import { AddAnswerKeyToLessons1728055000000 } from './migrations/1728055000000-AddAnswerKeyToLessons';
@@ -37,6 +38,7 @@ import {
 } from './auth/throttle.constants';
 
 const databaseMigrations = [
+  InitialSchema1700000000000,
   AddLessonIdToSubmissions1728045200000,
   AddReviewedAnswersToSubmissions1728054000000,
   AddAnswerKeyToLessons1728055000000,
@@ -79,9 +81,14 @@ const databaseMigrations = [
             migrations: databaseMigrations,
             migrationsRun: true,
             synchronize: dbSync,
-            ssl: databaseUrl.includes('render.com') ? {
-              rejectUnauthorized: false, // SSL только для облачной базы данных Render
-            } : false,
+            // SSL: для Render отключаем проверку сертификата (self-signed),
+            // для Neon — используем TLS но принимаем сертификат (sslmode=require из URL),
+            // для локальной docker-базы — SSL не нужен
+            ssl: databaseUrl.includes('render.com')
+              ? { rejectUnauthorized: false }
+              : databaseUrl.includes('neon.tech')
+                ? { rejectUnauthorized: false }
+                : false,
           };
         }
 
