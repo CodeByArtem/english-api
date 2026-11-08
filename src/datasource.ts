@@ -18,6 +18,7 @@ import { AddAnswerKeyToLessons1728055000000 } from './migrations/1728055000000-A
 import { CreateRefreshTokensTable1791486895272 } from './migrations/1791486895272-CreateRefreshTokensTable';
 import { CreateSubmissionAudioTable1792000000000 } from './migrations/1792000000000-CreateSubmissionAudioTable';
 import { AddUniqueIndexToSubmissions1792100000000 } from './migrations/1792100000000-AddUniqueIndexToSubmissions';
+import { AddStorageKeyToSubmissionAudio1792200000000 } from './migrations/1792200000000-AddStorageKeyToSubmissionAudio';
 
 // DataSource для TypeORM CLI (генерация и запуск миграций вне NestJS)
 // Использует DATABASE_URL_UNPOOLED из .env — прямое соединение обязательно для миграций
@@ -40,6 +41,7 @@ export const AppDataSource = new DataSource({
     CreateRefreshTokensTable1791486895272,
     CreateSubmissionAudioTable1792000000000,
     AddUniqueIndexToSubmissions1792100000000,
+    AddStorageKeyToSubmissionAudio1792200000000,
   ],
   migrationsTableName: 'migrations',
 });

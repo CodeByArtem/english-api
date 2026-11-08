@@ -1,13 +1,14 @@
 import { IsString, IsOptional, IsObject, IsNumber, Min, Max } from 'class-validator';
+import type { SubmissionAnswers, ReviewedAnswers } from '../types/submission.types';
 
 export class ReviewSubmissionDto {
   @IsObject()
   @IsOptional()
-  answers?: Record<string, unknown>;
+  answers?: SubmissionAnswers;
 
   @IsObject()
   @IsOptional()
-  reviewedAnswers?: Record<string, unknown>;
+  reviewedAnswers?: ReviewedAnswers;
 
   @IsNumber()
   @Min(0)

@@ -135,11 +135,19 @@ export class SubmissionsController {
     );
 
     res.setHeader('Content-Type', audio.mimeType);
-    res.setHeader('Content-Length', audio.data.length);
+    if (audio.sizeBytes) {
+      res.setHeader('Content-Length', audio.sizeBytes);
+    }
     res.setHeader('Cache-Control', 'private, no-store');
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Content-Disposition', 'inline');
 
-    return res.end(audio.data);
+    if (audio.stream) {
+      return audio.stream.pipe(res);
+    }
+    if (audio.data) {
+      return res.end(audio.data);
+    }
+    return res.status(404).end('Audio content not found');
   }
 }

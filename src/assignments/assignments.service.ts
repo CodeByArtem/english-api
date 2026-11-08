@@ -5,7 +5,9 @@ import {
   ForbiddenException,
   PayloadTooLargeException,
   Logger,
+  Optional,
 } from '@nestjs/common';
+import { Readable } from 'stream';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Assignment } from './entities/assignment.entity';
@@ -13,23 +15,36 @@ import { Submission } from './entities/submission.entity';
 import { SubmissionAudio } from './entities/submission-audio.entity';
 import { Lesson } from '../content/entities/lesson.entity';
 import { User } from '../users/user.entity';
+import { StorageService } from '../storage/storage.service';
 import { Role } from '../common/role.enum';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
 import { ReviewSubmissionDto } from './dto/review-submission.dto';
 import { UploadedAudioFile } from './interfaces/audio-file.interface';
 
-export interface GradingDetails {
-  totalQuestions?: number;
-  correctAnswers?: number;
-  failedQuestions?: string[];
-  gradedAt?: string;
+export type {
+  GradingDetails,
+  GradingResult,
+  SubmissionAnswers,
+  ReviewedAnswers,
+} from './types/submission.types';
+import type {
+  GradingDetails,
+  GradingResult,
+  SubmissionAnswers,
+} from './types/submission.types';
+
+export interface RequestUser {
+  id: string;
+  email?: string;
+  role?: string;
   [key: string]: unknown;
 }
 
-export interface GradingResult {
-  score: number;
-  details: GradingDetails;
-}
+export type AssignmentSubmissionStatus =
+  | 'pending'
+  | 'submitted'
+  | 'graded'
+  | 'needs_revision';
 
 @Injectable()
 export class AssignmentsService {
@@ -45,6 +60,8 @@ export class AssignmentsService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(SubmissionAudio)
     private readonly submissionAudioRepository: Repository<SubmissionAudio>,
+    @Optional()
+    private readonly storageService?: StorageService,
   ) {}
 
   async getStudentsList() {
@@ -69,14 +86,14 @@ export class AssignmentsService {
       description,
       dueDate,
       attachmentUrl,
-      student: studentId ? ({ id: studentId } as any) : null,
-      teacher: teacherId ? ({ id: teacherId } as any) : null,
-      lesson: lessonId ? ({ id: lessonId } as any) : null,
+      student: studentId ? ({ id: studentId } as User) : null,
+      teacher: teacherId ? ({ id: teacherId } as User) : null,
+      lesson: lessonId ? ({ id: lessonId } as Lesson) : null,
     });
     return this.assignmentRepository.save(assignment);
   }
 
-  async findAllForUser(user: any) {
+  async findAllForUser(user: RequestUser) {
     const isStudent = user?.role?.toLowerCase() === Role.STUDENT;
 
     const assignments = await this.assignmentRepository.find({
@@ -98,7 +115,7 @@ export class AssignmentsService {
       : assignments;
 
     return filtered.map((assignment) => {
-      let status: 'pending' | 'submitted' | 'graded' | 'needs_revision' = 'pending';
+      let status: AssignmentSubmissionStatus = 'pending';
       let grade: number | null = null;
       let submissionId: string | null = null;
 
@@ -108,7 +125,7 @@ export class AssignmentsService {
           : assignment.submissions[0];
 
         if (studentSub) {
-          status = studentSub.status as any;
+          status = (studentSub.status || 'submitted') as AssignmentSubmissionStatus;
           grade = studentSub.grade ?? studentSub.score ?? null;
           submissionId = studentSub.id;
         }
@@ -132,7 +149,7 @@ export class AssignmentsService {
     });
   }
 
-  async findOneForUser(id: string, user: any) {
+  async findOneForUser(id: string, user: RequestUser) {
     const assignment = await this.assignmentRepository.findOne({
       where: { id },
       relations: {
@@ -298,7 +315,7 @@ export class AssignmentsService {
         answers: dto.answers,
         assignment: assignment || null,
         lesson: lesson || null,
-        student: { id: studentId } as any,
+        student: { id: studentId } as User,
         score,
         details,
         status: 'submitted',
@@ -328,12 +345,13 @@ export class AssignmentsService {
         });
       }
       return await executeSubmissionWrite(this.submissionRepository);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { code?: string; message?: string } | null;
       if (
-        error?.code === '23505' ||
-        (typeof error?.message === 'string' &&
-          (error.message.includes('idx_submissions_unique_student_lesson') ||
-            error.message.includes('duplicate key value violates unique constraint')))
+        err?.code === '23505' ||
+        (typeof err?.message === 'string' &&
+          (err.message.includes('idx_submissions_unique_student_lesson') ||
+            err.message.includes('duplicate key value violates unique constraint')))
       ) {
         throw new BadRequestException(
           'You have already submitted this homework. It is currently under review by your teacher.',
@@ -343,7 +361,7 @@ export class AssignmentsService {
     }
   }
 
-  normalizeAnswer(val: any): string {
+  normalizeAnswer(val: unknown): string {
     if (val === null || val === undefined) return '';
     return String(val)
       .trim()
@@ -354,7 +372,7 @@ export class AssignmentsService {
       .replace(/\.+$/, '');
   }
 
-  matchesAnswer(studentVal: any, expected: any): boolean {
+  matchesAnswer(studentVal: unknown, expected: unknown): boolean {
     const normalizedStudent = this.normalizeAnswer(studentVal);
     if (!normalizedStudent) return false;
 
@@ -372,25 +390,26 @@ export class AssignmentsService {
   public isIgnoredOrExample(
     key: string,
     item: unknown,
-    container?: Record<string, any>,
+    container?: Record<string, unknown> | object,
   ): boolean {
     if (key.startsWith('_')) {
       return true;
     }
 
     if (item && typeof item === 'object' && !Array.isArray(item)) {
-      const obj = item as Record<string, any>;
+      const obj = item as Record<string, unknown>;
       if (obj.isExample === true || obj.ignored === true) {
         return true;
       }
     }
 
-    if (container) {
+    if (container && typeof container === 'object') {
+      const record = container as Record<string, unknown>;
       const ignoredList =
-        container._ignored ||
-        container._examples ||
-        container.ignoredKeys ||
-        container.examples;
+        record._ignored ||
+        record._examples ||
+        record.ignoredKeys ||
+        record.examples;
       if (Array.isArray(ignoredList)) {
         const normKey = this.normalizeAnswer(key);
         if (ignoredList.some((k: unknown) => this.normalizeAnswer(k) === normKey)) {
@@ -405,30 +424,31 @@ export class AssignmentsService {
   /**
    * Извлекает фактическое эталонное значение ответа из примитива или объекта с метаданными
    */
-  public extractExpectedValue(val: any): any {
+  public extractExpectedValue(val: unknown): unknown {
     if (val && typeof val === 'object' && !Array.isArray(val)) {
-      if ('value' in val) return val.value;
-      if ('expected' in val) return val.expected;
-      if ('answer' in val) return val.answer;
+      const obj = val as Record<string, unknown>;
+      if ('value' in obj) return obj.value;
+      if ('expected' in obj) return obj.expected;
+      if ('answer' in obj) return obj.answer;
     }
     return val;
   }
 
   public calculateScore(
     lesson: Lesson,
-    studentAnswers: Record<string, any>,
+    studentAnswers: SubmissionAnswers,
   ): GradingResult {
     if (!lesson) {
       return { score: 0, details: {} };
     }
 
-    const answerKey = lesson.answerKey || {};
-    const answers = studentAnswers || {};
-    const flagAnswers = answers.flagAnswers || {};
-    const dialogInputs = answers.dialogInputs || {};
-    const stressTableInputs = answers.stressTableInputs || {};
-    const grammarInputs = answers.grammarInputs || {};
-    const dialogue7aInputs = answers.dialogue7aInputs || {};
+    const answerKey = (lesson.answerKey || {}) as Record<string, unknown>;
+    const answers = (studentAnswers || {}) as Record<string, unknown>;
+    const flagAnswers = (answers.flagAnswers || {}) as Record<string, unknown>;
+    const dialogInputs = (answers.dialogInputs || {}) as Record<string, unknown>;
+    const stressTableInputs = (answers.stressTableInputs || {}) as Record<string, string>;
+    const grammarInputs = (answers.grammarInputs || {}) as Record<string, unknown>;
+    const dialogue7aInputs = (answers.dialogue7aInputs || {}) as Record<string, unknown>;
 
     let totalQuestions = 0;
     let correctAnswers = 0;
@@ -555,9 +575,9 @@ export class AssignmentsService {
       if (handledLesson1AKeys.has(sectionKey) || sectionKey.startsWith('_')) continue;
 
       if (sectionValue && typeof sectionValue === 'object' && !Array.isArray(sectionValue)) {
-        const studentSection = answers[sectionKey] || {};
-        for (const [qKey, expectedVal] of Object.entries(sectionValue as Record<string, any>)) {
-          if (this.isIgnoredOrExample(qKey, expectedVal, sectionValue as Record<string, any>)) {
+        const studentSection = (answers[sectionKey] || {}) as Record<string, unknown>;
+        for (const [qKey, expectedVal] of Object.entries(sectionValue as Record<string, unknown>)) {
+          if (this.isIgnoredOrExample(qKey, expectedVal, sectionValue as Record<string, unknown>)) {
             continue;
           }
           totalQuestions++;
@@ -570,7 +590,7 @@ export class AssignmentsService {
           }
         }
       } else {
-        if (this.isIgnoredOrExample(sectionKey, sectionValue, answerKey as Record<string, any>)) {
+        if (this.isIgnoredOrExample(sectionKey, sectionValue, answerKey as Record<string, unknown>)) {
           continue;
         }
         totalQuestions++;
@@ -587,7 +607,7 @@ export class AssignmentsService {
     // Динамическая проверка exercises сущностей (если answerKey был пуст или не содержал вопросов)
     if (totalQuestions === 0 && Array.isArray(lesson.exercises) && lesson.exercises.length > 0) {
       for (const exercise of lesson.exercises) {
-        const payload = exercise.payload || {};
+        const payload = (exercise.payload || {}) as Record<string, unknown>;
         if (exercise.type === 'multiple_choice' && payload.correctAnswer) {
           totalQuestions++;
           const studentVal = answers[exercise.id] ?? answers[exercise.order];
@@ -605,8 +625,8 @@ export class AssignmentsService {
             failedQuestions.push(String(exercise.id || exercise.order));
           }
         } else if (exercise.type === 'fill_in_the_blank' && Array.isArray(payload.gaps)) {
-          const studentGaps = answers[exercise.id] || answers;
-          for (const gap of payload.gaps) {
+          const studentGaps = (answers[exercise.id] || answers) as Record<string, unknown>;
+          for (const gap of payload.gaps as Array<{ id?: string; answer?: unknown }>) {
             if (gap.id && gap.answer) {
               totalQuestions++;
               const studentVal = studentGaps[gap.id];
@@ -678,7 +698,7 @@ export class AssignmentsService {
     });
   }
 
-  assertCanAccessSubmission(user: any, submission: Submission): void {
+  assertCanAccessSubmission(user: RequestUser, submission: Submission): void {
     const role = user?.role?.toUpperCase();
     if (role === 'TUTOR') {
       return;
@@ -692,7 +712,7 @@ export class AssignmentsService {
     throw new ForbiddenException('Access denied');
   }
 
-  async getSubmissionById(id: string, user: any) {
+  async getSubmissionById(id: string, user: RequestUser) {
     let submission: Submission | null = null;
     try {
       submission = await this.submissionRepository.findOne({
@@ -708,11 +728,12 @@ export class AssignmentsService {
           audios: true,
         },
       });
-    } catch (dbErr: any) {
+    } catch (dbErr: unknown) {
       // Безопасный откат: если таблица submission_audio ещё отсутствует в БД (до синхронизации)
       // или relation audios вызывает ошибку, загружаем сущность без audios,
       // чтобы учитель и ученик не получали 500 ошибку при открытии страницы
-      this.logger.warn(`Failed to fetch submission with audios relation: ${dbErr?.message || dbErr}`);
+      const message = dbErr instanceof Error ? dbErr.message : String(dbErr);
+      this.logger.warn(`Failed to fetch submission with audios relation: ${message}`);
       submission = await this.submissionRepository.findOne({
         where: { id },
         relations: {
@@ -759,7 +780,7 @@ export class AssignmentsService {
     submissionId: string,
     exerciseKey: string,
     file: UploadedAudioFile,
-    user: any,
+    user: RequestUser,
   ) {
     const role = user?.role?.toUpperCase();
     if (role !== 'STUDENT') {
@@ -802,17 +823,29 @@ export class AssignmentsService {
       },
     });
 
+    let storageKey: string | null = null;
+    if (this.storageService?.isConfigured()) {
+      const generatedKey = `submissions/${submissionId}/${exerciseKey}.webm`;
+      storageKey = await this.storageService.uploadAudio(
+        generatedKey,
+        file.buffer,
+        file.mimetype,
+      );
+    }
+
     if (audioRecord) {
-      audioRecord.data = file.buffer;
       audioRecord.mimeType = file.mimetype;
       audioRecord.sizeBytes = file.size;
+      audioRecord.storageKey = storageKey;
+      audioRecord.data = storageKey ? null : file.buffer;
     } else {
       audioRecord = this.submissionAudioRepository.create({
         submission,
         exerciseKey,
         mimeType: file.mimetype,
         sizeBytes: file.size,
-        data: file.buffer,
+        storageKey,
+        data: storageKey ? null : file.buffer,
       });
     }
 
@@ -823,14 +856,22 @@ export class AssignmentsService {
       exerciseKey: saved.exerciseKey,
       mimeType: saved.mimeType,
       sizeBytes: saved.sizeBytes,
+      storageKey: saved.storageKey,
     };
   }
 
   async getSubmissionAudio(
     submissionId: string,
     exerciseKey: string,
-    user: any,
-  ) {
+    user: RequestUser,
+  ): Promise<{
+    id: string;
+    exerciseKey: string;
+    mimeType: string;
+    sizeBytes: number;
+    data?: Buffer | null;
+    stream?: Readable | null;
+  }> {
     const submission = await this.submissionRepository.findOne({
       where: { id: submissionId },
       relations: { student: true },
@@ -852,6 +893,7 @@ export class AssignmentsService {
         exerciseKey: true,
         mimeType: true,
         sizeBytes: true,
+        storageKey: true,
         data: true,
       },
     });
@@ -860,7 +902,35 @@ export class AssignmentsService {
       throw new NotFoundException(`Audio not found for exercise "${exerciseKey}"`);
     }
 
-    return audio;
+    if (audio.storageKey && this.storageService?.isConfigured()) {
+      try {
+        const s3Object = await this.storageService.getAudioStream(audio.storageKey);
+        return {
+          id: audio.id,
+          exerciseKey: audio.exerciseKey,
+          mimeType: s3Object.mimeType || audio.mimeType,
+          sizeBytes: s3Object.contentLength || audio.sizeBytes,
+          stream: s3Object.stream,
+          data: null,
+        };
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        this.logger.warn(`Failed to retrieve S3 audio object "${audio.storageKey}": ${msg}`);
+      }
+    }
+
+    if (audio.data) {
+      return {
+        id: audio.id,
+        exerciseKey: audio.exerciseKey,
+        mimeType: audio.mimeType,
+        sizeBytes: audio.sizeBytes,
+        data: audio.data,
+        stream: null,
+      };
+    }
+
+    throw new NotFoundException(`Audio data not found for exercise "${exerciseKey}"`);
   }
 
   async getSubmissionsByStudent(studentId: string) {
@@ -913,10 +983,19 @@ export class AssignmentsService {
   async deleteSubmission(submissionId: string) {
     const submission = await this.submissionRepository.findOne({
       where: { id: submissionId },
+      relations: { audios: true },
     });
 
     if (!submission) {
       throw new NotFoundException('Submission not found');
+    }
+
+    if (this.storageService?.isConfigured() && submission.audios?.length) {
+      for (const audio of submission.audios) {
+        if (audio.storageKey) {
+          await this.storageService.deleteAudio(audio.storageKey);
+        }
+      }
     }
 
     await this.submissionRepository.remove(submission);
@@ -968,7 +1047,7 @@ export class AssignmentsService {
       submission = this.submissionRepository.create({
         assignment,
         lesson: assignment.lesson || null,
-        student: { id: studentId } as any,
+        student: { id: studentId } as User,
         answers: { text: content },
         status: 'submitted',
       });

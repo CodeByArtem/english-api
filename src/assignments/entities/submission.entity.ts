@@ -11,6 +11,11 @@ import { Assignment } from './assignment.entity';
 import { User } from '../../users/user.entity';
 import { Lesson } from '../../content/entities/lesson.entity';
 import { SubmissionAudio } from './submission-audio.entity';
+import type {
+  GradingDetails,
+  SubmissionAnswers,
+  ReviewedAnswers,
+} from '../types/submission.types';
 
 @Entity('submissions')
 export class Submission {
@@ -18,7 +23,7 @@ export class Submission {
   id: string;
 
   @Column({ type: 'jsonb' })
-  answers: Record<string, any>;
+  answers: SubmissionAnswers;
 
   @Column({
     type: 'varchar',
@@ -33,10 +38,10 @@ export class Submission {
   score: number | null;
 
   @Column({ type: 'jsonb', nullable: true })
-  details: Record<string, any> | null;
+  details: GradingDetails | null;
 
   @Column({ type: 'jsonb', nullable: true })
-  reviewedAnswers: Record<string, any> | null;
+  reviewedAnswers: ReviewedAnswers | null;
 
   @Column({ type: 'text', nullable: true })
   tutorComment: string | null;

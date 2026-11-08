@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Unit } from './unit.entity';
 import { Exercise } from './exercise.entity';
+import type { LessonAnswerKey } from '../types/answer-key.interface';
 
 @Entity('lessons')
 export class Lesson {
@@ -30,7 +31,7 @@ export class Lesson {
   media_links: string[] | null;
 
   @Column({ type: 'jsonb', nullable: true })
-  answerKey: Record<string, any> | null;
+  answerKey: LessonAnswerKey | null;
 
   @ManyToOne(() => Unit, (unit) => unit.lessons, {
     onDelete: 'CASCADE',

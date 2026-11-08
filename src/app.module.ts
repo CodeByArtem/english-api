@@ -13,6 +13,7 @@ import { AppThrottlerGuard } from './common/guards/app-throttler.guard';
 import { getAllowedOrigins } from './common/cors.config';
 import { AssignmentsModule } from './assignments/assignments.module';
 import { InvitesModule } from './invites/invites.module';
+import { StorageModule } from './storage/storage.module';
 import { User } from './users/user.entity';
 import { Invite } from './invites/invite.entity';
 import { Textbook } from './content/entities/textbook.entity';
@@ -31,6 +32,7 @@ import { AddAnswerKeyToLessons1728055000000 } from './migrations/1728055000000-A
 import { CreateRefreshTokensTable1791486895272 } from './migrations/1791486895272-CreateRefreshTokensTable';
 import { CreateSubmissionAudioTable1792000000000 } from './migrations/1792000000000-CreateSubmissionAudioTable';
 import { AddUniqueIndexToSubmissions1792100000000 } from './migrations/1792100000000-AddUniqueIndexToSubmissions';
+import { AddStorageKeyToSubmissionAudio1792200000000 } from './migrations/1792200000000-AddStorageKeyToSubmissionAudio';
 import {
   THROTTLE_TTL,
   THROTTLE_GLOBAL_LIMIT,
@@ -45,13 +47,14 @@ const databaseMigrations = [
   CreateRefreshTokensTable1791486895272,
   CreateSubmissionAudioTable1792000000000,
   AddUniqueIndexToSubmissions1792100000000,
+  AddStorageKeyToSubmissionAudio1792200000000,
 ];
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: ['.env.local', '.env', '../.env.local', '../.env'],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -128,6 +131,7 @@ const databaseMigrations = [
     ContentModule,
     AssignmentsModule,
     InvitesModule,
+    StorageModule,
   ],
   controllers: [AppController],
   providers: [

@@ -4,6 +4,7 @@ import {
   BadRequestException,
   PayloadTooLargeException,
 } from '@nestjs/common';
+import { Readable } from 'stream';
 import { AssignmentsService } from './assignments.service';
 import { Lesson } from '../content/entities/lesson.entity';
 import { Submission } from './entities/submission.entity';
@@ -1347,6 +1348,89 @@ describe('AssignmentsService - calculateScore & Answer Checking', () => {
       const stats = await audioService.getTeacherStats();
       expect(stats[0]).not.toHaveProperty('audios');
       expect(stats[0]).not.toHaveProperty('data');
+    });
+
+    it('should upload to S3 storage when storageService is configured', async () => {
+      const studentUser = { id: 'student-owner', role: 'STUDENT' };
+      const file: UploadedAudioFile = {
+        fieldname: 'file',
+        originalname: 'test.webm',
+        encoding: '7bit',
+        mimetype: 'audio/webm',
+        size: 1024,
+        buffer: Buffer.from('s3 audio data'),
+      };
+
+      const mockStorageService = {
+        isConfigured: jest.fn().mockReturnValue(true),
+        uploadAudio: jest.fn().mockResolvedValue('submissions/sub-abc/ex_1.webm'),
+        getAudioStream: jest.fn().mockResolvedValue({
+          stream: Readable.from(['chunk1']),
+          mimeType: 'audio/webm',
+          contentLength: 1024,
+        }),
+        deleteAudio: jest.fn().mockResolvedValue(undefined),
+      };
+
+      const s3AudioService = new AssignmentsService(
+        {} as any,
+        mockSubmissionRepo,
+        {} as any,
+        {} as any,
+        mockAudioRepo,
+        mockStorageService as any,
+      );
+
+      const result = await s3AudioService.saveSubmissionAudio('sub-abc', 'ex_1', file, studentUser);
+      expect(result.storageKey).toBe('submissions/sub-abc/ex_1.webm');
+      expect(mockStorageService.uploadAudio).toHaveBeenCalledWith(
+        'submissions/sub-abc/ex_1.webm',
+        file.buffer,
+        file.mimetype,
+      );
+
+      expect(mockAudioRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          storageKey: 'submissions/sub-abc/ex_1.webm',
+          data: null,
+        }),
+      );
+    });
+
+    it('should stream from S3 when audio record has storageKey', async () => {
+      const studentUser = { id: 'student-owner', role: 'STUDENT' };
+      mockAudioRepo.findOne.mockResolvedValueOnce({
+        id: 'audio-id-s3',
+        exerciseKey: 'ex_1',
+        mimeType: 'audio/webm',
+        sizeBytes: 1024,
+        storageKey: 'submissions/sub-abc/ex_1.webm',
+        data: null,
+      });
+
+      const mockStream = Readable.from(['audio chunks']);
+      const mockStorageService = {
+        isConfigured: jest.fn().mockReturnValue(true),
+        getAudioStream: jest.fn().mockResolvedValue({
+          stream: mockStream,
+          mimeType: 'audio/webm',
+          contentLength: 1024,
+        }),
+      };
+
+      const s3AudioService = new AssignmentsService(
+        {} as any,
+        mockSubmissionRepo,
+        {} as any,
+        {} as any,
+        mockAudioRepo,
+        mockStorageService as any,
+      );
+
+      const audio = await s3AudioService.getSubmissionAudio('sub-abc', 'ex_1', studentUser);
+      expect(audio.stream).toBe(mockStream);
+      expect(audio.data).toBeNull();
+      expect(mockStorageService.getAudioStream).toHaveBeenCalledWith('submissions/sub-abc/ex_1.webm');
     });
   });
 });

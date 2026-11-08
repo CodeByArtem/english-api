@@ -6,6 +6,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Lesson } from './lesson.entity';
+import type { ExercisePayload } from '../types/exercise-payload.interface';
 
 @Entity('exercises')
 export class Exercise {
@@ -19,7 +20,7 @@ export class Exercise {
   type: string;
 
   @Column({ type: 'jsonb' })
-  payload: Record<string, any>;
+  payload: ExercisePayload;
 
   @Column({ type: 'int' })
   order: number;

@@ -31,8 +31,11 @@ export class SubmissionAudio {
   @Column({ name: 'size_bytes', type: 'int' })
   sizeBytes: number;
 
-  @Column({ type: 'bytea', select: false })
-  data: Buffer;
+  @Column({ name: 'storage_key', type: 'varchar', nullable: true })
+  storageKey: string | null;
+
+  @Column({ type: 'bytea', select: false, nullable: true })
+  data: Buffer | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

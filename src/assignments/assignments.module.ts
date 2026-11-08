@@ -8,9 +8,13 @@ import { Lesson } from '../content/entities/lesson.entity';
 import { AssignmentsService } from './assignments.service';
 import { AssignmentsController } from './assignments.controller';
 import { SubmissionsController } from './submissions.controller';
+import { StorageModule } from '../storage/storage.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Assignment, Submission, SubmissionAudio, User, Lesson])],
+  imports: [
+    TypeOrmModule.forFeature([Assignment, Submission, SubmissionAudio, User, Lesson]),
+    StorageModule,
+  ],
   controllers: [AssignmentsController, SubmissionsController],
   providers: [AssignmentsService],
   exports: [AssignmentsService],
