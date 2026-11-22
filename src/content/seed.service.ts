@@ -16,6 +16,7 @@ import {
   seedUnit7,
   seedUnit8,
   seedUnit9,
+  seedUnit10,
 } from './seeds';
 
 @Injectable()
@@ -128,6 +129,12 @@ export class SeedService implements OnApplicationBootstrap {
       9,
       textbook,
     );
+    const unit10 = await this.ensureUnit(
+      'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a21',
+      'Unit 10: Goals & Plans',
+      10,
+      textbook,
+    );
 
     // Seed Lessons & Exercises by Unit
     await seedUnit1(unit1, this.lessonRepository, this.exerciseRepository);
@@ -139,6 +146,7 @@ export class SeedService implements OnApplicationBootstrap {
     await seedUnit7(unit7, this.lessonRepository);
     await seedUnit8(unit8, this.lessonRepository);
     await seedUnit9(unit9, this.lessonRepository);
+    await seedUnit10(unit10, this.lessonRepository);
 
     // Audio Materials
     const material1 = this.materialRepository.create({
