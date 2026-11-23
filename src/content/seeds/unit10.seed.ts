@@ -310,4 +310,271 @@ export async function seedUnit10(
     },
     unit,
   });
+
+  // ----------------------------------------------------
+  // Lesson 10C: My plans
+  // ----------------------------------------------------
+  await lessonRepository.save({
+    id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd381003',
+    title: '10C My plans',
+    order: 39,
+    content: `
+      <div class="lesson-section">
+        <h3>Vocabulary: Seasons & Time Expressions</h3>
+        <p>Learn the four seasons: <em>autumn, spring, summer, winter</em> and time expressions with prepositions <em>in, on, for, next</em>.</p>
+        <h3>Listening: Holiday in New Zealand</h3>
+        <p>Listen to a conversation about holiday travel, visiting friends in Auckland, and seeing filming locations from The Lord of the Rings.</p>
+        <h3>Grammar: be going to: questions</h3>
+        <p>Learn how to form Yes/No questions and Wh- questions with <em>be going to</em> to ask people about their plans and intentions for the year.</p>
+        <h3>Pronunciation: Linking in Questions</h3>
+        <p>Notice and practice linked sounds in rapid speech: <em>What are... / going to...</em>.</p>
+        <h3>Speaking & Recording: Plans for the Year</h3>
+        <p>Prepare notes about your plans for the year (what, when, how long) and record your spoken report for the teacher using AudioAnswerRecorder.</p>
+      </div>
+    `,
+    theory: `
+      <div class="theory-section">
+        <p><strong>Goal:</strong> ask and answer about plans for the year.<br/>
+        <strong>Grammar:</strong> <em>be going to</em>: questions.<br/>
+        <strong>Vocabulary:</strong> seasons, time expressions.</p>
+
+        <h4>Seasons</h4>
+        <ul>
+          <li><strong>spring:</strong> March, April, May (flowers bloom, warmer days).</li>
+          <li><strong>summer:</strong> June, July, August (sunny, hot weather, summer holidays).</li>
+          <li><strong>autumn:</strong> September, October, November (leaves turn red and fall).</li>
+          <li><strong>winter:</strong> December, January, February (cold, snow, winter sports).</li>
+        </ul>
+
+        <h4>Time Prepositions</h4>
+        <ul>
+          <li><strong>in + season / month:</strong> <em>in the autumn, in July, in March</em></li>
+          <li><strong>on + date / day:</strong> <em>on 23rd December, on 31st December, on Sunday</em></li>
+          <li><strong>for + duration:</strong> <em>for three days, for two weeks, for a fortnight</em> (two weeks)</li>
+          <li><strong>next + time noun (no preposition):</strong> <em>next week, next month, next year</em></li>
+        </ul>
+
+        <h4>Grammar: be going to: questions</h4>
+        <table class="theory-table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Question Form</th>
+              <th>Short Answers</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Yes/No</strong></td>
+              <td><strong>Am</strong> I going to drive?<br/>
+                  <strong>Are</strong> you going to go on holiday?<br/>
+                  <strong>Is</strong> he/she/it going to be at the café?<br/>
+                  <strong>Are</strong> we/they going to visit?</td>
+              <td>+ Yes, you are. / - No, you aren't.<br/>
+                  + Yes, I am. / - No, I'm not.<br/>
+                  + Yes, he is. / - No, he isn't.<br/>
+                  + Yes, they are. / - No, they aren't.</td>
+            </tr>
+            <tr>
+              <td><strong>Wh- questions</strong></td>
+              <td><strong>Question word</strong> + be + subject + <strong>going to</strong> + verb?<br/>
+                  <em>When are you going to go?<br/>What are you going to do there?<br/>Where are you going to take them?</em></td>
+              <td>Specific information: <em>In August. / We're going to visit friends.</em></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    `,
+    answerKey: {
+      exercise_1a_seasons: {
+        a: ['winter', 'Winter'],
+        b: ['spring', 'Spring'],
+        c: ['autumn', 'Autumn'],
+        d: ['summer', 'Summer'],
+      },
+      exercise_2_calendar: {
+        '2': ['7', 'seven'],
+        '3': ['take Jake to summer school', 'send Jake to summer school'],
+        '4': ['4', 'four'],
+        '5': ["Olga's mother", "olga's mother", 'Olgas mother'],
+        '6': ['December', 'december'],
+      },
+      exercise_3a_prepositions: {
+        '1': ['in', 'In'],
+        '2': ['In', 'in'],
+        '3': ['Next', 'next', 'This', 'this'],
+        '4': ['on', 'On'],
+        '5': ['for', 'For'],
+      },
+      exercise_5_listening: {
+        '1': ['c', 'C', 'New Zealand'],
+        '2': ['a', 'A', "He isn't going to go on holiday."],
+      },
+      exercise_6_matching: {
+        '1': ['d', 'D', 'Yes, we are.'],
+        '2': ['c', 'C', 'In August.'],
+        '3': ['b', 'B', "My friend lives in Auckland, so we're going to visit him."],
+        '4': ['a', 'A', 'Yes, they are.'],
+      },
+      exercise_7_grammar: {
+        '1': ['Are', 'are'],
+        '2': ["I'm not", 'am not', 'm not'],
+        '3': ['Are', 'are'],
+        '4': ['are'],
+        '5': ['are'],
+        '6': ['to'],
+      },
+      exercise_9_add_word: {
+        '2': ['are', 'Are'],
+        '3': ['Is', 'is'],
+        '4': ['What', 'what', 'Where', 'where'],
+        '5': ['going'],
+        '6': ['are', 'Are'],
+        '7': ['to'],
+        '8': ['Are', 'are'],
+      },
+      exercise_10a_prompts: {
+        '2': ['Where are you going to go next weekend?', 'where are you going to go next weekend'],
+        '3': ['Are you going to study on Sunday?', 'are you going to study on Sunday'],
+        '4': ['When are you going to go on holiday?', 'when are you going to go on holiday'],
+        '5': ['Who are you going to have dinner with on Saturday?', 'who are you going to have dinner with on Saturday'],
+        '6': ['Are you going to take a trip next month?', 'are you going to take a trip next month'],
+      },
+    },
+    unit,
+  });
+
+  // ----------------------------------------------------
+  // Lesson 10D: English in action
+  // ----------------------------------------------------
+  await lessonRepository.save({
+    id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd381004',
+    title: '10D English in action',
+    order: 40,
+    content: `
+      <div class="lesson-section">
+        <h3>Social English: Invitations</h3>
+        <p>Learn how to make friendly invitations (<em>Would you like to come / have dinner with us / join me?</em>) and respond politely (<em>I'd love to, thanks / That would be great / Sorry, I can't, because...</em>).</p>
+        <h3>Listening: Three Weekend Invitations</h3>
+        <p>Listen to conversations matching lunch at Green Cafe, dinner at a friend's house, and a movie at the cinema.</p>
+        <h3>Check and Reflect: Unit 10 Review</h3>
+        <p>Consolidate your mastery of collocations, would like/love to, party vocabulary anagrams, be going to future plans, common mistake corrections, and question building.</p>
+      </div>
+    `,
+    theory: `
+      <div class="theory-section">
+        <p><strong>Goal:</strong> make and respond to invitations.<br/>
+        <strong>Language:</strong> polite invitation phrases.</p>
+
+        <h4>Useful Phrases</h4>
+        <div class="vocab-grid">
+          <div>
+            <h5>Making invitations</h5>
+            <ul>
+              <li><strong>Would you like to come?</strong></li>
+              <li><strong>Would you like to have dinner with us?</strong></li>
+              <li><strong>Would you like to come with me?</strong></li>
+              <li><strong>Would you like to come with us?</strong></li>
+            </ul>
+          </div>
+          <div>
+            <h5>Responding to invitations</h5>
+            <ul>
+              <li><strong>I'd love to, thanks.</strong> (Saying yes enthusiastically)</li>
+              <li><strong>That would be great.</strong> (Saying yes)</li>
+              <li><strong>Sorry, I can't, because I work on Saturdays.</strong> (Polite refusal with reason)</li>
+              <li><strong>Thank you, but I can't, because I'm going to have dinner with my parents.</strong></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    `,
+    answerKey: {
+      exercise_1b_conversations: {
+        '1': ['c', 'C', 'Photo C'],
+        '2': ['b', 'B', 'Photo B'],
+        '3': ['a', 'A', 'Photo A'],
+      },
+      exercise_1c_questions: {
+        '1': ['the Green Cafe', 'Green Cafe', 'a cafe', 'the green cafe'],
+        '2': ['have dinner', 'go to a dinner party', 'dinner party', 'have a dinner party', 'dinner'],
+        '3': ['6.30', '6:30', 'at 6.30', 'at 6:30'],
+      },
+      exercise_2a_phrases: {
+        '1': ['2'],
+        '2': ['not used', 'not_used', 'none'],
+        '3': ['3'],
+        '4': ['1'],
+        '5': ['2'],
+        '6': ['3'],
+        '7': ['1'],
+        '8': ['not used', 'not_used', 'none'],
+      },
+      exercise_3a_conversation: {
+        '1': ['Would you like to come', 'would you like to come'],
+        '2': ["I can't, because", "I can't because", "i can't, because"],
+        '3': ['Would you', 'would you'],
+        '4': ['like'],
+        '5': ['would be', 'would be great'],
+      },
+      exercise_cr1_verbs: {
+        '1': ['change', 'Change'],
+        '2': ['sold', 'Sold'],
+        '3': ['make', 'Make'],
+        '4': ['joined', 'Joined'],
+        '5': ['started', 'Started'],
+        '6': ['have', 'Have'],
+        '7': ['build', 'Build'],
+        '8': ['move', 'Move'],
+      },
+      exercise_cr2a_alternatives: {
+        '1': ['see'],
+        '2': ['like'],
+        '3': ['Would you like'],
+        '4': ["I'd", "I'd love"],
+        '5': ['would'],
+        '6': ["wouldn't like"],
+        '7': ['next'],
+        '8': ['to talk'],
+      },
+      exercise_cr3_anagrams: {
+        '1': ['play games', 'Play games'],
+        '2': ['listen to music', 'Listen to music'],
+        '3': ['dance', 'Dance'],
+        '4': ['sandwiches', 'Sandwiches'],
+        '5': ['talk to friends', 'Talk to friends'],
+        '6': ['snacks', 'Snacks'],
+        '7': ['drinks', 'Drinks'],
+        '8': ['a dessert', 'A dessert', 'dessert'],
+        '9': ['sing songs', 'Sing songs'],
+        '10': ['salad', 'Salad'],
+        '11': ['fruit', 'Fruit'],
+      },
+      exercise_cr4_going_to: {
+        '1': ["I'm going to", 'am going to', "I am going to"],
+        '2': ['are going to', "'re going to"],
+        '3': ["I'm going to", 'am going to', "I am going to"],
+        '4': ["'re going to", 'are going to', "We're going to"],
+        '5': ["I'm going to", 'am going to'],
+        '6': ["aren't going to", "are not going to", "'re not going to"],
+      },
+      exercise_cr5_mistakes: {
+        '1': ['in May', 'In May'],
+        '3': ['Next year', 'next year'],
+        '4': ['On 25th September', 'on 25th September', 'on 25th september'],
+        '7': ['In July', 'in July', 'in july'],
+        '10': ['What are you going to do', 'what are you going to do'],
+      },
+      exercise_cr6a_questions: {
+        '2': ['Where are you going to have lunch today?', 'where are you going to have lunch today?'],
+        '3': ['What time is this train going to arrive?', 'what time is this train going to arrive?'],
+        '4': ['Who is Tim going to visit next month?', 'who is Tim going to visit next month?'],
+        '5': ['Is Fred going to change his job?', 'is Fred going to change his job?'],
+        '6': ['Are we going to take a taxi next week?', 'are we going to take a taxi next week?'],
+        '7': ['Are you going to finish early on Friday?', 'are you going to finish early on Friday?'],
+        '8': ['Where are you going to buy your new phone?', 'where are you going to buy your new phone?'],
+      },
+    },
+    unit,
+  });
 }
